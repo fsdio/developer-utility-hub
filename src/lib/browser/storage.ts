@@ -1,6 +1,8 @@
 /**
  * Wrapper localStorage: gagal secara senyap dan jatuh ke memori.
  * Hanya preferensi yang boleh lewat sini — TIDAK PERNAH isi input (PRD §3).
+ * `recentTools` hanya menyimpan id tool publik (bukan judul/nama file), sehingga
+ * tidak dapat mengungkap isi pekerjaan pengguna.
  */
 
 export const PREFERENCE_KEYS = {
@@ -9,6 +11,7 @@ export const PREFERENCE_KEYS = {
   jsonIndent: "duh:v1:json-formatter:indent",
   xmlOptions: "duh:v1:xml-formatter:options",
   textDiffOptions: "duh:v1:text-diff:options",
+  recentTools: "duh:v1:recent-tools",
 } as const;
 
 export type PreferenceKey = (typeof PREFERENCE_KEYS)[keyof typeof PREFERENCE_KEYS];

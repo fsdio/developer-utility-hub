@@ -39,15 +39,38 @@
   --space-7: 48px;
   --space-8: 64px;
 
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
+  /* Skala radius: kartu dan panel memakai --radius-lg agar tidak terasa kaku. */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  /* Permukaan: membedakan kartu dari latar halaman tanpa garis tebal. */
+  --surface-hover: #f4f4f1;
+  --surface-active: #ecebe6;
+  --focus-ring: 0 0 0 3px rgb(37 99 235 / 0.35);
+
+  /* Diff: latar + gutter + penanda tepi, dipakai baris dan word-level. */
+  --added-gutter: #d3f2df;
+  --added-edge: #2f9e60;
+  --added-mark: #b6ebc9;
+  --removed-gutter: #fbdcdc;
+  --removed-edge: #d1453b;
+  --removed-mark: #f8c3c3;
+  --changed-gutter: #fbeec2;
+  --changed-edge: #b7791f;
+  --changed-mark: #f6e0a3;
 
   --shadow-1: 0 4px 16px rgb(0 0 0 / 0.12);
+  --shadow-2: 0 1px 2px rgb(0 0 0 / 0.05), 0 8px 24px rgb(0 0 0 / 0.07);
+  --shadow-3: 0 2px 4px rgb(0 0 0 / 0.06), 0 16px 40px rgb(0 0 0 / 0.1);
 
   --header-h: 56px;
   --container-max: 1180px;
   --panel-min-h: 240px;
+  --panel-radius: var(--radius-lg);
 
   --motion: 120ms ease-out;
 }
@@ -71,7 +94,24 @@
   --changed-fg: #e8c97a;
   --danger: #f97066;
   --success: #4ade80;
+
+  --surface-hover: #1c222b;
+  --surface-active: #232a34;
+  --focus-ring: 0 0 0 3px rgb(110 168 254 / 0.45);
+
+  --added-gutter: #143525;
+  --added-edge: #3fbf74;
+  --added-mark: #1d4a31;
+  --removed-gutter: #3f1a1d;
+  --removed-edge: #e5645c;
+  --removed-mark: #522025;
+  --changed-gutter: #3a2e12;
+  --changed-edge: #d8a33f;
+  --changed-mark: #4d3d18;
+
   --shadow-1: 0 4px 16px rgb(0 0 0 / 0.5);
+  --shadow-2: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.45);
+  --shadow-3: 0 2px 4px rgb(0 0 0 / 0.45), 0 16px 40px rgb(0 0 0 / 0.55);
 }
 
 @media (prefers-reduced-motion: reduce) {

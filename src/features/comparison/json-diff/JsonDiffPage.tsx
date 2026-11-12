@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { ToolLayout } from "@/components/editor/ToolLayout";
 import { Panel } from "@/components/editor/Panel";
+import { DiffSummary } from "@/components/editor/DiffSummary";
 import { CodeArea } from "@/components/editor/CodeArea";
 import { CopyButton } from "@/components/common/CopyButton";
 import { DownloadButton } from "@/components/common/DownloadButton";
@@ -117,12 +118,12 @@ export default function JsonDiffPage() {
           <ErrorMessage error={result.error} />
         ) : result?.ok ? (
           <>
-            <p className="diff-summary" aria-live="polite">
-              <span>+{result.value.added} ditambah</span>
-              <span>-{result.value.removed} dihapus</span>
-              <span>~{result.value.changed} diubah</span>
-              {result.value.identical ? <span>Kedua dokumen identik secara struktur.</span> : null}
-            </p>
+            <DiffSummary
+              added={result.value.added}
+              removed={result.value.removed}
+              modified={result.value.changed}
+              note={result.value.identical ? "Kedua dokumen identik secara struktur." : undefined}
+            />
 
             {result.value.identical ? null : view === "patch" ? (
               <>

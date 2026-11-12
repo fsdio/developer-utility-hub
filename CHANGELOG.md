@@ -5,6 +5,32 @@ dan [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Unreleased]
 
+### Changed — refresh visual & UX (ADR-0010)
+
+- **Kartu dan panel membulat** dengan skala radius baru (12/16/20 px); kartu katalog
+  memakai `--radius-xl` + `--shadow-2`, bukan sudut 10 px yang terasa kaku.
+- **Hierarki empat tingkat permukaan**: latar halaman → kartu katalog (dengan kicker
+  aksen) → panel kerja (dengan header berlabel) → kotak informasi (`bg-sunken`,
+  garis tepi kiri). Tidak lagi "semua kotak sama".
+- **Diff bergaya `git diff`**: nomor baris kiri/kanan, penanda `+`/`−`/`~`, tepi
+  berwarna tegas, gutter bernomor, sorotan karakter, ringkasan berupa pill, dan
+  legenda warna. Warna selalu berpasangan dengan teks, tidak berdiri sendiri.
+- **Color Converter memilih warna, bukan mengetik**: pemilih warna native 84 px,
+  swatch preset 24 px, dan tiap baris hasil punya tombol salin + pemilih warna mini.
+- **Beranda lebih cepat dipakai**: pintasan "Paling sering dipakai", pencarian
+  katalog, bagian "Terakhir kamu buka" (maks 6 id tool), filter berlabel jumlah.
+- **Navigasi antar tool**: halaman tool menampilkan tool lain di kategori yang sama.
+
+### Fixed
+
+- Teks hero menyebut "Lima tool inti" padahal registry sudah 15 tool.
+- Tombol salin di baris hasil warna punya nama aksesibel yang sama; kini tiap
+  tombol menyebut konteksnya ("Salin nilai HEX ke clipboard").
+- Lint: komentar `eslint-disable` untuk aturan `react-hooks/exhaustive-deps` yang
+  tidak terpasang, diganti pola `useRef` agar tetap benar tanpa mematikan aturan.
+
+## [Unreleased]
+
 ### Added — Phase 5 (kategori `utilities`, ADR-0007)
 
 - 9 tool baru, tanpa dependency tambahan:

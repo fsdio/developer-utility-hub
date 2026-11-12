@@ -7,6 +7,18 @@ const KIND_LABEL: Record<DiffLine["kind"], string> = {
   modified: "diubah",
 };
 
+const SIGN: Record<DiffLine["kind"], string> = {
+  unchanged: " ",
+  added: "+",
+  removed: "−",
+  modified: "~",
+};
+
+/**
+ * Diff bergaya `git diff` (docs/ui-specification.md §5).
+ * Warna tidak pernah menjadi satu-satunya penanda: setiap baris juga punya
+ * tombol +/−/~ dan teks tersembunyi untuk pembaca layar.
+ */
 interface DiffViewProps {
   lines: DiffLine[];
 }
@@ -21,13 +33,16 @@ export function DiffView({ lines }: DiffViewProps) {
           className={`diff-row diff-row--${line.kind}`}
         >
           <span className="diff-gutter" aria-hidden="true">
-            {line.leftNumber ?? ""}·{line.rightNumber ?? ""}
+            {line.leftNumber ?? ""}
           </span>
-          <span role="cell">
+          <span className="diff-gutter" aria-hidden="true">
+            {line.rightNumber ?? ""}
+          </span>
+          <span className="diff-sign" aria-hidden="true">
+            {SIGN[line.kind]}
+          </span>
+          <span role="cell" className="diff-text">
             <span className="sr-only">{KIND_LABEL[line.kind]}: </span>
-            <span aria-hidden="true">
-              {line.kind === "added" ? "+" : line.kind === "removed" ? "-" : line.kind === "modified" ? "~" : " "}
-            </span>
             {line.kind === "modified" && line.segments ? (
               line.segments.map((segment, segmentIndex) =>
                 segment.changed ? (

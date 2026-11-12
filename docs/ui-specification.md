@@ -34,6 +34,11 @@ Tidak ada nilai warna/spacing hard-coded di komponen.
 | `--danger` | `#b42318` | `#f97066` | error |
 | `--success` | `#067647` | `#4ade80` | status copy berhasil |
 
+Token tambahan (ADR-0010): `--surface-hover`, `--surface-active`, `--focus-ring`,
+`--added/removed/changed-gutter`, `--added/removed/changed-edge`,
+`--added/removed/changed-mark`, `--shadow-2`, `--shadow-3`, serta skala radius
+`--radius-xs` 6 / `--sm` 8 / `--md` 12 / `--lg` 16 / `--xl` 20 / `--pill` 999.
+
 Kontras minimum: 4.5:1 untuk teks normal, 3:1 untuk teks ≥18,66 px bold / ≥24 px
 dan untuk batas komponen (WCAG 2.2 AA). Pasangan di atas dipilih agar lolos di
 kedua tema; nilai diuji dengan `scripts/check-contrast.mjs` (bagian dari CI).
