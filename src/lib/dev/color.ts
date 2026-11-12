@@ -168,6 +168,14 @@ export function hslToRgb({ h, s, l }: Hsl): Rgb {
   };
 }
 
+/**
+ * HEX 6 digit tanpa alpha untuk `<input type="color">`, yang tidak menerima
+ * alpha. Alpha tetap disimpan di hasil konversi dan ditampilkan terpisah.
+ */
+export function hexForColorInput({ r, g, b }: Rgb): string {
+  return rgbToHex({ r, g, b, a: 1 }).slice(0, 7);
+}
+
 export interface ColorConversion {
   hex: string;
   rgb: string;

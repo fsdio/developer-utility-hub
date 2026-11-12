@@ -79,10 +79,24 @@ halaman, tanpa dependency baru.
 | 5.9 | Number Base Converter (BigInt) | `lib/dev/number-base.ts` | S | ✅ |
 | 5.10 | JWT Decoder (decode saja, peringatan 3 lapis) | `lib/dev/jwt.ts` | M | ✅ |
 
-Gate tambahan yang dijalankan: registry-load test (semua 14 `load()` dirender),
+Gate tambahan yang dijalankan: registry-load test (semua 15 `load()` dirender),
 axe a11y untuk semua halaman, dan audit privasi diperluas ke tool Phase 5.
 
-## Backlog ekspansi berikutnya (Phase 6+) — belum dijadwalkan
+## Phase 6 — Polish UX (ADR-0010) — SELESAI
+
+Umpan balik pemakaian: kartu terlalu kaku, semua permukaan terasa sama, diff sulit
+dipindai, dan Color Converter masih berbasis form teks.
+
+| # | Item | Modul | Ukuran | Status |
+|---|---|---|---|---|
+| 6.1 | Refresh visual: skala radius, hierarki permukaan, diff bergaya git | `styles/base.css`, `DiffView`, `DiffSummary` | M | ✅ |
+| 6.2 | Color Converter: pemilih warna native + salin per baris | `features/utilities/color` | S | ✅ |
+| 6.3 | Beranda: quick picks, pencarian katalog, riwayat tool | `features/home`, `hooks/useRecentTools` | M | ✅ |
+| 6.4 | Navigasi antar tool di halaman tool | `components/editor/ToolLayout` | S | ✅ |
+
+Gate: 327 test, bundle 80,9 KB gzip, kontras AA termasuk token diff baru.
+
+## Backlog ekspansi berikutnya (Phase 7+) — belum dijadwalkan
 
 | Item | Catatan |
 |---|---|

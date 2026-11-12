@@ -5,6 +5,13 @@ interface CopyButtonProps {
   text: string;
   label?: string;
   disabled?: boolean;
+  /** Tombol rapat tanpa teks label — untuk baris hasil yang padat. */
+  compact?: boolean;
+  /**
+   * Konteks tambahan untuk nama aksesibel, mis. "nilai HEX". Wajib ketika
+   * beberapa CopyButton tampil berjajar agar pembaca layar bisa membedakan.
+   */
+  context?: string;
 }
 
 const FEEDBACK: Record<"idle" | "copied" | "fallback" | "failed", string> = {
@@ -14,15 +21,26 @@ const FEEDBACK: Record<"idle" | "copied" | "fallback" | "failed", string> = {
   failed: "Gagal menyalin",
 };
 
-export function CopyButton({ text, label = "Copy", disabled }: CopyButtonProps) {
+export function CopyButton({
+  text,
+  label = "Copy",
+  disabled,
+  compact,
+  context,
+}: CopyButtonProps) {
   const { status, copy } = useCopy();
   const failed = status === "failed";
   return (
     <>
       <Button
+        className={compact ? "button--compact" : undefined}
         onClick={() => void copy(text)}
         disabled={disabled ?? text === ""}
-        aria-label={failed ? "Gagal menyalin. Pilih teks lalu tekan Ctrl+C." : `${label} ke clipboard`}
+        aria-label={
+          failed
+            ? `Gagal menyalin${context ? ` ${context}` : ""}. Pilih teks lalu tekan Ctrl+C.`
+            : `Salin ${context ?? label} ke clipboard`
+        }
       >
         {failed ? FEEDBACK.failed : status === "idle" ? label : FEEDBACK[status]}
       </Button>

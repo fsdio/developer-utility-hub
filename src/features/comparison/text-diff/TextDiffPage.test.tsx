@@ -19,7 +19,7 @@ describe("TextDiffPage", () => {
     await user.click(screen.getByRole("textbox", { name: "Teks modified" }));
     await user.paste("a\nc\nd");
 
-    await waitFor(() => expect(screen.getByText(/ditambah/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/^\+2 ditambah$/)).toBeInTheDocument());
     expect(screen.getByRole("table", { name: "Hasil perbandingan" })).toBeInTheDocument();
   });
 

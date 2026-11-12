@@ -68,7 +68,7 @@ describe("audit privasi", () => {
     await user.paste(SECRET);
     await user.click(screen.getByRole("textbox", { name: "Teks modified" }));
     await user.paste(`${SECRET}-berubah`);
-    await waitFor(() => expect(screen.getByText(/ditambah/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/ditambah$/)).toBeInTheDocument());
     expectNoSecret();
   });
 
@@ -104,6 +104,20 @@ describe("audit privasi", () => {
     const storageDump = allStorageValues().join("|");
     expect(storageDump).not.toContain(firstUuid);
     expect(window.location.hash).not.toContain(firstUuid);
+  });
+
+  it("riwayat tool hanya menyimpan id tool, bukan isi input", async () => {
+    const user = userEvent.setup();
+    renderWithTheme(<JsonFormatterPage />);
+    await user.click(screen.getByRole("textbox", { name: "JSON sumber" }));
+    await user.paste(`{"kunci":"${SECRET}"}`);
+    await screen.findAllByText(/kunci/);
+
+    const stored = localStorage.getItem(PREFERENCE_KEYS.recentTools);
+    expect(stored).not.toBeNull();
+    expect(stored).toContain("json-formatter");
+    expect(stored).not.toContain(SECRET);
+    expect(stored).not.toContain("kunci");
   });
 
   it("preferensi yang disimpan hanya kunci tampilan yang terdaftar", async () => {

@@ -3,6 +3,7 @@ import { ToolLayout } from "@/components/editor/ToolLayout";
 import { Panel } from "@/components/editor/Panel";
 import { CodeArea } from "@/components/editor/CodeArea";
 import { DiffView } from "@/components/editor/DiffView";
+import { DiffLegend, DiffSummary } from "@/components/editor/DiffSummary";
 import { CopyButton } from "@/components/common/CopyButton";
 import { DownloadButton } from "@/components/common/DownloadButton";
 import { ResetButton } from "@/components/common/ResetButton";
@@ -167,12 +168,13 @@ export default function TextDiffPage() {
           </EmptyState>
         ) : result ? (
           <>
-            <p className="diff-summary" aria-live="polite">
-              <span>+{result.added} ditambah</span>
-              <span>-{result.removed} dihapus</span>
-              <span>~{result.modified} diubah</span>
-              {result.identical ? <span>Kedua teks identik.</span> : null}
-            </p>
+            <DiffSummary
+              added={result.added}
+              removed={result.removed}
+              modified={result.modified}
+              note={result.identical ? "Kedua teks identik." : undefined}
+            />
+            <DiffLegend />
             <DiffView lines={result.lines} />
           </>
         ) : null}

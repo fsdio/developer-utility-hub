@@ -56,6 +56,19 @@ const PAIRS = [
   ["removed-fg", "removed-bg", 4.5],
   ["changed-fg", "changed-bg", 4.5],
   ["danger", "bg-raised", 4.5],
+  // Diff bergaya git: teks baris di atas gutter berwarna dan sorotan karakter.
+  ["added-fg", "added-gutter", 4.5],
+  ["removed-fg", "removed-gutter", 4.5],
+  ["changed-fg", "changed-gutter", 4.5],
+  ["added-fg", "added-mark", 4.5],
+  ["removed-fg", "removed-mark", 4.5],
+  ["changed-fg", "changed-mark", 4.5],
+  // Nomor baris dan teks sekunder di atas permukaan kartu yang di-hover.
+  ["fg-muted", "surface-hover", 4.5],
+  ["fg-muted", "surface-active", 4.5],
+  // Kicker kartu & tautan aksen di atas permukaan kartu.
+  ["accent", "bg-raised", 4.5],
+  ["accent", "bg-sunken", 4.5],
 ];
 
 let failures = 0;
