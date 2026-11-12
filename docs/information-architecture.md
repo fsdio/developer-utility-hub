@@ -15,8 +15,10 @@ Developer Utility Hub
 │   └── Grup kategori
 │       ├── Text            → Case Converter
 │       ├── Formatter       → JSON Formatter, XML Formatter
-│       └── Diff            → Text Diff, JSON Diff
-├── Halaman tool (5)
+│       ├── Diff            → Text Diff, JSON Diff
+│       └── Utilities       → Base64, URL Encoder, HTML Entity, Escape,
+│                             UUID, Hash, Timestamp, Color, Number Base
+├── Halaman tool (14)
 ├── Community
 │   ├── Suggest a Feature   → GitHub Issue (template feature_request)
 │   └── Report a Bug        → GitHub Issue (template bug_report)
@@ -28,9 +30,10 @@ Developer Utility Hub
     └── Catatan keterbatasan
 ```
 
-Kategori blueprint §5 menyebut "Encoder/Utilities" — kategori itu **belum punya
-anggota di MVP**, jadi tidak dirender (menu kosong menyesatkan). Kategori akan
-muncul otomatis saat tool pertamanya didaftarkan di registry.
+Kategori blueprint §5 menyebut "Encoder/Utilities". Pada MVP kategori itu kosong
+sehingga tidak dirender (menu kosong menyesatkan). Setelah Phase 5 (ADR-0007)
+kategori `utilities` berisi 9 tool dan muncul otomatis — perilaku ini memang
+dirancang: kategori hanya dirender bila punya anggota.
 
 ## 2. Registry sebagai sumber tunggal
 
@@ -41,7 +44,7 @@ Semua metadata tool hidup di `src/registry/tools.ts`:
 | `id` | string (slug) | route, test id, localStorage key |
 | `name` | string | kartu katalog, header tool, `<title>` |
 | `description` | string (1 kalimat) | kartu, meta description |
-| `category` | `"text" \| "formatter" \| "diff" \| "utilities"` | grup katalog, navigasi |
+| `category` | `"text" \| "formatter" \| "diff" \| "utilities"` | grup katalog, navigasi, filter beranda |
 | `keywords` | string[] | pencarian |
 | `route` | string (hash) | router |
 | `limitations` | string[] | catatan di halaman tool |
@@ -61,6 +64,15 @@ Tidak ada daftar tool kedua di tempat lain.
 | `#/tools/xml-formatter` | XML Formatter |
 | `#/tools/text-diff` | Text Diff |
 | `#/tools/json-diff` | JSON Diff |
+| `#/tools/base64` | Base64 Encode / Decode |
+| `#/tools/url-encoder` | URL Encode / Decode |
+| `#/tools/html-entity` | HTML Entity Encode / Decode |
+| `#/tools/escape` | String Escape / Unescape |
+| `#/tools/uuid` | UUID Generator |
+| `#/tools/hash` | Hash Generator (SHA) |
+| `#/tools/timestamp` | Unix Timestamp Converter |
+| `#/tools/color` | Color Converter |
+| `#/tools/number-base` | Number Base Converter |
 | `#/tools/<tidak-dikenal>` | 404 |
 | `#/community` | Community |
 | `#/privacy` | Privacy |

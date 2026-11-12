@@ -6,6 +6,10 @@ import CaseConverterPage from "@/features/text/case-converter/CaseConverterPage"
 import JsonFormatterPage from "@/features/data/json-formatter/JsonFormatterPage";
 import TextDiffPage from "@/features/comparison/text-diff/TextDiffPage";
 import { PREFERENCE_KEYS } from "@/lib/browser/storage";
+import Base64Page from "@/features/utilities/base64/Base64Page";
+import TimestampPage from "@/features/utilities/timestamp/TimestampPage";
+import UuidPage from "@/features/utilities/uuid/UuidPage";
+import ColorPage from "@/features/utilities/color/ColorPage";
 
 /**
  * Audit privasi (technical-design §11): isi input tidak boleh masuk ke
@@ -24,6 +28,12 @@ const allStorageValues = (): string[] => {
     return values;
   };
   return [...collect(localStorage), ...collect(sessionStorage)];
+};
+
+const expectAllStorageClean = (): void => {
+  for (const value of allStorageValues()) {
+    expect(value).not.toMatch(/1700000000|#2563eb/);
+  }
 };
 
 const expectNoSecret = (): void => {
@@ -60,6 +70,40 @@ describe("audit privasi", () => {
     await user.paste(`${SECRET}-berubah`);
     await waitFor(() => expect(screen.getByText(/ditambah/)).toBeInTheDocument());
     expectNoSecret();
+  });
+
+  it("tool Phase 5 tidak menyimpan isi input", async () => {
+    const user = userEvent.setup();
+    const { unmount } = renderWithTheme(<Base64Page />);
+    await user.click(screen.getByRole("textbox", { name: /akan di-encode/i }));
+    await user.paste(SECRET);
+    await waitFor(() => expect(document.querySelector(".output-area")).not.toBeNull());
+    expectNoSecret();
+    unmount();
+
+    const timestamp = renderWithTheme(<TimestampPage />);
+    await user.click(screen.getByRole("textbox"));
+    await user.paste("1700000000");
+    await waitFor(() => expect(screen.getByText("2023-11-14T22:13:20.000Z")).toBeInTheDocument());
+    expectAllStorageClean();
+    timestamp.unmount();
+
+    renderWithTheme(<ColorPage />);
+    await user.click(screen.getByRole("textbox"));
+    await user.paste("#2563eb");
+    await waitFor(() => expect(document.querySelector(".swatch")).not.toBeNull());
+    expectAllStorageClean();
+  });
+
+  it("UUID generator tidak menyimpan UUID yang dihasilkan", async () => {
+    renderWithTheme(<UuidPage />);
+    const codes = await screen.findAllByText(/^[0-9a-f-]{36}$/);
+    const firstUuid = codes[0]?.textContent ?? "";
+    expect(firstUuid.length).toBe(36);
+
+    const storageDump = allStorageValues().join("|");
+    expect(storageDump).not.toContain(firstUuid);
+    expect(window.location.hash).not.toContain(firstUuid);
   });
 
   it("preferensi yang disimpan hanya kunci tampilan yang terdaftar", async () => {

@@ -61,20 +61,37 @@
 | 4.5 | Deploy workflow GitHub Pages + `.nojekyll` + `404.html` | M | ✅ | Job deploy hanya dari `main` |
 | 4.6 | Lisensi MIT tercatat di README & footer | XS | ✅ | Sesuai ADR/blueprint v2 |
 
-## Backlog ekspansi (Phase 5) — belum dijadwalkan
+## Epic 5 — Expansion (Phase 5) — SELESAI
+
+Keputusan cakupan: ADR-0007. Semua item di bawah punya engine murni + test +
+halaman, tanpa dependency baru.
+
+| # | Tool | Engine | Est | Status |
+|---|---|---|---|---|
+| 5.1 | Base64 Encode/Decode (+ URL-safe, wrap 76) | `lib/encoding/base64.ts` | M | ✅ |
+| 5.2 | URL Encode/Decode (+ mode form, `+`→spasi) | `lib/encoding/url.ts` | S | ✅ |
+| 5.3 | HTML Entity Encode/Decode (named + numerik, tanpa DOM) | `lib/encoding/html-entity.ts` | M | ✅ |
+| 5.4 | String Escape/Unescape (JSON/JS/HTML/SQL/XML) | `lib/encoding/escape.ts` | M | ✅ |
+| 5.5 | UUID Generator v4 & v7 (Web Crypto, time-ordered) | `lib/dev/uuid.ts` | M | ✅ |
+| 5.6 | Hash Generator SHA-256/512/1 (hex + base64) | `lib/dev/hash.ts` | M | ✅ |
+| 5.7 | Unix Timestamp Converter (UTC + lokal, relatif) | `lib/dev/timestamp.ts` | M | ✅ |
+| 5.8 | Color Converter HEX/RGB/HSL + pratinjau | `lib/dev/color.ts` | M | ✅ |
+| 5.9 | Number Base Converter (BigInt) | `lib/dev/number-base.ts` | S | ✅ |
+
+Gate tambahan yang dijalankan: registry-load test (semua 14 `load()` dirender),
+axe a11y untuk semua halaman, dan audit privasi diperluas ke tool Phase 5.
+
+## Backlog ekspansi berikutnya (Phase 6+) — belum dijadwalkan
 
 | Item | Catatan |
 |---|---|
-| Base64 encoder/decoder | Label "encoding bukan enkripsi"; dukung UTF-8 dengan `TextEncoder` |
-| URL encoder/decoder | `encodeURIComponent`, jelaskan perbedaan `+` vs `%20` |
-| UUID generator | `crypto.randomUUID()` + fallback `crypto.getRandomValues` |
-| Hash generator (SHA-256/512) | Web Crypto; butuh secure context (HTTPS Pages: aman) |
-| Unix timestamp converter | Zona waktu lokal + UTC eksplisit |
-| String escape/unescape (JSON, JS, HTML, SQL, XML) + Base64→file | Murni string |
-| Regex tester | Butuh mitigasi ReDoS (ADR terpisah: timeout/isolasi) |
-| SQL formatter | Dependency besar; evaluasi ulang |
-| Color & number converter | Kecil, kandidat cepat |
-| JWT decoder | Wajib banner "bukan verifikasi signature" |
+| Regex tester | **Ditunda** — ADR-0008: butuh Web Worker + terminasi, bukan `setTimeout` |
+| SQL formatter | **Ditunda** — hanya realistis dengan parser/dialek; dependency besar |
+| JWT decoder | **Ditunda** — butuh desain microcopy agar tidak disalahartikan sebagai verifikasi |
+| XML Diff | **Ditunda** — tentukan tekstual vs struktural lebih dulu (semangat ADR-0004) |
+| Base64 → file / file → Base64 | Butuh kebijakan ukuran file dan File API; belum ada permintaan |
+| Cron expression parser | Kandidat berikutnya setelah ada permintaan nyata |
+| Cron/JWT/Hash file-level, diff antar file | Tunggu kebutuhan |
 | JSON→XML / XML→JSON | ADR-0004: butuh aturan pemetaan dulu |
 | XML Diff | Tentukan tekstual vs struktural sebelum mulai |
 | File comparison, favorites, recent, command palette | Sesuai blueprint §5/§11 — tunggu kebutuhan nyata |

@@ -50,7 +50,7 @@ src/
 ├── app/            shell, router hash, error boundary, host route tool
 ├── components/     layout, navigation, editor, komponen bersama
 ├── features/       satu folder per tool + halaman statis
-├── lib/            engine murni: text, json, xml, diff, browser
+├── lib/            engine murni: text, json, xml, diff, encoding, dev, browser
 ├── registry/       tools.ts — satu-satunya sumber metadata tool
 ├── hooks/          useDebouncedValue, useCopy, useHashRoute, useTheme, …
 ├── styles/         tokens.css (design tokens), base.css

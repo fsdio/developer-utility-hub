@@ -7,7 +7,14 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const ROOT = new URL("..", import.meta.url).pathname;
-const ENGINE_DIRS = ["src/lib/text", "src/lib/json", "src/lib/xml", "src/lib/diff"];
+const ENGINE_DIRS = [
+  "src/lib/text",
+  "src/lib/json",
+  "src/lib/xml",
+  "src/lib/diff",
+  "src/lib/encoding",
+  "src/lib/dev",
+];
 const FORBIDDEN_IMPORTS = [/from\s+["']react/, /from\s+["']react-dom/, /from\s+["']@\/hooks/, /from\s+["']@\/components/, /from\s+["']@\/features/];
 const FORBIDDEN_GLOBALS = [/\bwindow\./, /\bdocument\./, /\blocalStorage\b/, /\bsessionStorage\b/, /\bnavigator\./, /\bfetch\(/];
 
@@ -51,4 +58,4 @@ if (violations > 0) {
   console.error(`\nBatas modul dilanggar: ${violations} temuan.`);
   process.exit(1);
 }
-console.log("✓ Batas modul engine bersih (tidak ada React/DOM di src/lib/{text,json,xml,diff}).");
+console.log("✓ Batas modul engine bersih (tidak ada React/DOM di src/lib engine).");

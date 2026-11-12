@@ -11,7 +11,8 @@ const ROOT = new URL("..", import.meta.url).pathname;
 const ASSETS = join(ROOT, "dist/assets");
 const INITIAL_BUDGET_KB = 200;
 const TOOL_CHUNK_BUDGET_KB = 80;
-const TOOL_CHUNK_PATTERN = /(CaseConverter|JsonFormatter|XmlFormatter|TextDiff|JsonDiff)Page-/;
+const TOOL_CHUNK_PATTERN = /^[A-Z][A-Za-z0-9]*Page-/;
+const MIN_TOOL_CHUNKS = 14;
 
 const files = readdirSync(ASSETS).filter((file) => file.endsWith(".js"));
 const sizes = files.map((file) => {
@@ -38,8 +39,8 @@ if (initialTotal > INITIAL_BUDGET_KB) {
   console.error(`✗ JS awal melebihi budget ${INITIAL_BUDGET_KB} KB`);
   failed = true;
 }
-if (toolChunks.length < 5) {
-  console.error(`✗ Diharapkan 5 chunk tool (lazy), ditemukan ${toolChunks.length}.`);
+if (toolChunks.length < MIN_TOOL_CHUNKS) {
+  console.error(`✗ Diharapkan ${MIN_TOOL_CHUNKS} chunk tool (lazy), ditemukan ${toolChunks.length}.`);
   failed = true;
 }
 

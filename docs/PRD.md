@@ -58,12 +58,43 @@ Plus: halaman beranda (katalog tools), halaman per tool, halaman 404, halaman
 Community (link ke GitHub Issues), halaman Privacy singkat, dark/light theme,
 pencarian tools di header, copy, reset, dan download hasil.
 
+### 4.1b Phase 5 — kategori `utilities` (ADR-0007)
+
+| ID | Tool | Route |
+|---|---|---|
+| `base64` | Base64 Encode / Decode | `#/tools/base64` |
+| `url-encoder` | URL Encode / Decode | `#/tools/url-encoder` |
+| `html-entity` | HTML Entity Encode / Decode | `#/tools/html-entity` |
+| `escape` | String Escape / Unescape (JSON/JS/HTML/SQL/XML) | `#/tools/escape` |
+| `uuid` | UUID Generator (v4, v7) | `#/tools/uuid` |
+| `hash` | Hash Generator (SHA-256/512/1) | `#/tools/hash` |
+| `timestamp` | Unix Timestamp Converter | `#/tools/timestamp` |
+| `color` | Color Converter (HEX/RGB/HSL) | `#/tools/color` |
+| `number-base` | Number Base Converter | `#/tools/number-base` |
+
+Aturan tambahan yang berlaku untuk seluruh tool di atas:
+
+- Setiap tool menyatakan batasnya di `limitations` registry: Base64/URL/HTML entity
+  **bukan enkripsi**; hash **tidak dapat dibalik**; UUID **bukan rahasia**;
+  timestamp menampilkan **UTC dan lokal** berdampingan.
+- Hash adalah satu-satunya tool async (Web Crypto). Kegagalan `crypto.subtle`
+  ditampilkan sebagai pesan yang menjelaskan kebutuhan konteks aman.
+- Random hanya dari `crypto.randomUUID` / `crypto.getRandomValues`; tidak ada
+  `Math.random` untuk identifier.
+- Semua tetap patuh batas 1.000.000 karakter dan tidak menyimpan input.
+
+### 4.1c Ditunda secara eksplisit
+
+Regex Tester (ADR-0008), SQL Formatter, JWT Decoder, XML Diff, JSON↔XML
+conversion (ADR-0004), file comparison, favorites/recent, command palette penuh.
+
 ### 4.2 Out of scope (dieksplisitkan agar tidak menyelinap masuk)
 
 - Akun, login, sinkronisasi, riwayat lintas sesi.
 - Backend, database, server-side rendering, analytics.
 - XML ↔ JSON conversion (backlog; lihat ADR-0004).
-- XML Diff, file comparison, favorites, recent tools, command palette `Ctrl+K`.
+- XML Diff, SQL Formatter, JWT Decoder, Regex Tester (lihat §4.1c).
+- File comparison, favorites, recent tools, command palette `Ctrl+K`.
 - Upload file sebagai input (hanya paste/type di MVP; tombol *Load file* ditunda).
 - i18n: UI berbahasa **Indonesia**, istilah teknis dibiarkan dalam bahasa Inggris.
 - Kolaborasi, sharing via URL yang memuat isi dokumen.

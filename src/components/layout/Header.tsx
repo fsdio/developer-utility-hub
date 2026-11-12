@@ -4,7 +4,7 @@ import { CATEGORY_LABELS, TOOLS, type ToolCategory } from "@/registry/tools";
 
 const REPO_URL = "https://github.com/fsdio/developer-utility-hub";
 
-const NAV_CATEGORIES = (["text", "formatter", "diff"] as ToolCategory[]).filter((category) =>
+const NAV_CATEGORIES = (["text", "formatter", "diff", "utilities"] as ToolCategory[]).filter((category) =>
   TOOLS.some((tool) => tool.category === category),
 );
 

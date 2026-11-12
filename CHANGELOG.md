@@ -5,6 +5,25 @@ dan [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Unreleased]
 
+### Added — Phase 5 (kategori `utilities`, ADR-0007)
+
+- 9 tool baru, tanpa dependency tambahan:
+  - **Base64 Encode/Decode** — UTF-8 aman, varian standar & URL-safe, wrap 76 karakter.
+  - **URL Encode/Decode** — mode komponen (`%20`) dan form (`+`), pesan error berposisi.
+  - **HTML Entity Encode/Decode** — named + numerik, tanpa `innerHTML`.
+  - **String Escape/Unescape** — JSON, JavaScript, HTML, SQL, XML.
+  - **UUID Generator** — v4 acak & v7 berurutan waktu via Web Crypto.
+  - **Hash Generator** — SHA-256/512/1, hex + base64, penanganan Web Crypto tidak tersedia.
+  - **Unix Timestamp Converter** — UTC + lokal + relatif, validasi tanggal mustahil.
+  - **Color Converter** — HEX/RGB/HSL dua arah, pratinjau, penentuan warna teks.
+  - **Number Base Converter** — biner/oktal/desimal/heksadesimal dengan BigInt.
+- ADR-0007 (cakupan Phase 5) dan ADR-0008 (Regex Tester ditunda beserta prasyarat).
+- Navigasi header & filter beranda kini menampilkan kategori `Utilities`.
+- Test: 119 test baru (unit engine, component, a11y untuk semua halaman,
+  registry-load, perluasan audit privasi).
+- Skrip `check-boundaries` diperluas ke `lib/encoding` dan `lib/dev`;
+  `check-bundle` kini menghitung minimum 14 chunk tool.
+
 ## [0.1.0] — 2026-11-12
 
 ### Added

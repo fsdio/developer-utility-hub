@@ -2,15 +2,38 @@ import { describe, expect, it } from "vitest";
 import { CATEGORY_ORDER, getTool, searchTools, TOOLS, toolsByCategory } from "@/registry/tools";
 
 describe("registry", () => {
-  it("berisi lima tool MVP", () => {
-    expect(TOOLS).toHaveLength(5);
-    expect(TOOLS.map((tool) => tool.id)).toEqual([
+  it("berisi 5 tool MVP + 9 tool Phase 5", () => {
+    expect(TOOLS).toHaveLength(14);
+    expect(TOOLS.slice(0, 5).map((tool) => tool.id)).toEqual([
       "case-converter",
       "json-formatter",
       "xml-formatter",
       "text-diff",
       "json-diff",
     ]);
+    expect(TOOLS.slice(5).map((tool) => tool.id)).toEqual([
+      "base64",
+      "url-encoder",
+      "html-entity",
+      "escape",
+      "uuid",
+      "hash",
+      "timestamp",
+      "color",
+      "number-base",
+    ]);
+  });
+
+  it("kategori utilities kini terisi dan muncul di grup", () => {
+    const utilities = toolsByCategory().find((group) => group.category === "utilities");
+    expect(utilities?.tools.length).toBe(9);
+  });
+
+  it("tool yang sengaja ditunda tidak terdaftar", () => {
+    const ids = TOOLS.map((tool) => tool.id);
+    for (const deferred of ["regex", "sql-formatter", "jwt", "xml-diff"]) {
+      expect(ids).not.toContain(deferred);
+    }
   });
 
   it("setiap tool punya metadata lengkap dan unik", () => {

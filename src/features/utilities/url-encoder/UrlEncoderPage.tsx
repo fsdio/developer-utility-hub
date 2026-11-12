@@ -1,0 +1,103 @@
+import { useMemo, useState } from "react";
+import { ToolLayout } from "@/components/editor/ToolLayout";
+import { Panel } from "@/components/editor/Panel";
+import { CodeArea } from "@/components/editor/CodeArea";
+import { CopyButton } from "@/components/common/CopyButton";
+import { DownloadButton } from "@/components/common/DownloadButton";
+import { ResetButton } from "@/components/common/ResetButton";
+import { EmptyState } from "@/components/common/EmptyState";
+import { ErrorMessage } from "@/components/common/StatusMessage";
+import { Button } from "@/components/common/Button";
+import { CheckboxField, SelectField } from "@/components/common/Field";
+import { MAX_INPUT_LENGTH } from "@/lib/limits";
+import { decodeUrl, encodeUrl, type UrlMode } from "@/lib/encoding/url";
+import { getTool } from "@/registry/tools";
+
+const TOOL = getTool("url-encoder")!;
+
+const MODES = [
+  { value: "component", label: "Komponen (%20)" },
+  { value: "form", label: "Form (+)" },
+] as const;
+
+export default function UrlEncoderPage() {
+  const [input, setInput] = useState("");
+  const [mode, setMode] = useState<"encode" | "decode">("encode");
+  const [urlMode, setUrlMode] = useState<UrlMode>("component");
+  const [plusAsSpace, setPlusAsSpace] = useState(false);
+
+  const overLimit = input.length > MAX_INPUT_LENGTH;
+  const result = useMemo(() => {
+    if (input.trim() === "" || overLimit) return null;
+    return mode === "encode" ? encodeUrl(input, urlMode) : decodeUrl(input, { plusAsSpace });
+  }, [input, mode, urlMode, plusAsSpace, overLimit]);
+
+  const output = result?.ok ? result.value : "";
+
+  return (
+    <ToolLayout
+      tool={TOOL}
+      toolbar={
+        <>
+          <Button variant={mode === "encode" ? "primary" : "default"} onClick={() => setMode("encode")} aria-pressed={mode === "encode"}>
+            Encode
+          </Button>
+          <Button variant={mode === "decode" ? "primary" : "default"} onClick={() => setMode("decode")} aria-pressed={mode === "decode"}>
+            Decode
+          </Button>
+          {mode === "encode" ? (
+            <SelectField id="url-mode" label="Gaya" value={urlMode} options={MODES} onChange={setUrlMode} />
+          ) : (
+            <CheckboxField
+              id="url-plus"
+              label="+ jadi spasi"
+              checked={plusAsSpace}
+              onChange={setPlusAsSpace}
+            />
+          )}
+          <span className="toolbar-spacer" />
+          <CopyButton text={output} />
+          <DownloadButton text={output} baseName="url-encoder" extension="txt" />
+          <ResetButton onReset={() => setInput("")} disabled={input === ""} />
+        </>
+      }
+    >
+      <div className="tool-grid">
+        <Panel
+          label="Input"
+          tone={result && !result.ok ? "error" : "default"}
+          footer={`${input.length.toLocaleString("id-ID")} / ${MAX_INPUT_LENGTH.toLocaleString("id-ID")} karakter`}
+        >
+          <CodeArea
+            label={mode === "encode" ? "Teks atau URL yang akan di-encode" : "Teks ter-encode yang akan di-decode"}
+            value={input}
+            onChange={setInput}
+            placeholder={mode === "encode" ? "cari?q=satu dua&x=1" : "cari%3Fq%3Dsatu%20dua%26x%3D1"}
+            hint="encodeURIComponent meng-encode semua karakter kecuali A–Z a–z 0–9 - _ . ! ~ * ' ( )."
+            error={Boolean(result && !result.ok)}
+          />
+        </Panel>
+
+        <Panel label="Hasil">
+          {overLimit ? (
+            <EmptyState>Input melebihi 1.000.000 karakter. Perkecil input untuk memproses.</EmptyState>
+          ) : result === null ? (
+            <EmptyState example={{ label: "Coba contoh", onUse: () => setInput("cari?q=satu dua&x=1") }}>
+              Percent-encoding untuk query string, path, atau nilai form.
+            </EmptyState>
+          ) : result.ok ? (
+            <pre className="output-area output-area--wrap">{result.value}</pre>
+          ) : (
+            <EmptyState>Perbaiki error untuk melihat hasil.</EmptyState>
+          )}
+        </Panel>
+      </div>
+
+      {result && !result.ok ? (
+        <div className="result-block">
+          <ErrorMessage error={result.error} />
+        </div>
+      ) : null}
+    </ToolLayout>
+  );
+}
