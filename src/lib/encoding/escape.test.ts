@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { escapeString, unescapeString } from "@/lib/encoding/escape";
+import {
+  escapeForFormatter,
+  escapeString,
+  unescapeForFormatter,
+  unescapeString,
+} from "@/lib/encoding/escape";
 
 describe("escapeString", () => {
   it("JSON menghasilkan string berkutip dengan escape", () => {
@@ -63,5 +68,52 @@ describe("unescapeString", () => {
     const original = "baris\nbaru 'kutip'";
     const result = unescapeString(escapeString(original, "js"), "js");
     expect(result.ok && result.value).toBe(original);
+  });
+});
+
+describe("escapeForFormatter", () => {
+  const PAYLOAD = 'Baris satu\nBaris "dua" & <tiga> \'empat\'';
+
+  it("json-string menghasilkan isi string tanpa kutip", () => {
+    const out = escapeForFormatter(PAYLOAD, "json-string");
+    expect(out.startsWith('"')).toBe(false);
+    expect(out).toContain('\\n');
+    expect(JSON.parse(`"${out}"`)).toBe(PAYLOAD);
+  });
+
+  it("json-document menghasilkan dokumen JSON utuh", () => {
+    const out = escapeForFormatter(PAYLOAD, "json-document");
+    expect(JSON.parse(out)).toBe(PAYLOAD);
+  });
+
+  it("xml-text meng-escape lima entitas", () => {
+    expect(escapeForFormatter(`<a> & "b" 'c'`, "xml-text")).toBe(
+      "&lt;a&gt; &amp; &quot;b&quot; &apos;c&apos;",
+    );
+  });
+
+  it("xml-document membungkus dalam elemen escaped", () => {
+    expect(escapeForFormatter("<x>", "xml-document")).toBe("<escaped>&lt;x&gt;</escaped>");
+  });
+
+  it("unescape mengembalikan teks asli untuk kedua dokumen", () => {
+    const jsonDoc = escapeForFormatter(PAYLOAD, "json-document");
+    const xmlDoc = escapeForFormatter(PAYLOAD, "xml-document");
+    expect(unescapeForFormatter(jsonDoc, "json-document")).toEqual({ ok: true, value: PAYLOAD });
+    expect(unescapeForFormatter(escapeForFormatter(PAYLOAD, "json-string"), "json-string")).toEqual({
+      ok: true,
+      value: PAYLOAD,
+    });
+    // Teks tanpa escape bukan error; dikembalikan apa adanya.
+    expect(unescapeForFormatter(PAYLOAD, "json-string")).toEqual({ ok: true, value: PAYLOAD });
+    expect(unescapeForFormatter(xmlDoc, "xml-document")).toEqual({ ok: true, value: PAYLOAD });
+    expect(unescapeForFormatter(`&lt;a&gt;`, "xml-text")).toEqual({ ok: true, value: "<a>" });
+  });
+
+  it("json-string menolak escape rusak dengan pesan yang jelas", () => {
+    const result = unescapeForFormatter("satu \\u12", "json-string");
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.message).toMatch(/heksadesimal/i);
+    expect(unescapeForFormatter("diakhiri \\", "json-string").ok).toBe(false);
   });
 });

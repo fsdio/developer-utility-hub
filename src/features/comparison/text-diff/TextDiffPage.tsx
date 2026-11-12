@@ -3,7 +3,8 @@ import { ToolLayout } from "@/components/editor/ToolLayout";
 import { Panel } from "@/components/editor/Panel";
 import { CodeArea } from "@/components/editor/CodeArea";
 import { DiffView } from "@/components/editor/DiffView";
-import { DiffLegend, DiffSummary } from "@/components/editor/DiffSummary";
+import { DiffLegend } from "@/components/editor/DiffSummary";
+import { InlineResult } from "@/components/editor/InlineResult";
 import { CopyButton } from "@/components/common/CopyButton";
 import { DownloadButton } from "@/components/common/DownloadButton";
 import { ResetButton } from "@/components/common/ResetButton";
@@ -107,7 +108,7 @@ export default function TextDiffPage() {
             onChange={(checked) => updatePrefs({ ignoreWhitespace: checked })}
           />
           <span className="toolbar-spacer" />
-          <CopyButton text={result?.unified ?? ""} label="Copy diff" />
+          <CopyButton text={result?.unified ?? ""} label="Copy diff" context="diff" />
           <DownloadButton
             text={result?.unified ?? ""}
             baseName="text-diff"
@@ -119,10 +120,7 @@ export default function TextDiffPage() {
       }
     >
       <div className="tool-grid">
-        <Panel
-          label="Original"
-          footer={`${left.length.toLocaleString("id-ID")} karakter`}
-        >
+        <Panel label="Original" footer={`${left.length.toLocaleString("id-ID")} karakter`}>
           <CodeArea
             label="Teks original"
             value={left}
@@ -131,8 +129,12 @@ export default function TextDiffPage() {
             rows={10}
           />
         </Panel>
+
+        {/* Panel kanan memuat input dan hasilnya sekaligus: pengguna melihat
+            perbedaan tanpa menggulir ke bagian bawah halaman. */}
         <Panel
           label="Modified"
+          stacked
           footer={`${right.length.toLocaleString("id-ID")} karakter`}
         >
           <CodeArea
@@ -142,43 +144,47 @@ export default function TextDiffPage() {
             placeholder="Teks sesudah perubahan"
             rows={10}
           />
+          <InlineResult
+            label={overLimit ? "Batas input" : empty ? "Menunggu input" : "Perbedaan"}
+            tone={overLimit ? "error" : "default"}
+            meta={
+              result
+                ? `+${result.added} −${result.removed} ~${result.modified}${
+                    result.identical ? " · identik" : ""
+                  }`
+                : undefined
+            }
+            actions={
+              result ? (
+                <CopyButton text={result.unified} label="Copy" compact context="diff" />
+              ) : undefined
+            }
+          >
+            {overLimit ? (
+              <StatusMessage tone="error">
+                Total input melebihi 1.000.000 karakter. Perkecil input untuk membandingkan.
+              </StatusMessage>
+            ) : empty ? (
+              <EmptyState
+                example={{
+                  label: "Isi kedua panel dengan contoh",
+                  onUse: () => {
+                    setLeft(EXAMPLE_LEFT);
+                    setRight(EXAMPLE_RIGHT);
+                  },
+                }}
+              >
+                Isi kedua panel untuk melihat perbedaan baris dan karakter.
+              </EmptyState>
+            ) : result ? (
+              <>
+                <DiffLegend />
+                <DiffView lines={result.lines} />
+              </>
+            ) : null}
+          </InlineResult>
         </Panel>
       </div>
-
-      <section className="result-block" aria-labelledby="diff-result-heading">
-        <h2 id="diff-result-heading" className="category-title">
-          Hasil perbandingan
-        </h2>
-
-        {overLimit ? (
-          <StatusMessage tone="error">
-            Total input melebihi 1.000.000 karakter. Perkecil input untuk membandingkan.
-          </StatusMessage>
-        ) : empty ? (
-          <EmptyState
-            example={{
-              label: "Isi kedua panel dengan contoh",
-              onUse: () => {
-                setLeft(EXAMPLE_LEFT);
-                setRight(EXAMPLE_RIGHT);
-              },
-            }}
-          >
-            Isi kedua panel untuk melihat perbedaan baris dan karakter.
-          </EmptyState>
-        ) : result ? (
-          <>
-            <DiffSummary
-              added={result.added}
-              removed={result.removed}
-              modified={result.modified}
-              note={result.identical ? "Kedua teks identik." : undefined}
-            />
-            <DiffLegend />
-            <DiffView lines={result.lines} />
-          </>
-        ) : null}
-      </section>
     </ToolLayout>
   );
 }

@@ -68,7 +68,7 @@ describe("audit privasi", () => {
     await user.paste(SECRET);
     await user.click(screen.getByRole("textbox", { name: "Teks modified" }));
     await user.paste(`${SECRET}-berubah`);
-    await waitFor(() => expect(screen.getByText(/ditambah$/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/^\+\d+ −\d+ ~\d+$/)).toBeInTheDocument());
     expectNoSecret();
   });
 

@@ -5,6 +5,18 @@ dan [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Unreleased]
 
+### Changed — hasil inline & escape di formatter (ADR-0012)
+
+- **Hasil pindah ke dalam panel input** pada Text Diff, JSON Diff, JSON Formatter,
+  dan XML Formatter. Strip `InlineResult` menempel di bawah textarea dengan label,
+  ringkasan `+/−/~`, dan tombol salin sendiri. Section "Hasil" terpisah dihapus.
+- **Formatter bisa escape/unescape**: tombol Escape & Unescape pada JSON dan XML
+  Formatter, dengan target baru `json-string`, `json-document`, `xml-text`, dan
+  `xml-document`. Opsi indentasi/komentar disembunyikan saat mode escape aktif.
+- **Unescape JSON tidak lagi memakai `JSON.parse`**: escape ditafsirkan satu per
+  satu sehingga teks dengan baris baru nyata tidak lagi gagal, `\uXXXX`
+  divalidasi, dan escape tak dikenal dibiarkan apa adanya.
+
 ### Changed — sudut siku & form ringkas (ADR-0011)
 
 - **Tidak ada sudut membulat**: semua token `--radius-*` = 0; chip, badge, keyword,

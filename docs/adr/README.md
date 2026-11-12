@@ -16,5 +16,6 @@ yang sebelumnya terbuka di blueprint (§14) dan tidak boleh dibuka kembali tanpa
 | [0009](0009-jwt-decoder-decode-only.md) | JWT Decoder: decode saja, tanpa input kunci/secret | Accepted | §3.4, §7 |
 | [0010](0010-visual-refresh-cards-and-diff.md) | Refresh visual: kartu, panel, diff bergaya git, warna dinamis | Accepted | §15, ui-spec |
 | [0011](0011-square-corners-and-lean-forms.md) | Sudut siku, form tanpa teks pengapit (menggantikan radius di 0010) | Accepted | ui-spec |
+| [0012](0012-inline-results-and-formatter-escape.md) | Hasil inline di panel input + escape di formatter | Accepted | §3.2, §3.3 |
 
 Format ADR: Konteks → Keputusan → Konsekuensi → Alternatif yang ditolak.

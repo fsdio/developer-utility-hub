@@ -47,13 +47,16 @@ export const TOOLS: readonly ToolMeta[] = [
   {
     id: "json-formatter",
     name: "JSON Formatter",
-    description: "Format, minify, dan validasi JSON dengan pesan error yang menunjukkan baris dan kolom.",
+    description:
+      "Format, minify, validasi, dan escape JSON dengan error berposisi baris/kolom.",
     category: "formatter",
-    keywords: ["json", "format", "beautify", "minify", "validate", "pretty"],
+    keywords: ["json", "format", "beautify", "minify", "validate", "escape", "unescape", "pretty"],
     route: "#/tools/json-formatter",
     limitations: [
       "Angka di atas 2^53 bisa kehilangan presisi (batasan Number).",
       "Key duplikat: yang terakhir menang.",
+      "Escape menghasilkan bentuk untuk disisipkan, bukan JSON yang di-parse balik.",
+      "Unescape menafsirkan escape JSON satu per satu; escape tak dikenal dibiarkan apa adanya.",
     ],
     status: "stable",
     load: () => import("@/features/data/json-formatter/JsonFormatterPage"),
@@ -61,9 +64,10 @@ export const TOOLS: readonly ToolMeta[] = [
   {
     id: "xml-formatter",
     name: "XML Formatter",
-    description: "Format dan minify XML, dengan komentar dan processing instruction yang dipertahankan.",
+    description:
+      "Format, minify, dan escape XML, dengan komentar serta processing instruction dipertahankan.",
     category: "formatter",
-    keywords: ["xml", "format", "beautify", "minify", "well-formed", "namespace"],
+    keywords: ["xml", "format", "beautify", "minify", "escape", "entity", "well-formed", "namespace"],
     route: "#/tools/xml-formatter",
     limitations: [
       "Bukan penjamin round-trip: CDATA ditulis ulang sebagai teks ter-escape.",
@@ -82,6 +86,7 @@ export const TOOLS: readonly ToolMeta[] = [
     limitations: [
       "Batas 1.000.000 karakter gabungan untuk kedua panel.",
       "Opsi ignore hanya memengaruhi pembandingan, bukan teks yang ditampilkan.",
+      "Perbedaan ditampilkan di panel Modified agar terlihat tanpa menggulir.",
     ],
     status: "stable",
     load: () => import("@/features/comparison/text-diff/TextDiffPage"),

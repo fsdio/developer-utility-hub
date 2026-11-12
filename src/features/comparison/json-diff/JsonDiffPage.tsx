@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { ToolLayout } from "@/components/editor/ToolLayout";
 import { Panel } from "@/components/editor/Panel";
-import { DiffSummary } from "@/components/editor/DiffSummary";
 import { CodeArea } from "@/components/editor/CodeArea";
+import { InlineResult } from "@/components/editor/InlineResult";
 import { CopyButton } from "@/components/common/CopyButton";
 import { DownloadButton } from "@/components/common/DownloadButton";
 import { ResetButton } from "@/components/common/ResetButton";
@@ -41,7 +41,11 @@ export default function JsonDiffPage() {
   }, [debouncedLeft, debouncedRight, overLimit, empty]);
 
   const patch = result?.ok ? patchToText(result.value.changes) : "";
-  const exportText = result?.ok ? (view === "patch" ? patch : JSON.stringify(result.value.changes, null, 2)) : "";
+  const exportText = result?.ok
+    ? view === "patch"
+      ? patch
+      : JSON.stringify(result.value.changes, null, 2)
+    : "";
 
   return (
     <ToolLayout
@@ -55,7 +59,7 @@ export default function JsonDiffPage() {
             Tampilan patch
           </Button>
           <span className="toolbar-spacer" />
-          <CopyButton text={exportText} />
+          <CopyButton text={exportText} context="hasil diff" />
           <DownloadButton
             text={exportText}
             baseName="json-diff"
@@ -82,7 +86,14 @@ export default function JsonDiffPage() {
             rows={10}
           />
         </Panel>
-        <Panel label="JSON kanan" footer={`${right.length.toLocaleString("id-ID")} karakter`}>
+
+        {/* Hasil perbedaan menempel di panel kanan, bukan section terpisah di
+            bawah form, agar perbandingan terlihat tanpa menggulir. */}
+        <Panel
+          label="JSON kanan"
+          stacked
+          footer={`${right.length.toLocaleString("id-ID")} karakter`}
+        >
           <CodeArea
             label="JSON modified"
             value={right}
@@ -90,88 +101,87 @@ export default function JsonDiffPage() {
             placeholder='{"version": 2}'
             rows={10}
           />
+          <InlineResult
+            label={
+              overLimit ? "Batas input" : empty ? "Menunggu input" : view === "patch" ? "Patch" : "Perubahan"
+            }
+            tone={overLimit || (result && !result.ok) ? "error" : "default"}
+            meta={
+              result?.ok
+                ? `+${result.value.added} −${result.value.removed} ~${result.value.changed}${
+                    result.value.identical ? " · identik" : ""
+                  }`
+                : undefined
+            }
+            actions={
+              result?.ok ? (
+                <CopyButton text={exportText} label="Copy" compact context="hasil diff" />
+              ) : undefined
+            }
+          >
+            {overLimit ? (
+              <StatusMessage tone="error">
+                Total input melebihi 1.000.000 karakter. Perkecil input untuk membandingkan.
+              </StatusMessage>
+            ) : empty ? (
+              <EmptyState
+                example={{
+                  label: "Isi kedua panel dengan contoh",
+                  onUse: () => {
+                    setLeft(EXAMPLE_LEFT);
+                    setRight(EXAMPLE_RIGHT);
+                  },
+                }}
+              >
+                Tempel dua JSON yang valid. Perbandingan dilakukan per struktur, bukan per baris.
+              </EmptyState>
+            ) : result && !result.ok ? (
+              <ErrorMessage error={result.error} />
+            ) : result?.ok ? (
+              result.value.identical ? (
+                <p className="hint-text hint-text--tight">Kedua dokumen identik secara struktur.</p>
+              ) : view === "patch" ? (
+                <pre className="output-area">{patch}</pre>
+              ) : (
+                <table className="change-table">
+                  <caption className="sr-only">Daftar perubahan per JSON Pointer</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Path</th>
+                      <th scope="col">Jenis</th>
+                      <th scope="col">Sebelum</th>
+                      <th scope="col">Sesudah</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.value.changes.map((change, index) => (
+                      <tr key={`${change.path}-${change.kind}-${index}`}>
+                        <td>
+                          <code>{change.path === "" ? "(root)" : change.path}</code>
+                        </td>
+                        <td>
+                          <span className={`kind kind--${change.kind}`}>{change.kind}</span>
+                          {change.typeChange ? (
+                            <span className="keyword" style={{ marginLeft: 6 }}>
+                              {change.typeChange.from} → {change.typeChange.to}
+                            </span>
+                          ) : null}
+                        </td>
+                        <td>
+                          <code>{formatValue(change.before)}</code>
+                        </td>
+                        <td>
+                          <code>{formatValue(change.after)}</code>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )
+            ) : null}
+          </InlineResult>
         </Panel>
       </div>
-
-      <section className="result-block" aria-labelledby="json-diff-heading">
-        <h2 id="json-diff-heading" className="category-title">
-          Hasil perbandingan
-        </h2>
-
-        {overLimit ? (
-          <StatusMessage tone="error">
-            Total input melebihi 1.000.000 karakter. Perkecil input untuk membandingkan.
-          </StatusMessage>
-        ) : empty ? (
-          <EmptyState
-            example={{
-              label: "Isi kedua panel dengan contoh",
-              onUse: () => {
-                setLeft(EXAMPLE_LEFT);
-                setRight(EXAMPLE_RIGHT);
-              },
-            }}
-          >
-            Tempel dua JSON yang valid. Perbandingan dilakukan per struktur, bukan per baris.
-          </EmptyState>
-        ) : result && !result.ok ? (
-          <ErrorMessage error={result.error} />
-        ) : result?.ok ? (
-          <>
-            <DiffSummary
-              added={result.value.added}
-              removed={result.value.removed}
-              modified={result.value.changed}
-              note={result.value.identical ? "Kedua dokumen identik secara struktur." : undefined}
-            />
-
-            {result.value.identical ? null : view === "patch" ? (
-              <>
-                <StatusMessage tone="info">
-                  Patch bersifat deskriptif dan tidak dijamin bisa di-apply pada dokumen dengan
-                  urutan key berbeda.
-                </StatusMessage>
-                <pre className="output-area">{patch}</pre>
-              </>
-            ) : (
-              <table className="change-table">
-                <caption className="sr-only">Daftar perubahan per JSON Pointer</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Path</th>
-                    <th scope="col">Jenis</th>
-                    <th scope="col">Sebelum</th>
-                    <th scope="col">Sesudah</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.value.changes.map((change, index) => (
-                    <tr key={`${change.path}-${change.kind}-${index}`}>
-                      <td>
-                        <code>{change.path === "" ? "(root)" : change.path}</code>
-                      </td>
-                      <td>
-                        <span className={`kind kind--${change.kind}`}>{change.kind}</span>
-                        {change.typeChange ? (
-                          <span className="keyword" style={{ marginLeft: 6 }}>
-                            {change.typeChange.from} → {change.typeChange.to}
-                          </span>
-                        ) : null}
-                      </td>
-                      <td>
-                        <code>{formatValue(change.before)}</code>
-                      </td>
-                      <td>
-                        <code>{formatValue(change.after)}</code>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </>
-        ) : null}
-      </section>
     </ToolLayout>
   );
 }

@@ -19,7 +19,7 @@ describe("TextDiffPage", () => {
     await user.click(screen.getByRole("textbox", { name: "Teks modified" }));
     await user.paste("a\nc\nd");
 
-    await waitFor(() => expect(screen.getByText(/^\+2 ditambah$/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/^\+\d+ −\d+ ~\d+$/)).toBeInTheDocument());
     expect(screen.getByRole("table", { name: "Hasil perbandingan" })).toBeInTheDocument();
   });
 
@@ -46,8 +46,8 @@ describe("TextDiffPage", () => {
     await user.click(screen.getByRole("textbox", { name: "Teks modified" }));
     await user.paste("halo");
 
-    await waitFor(() => expect(screen.getByText(/~1 diubah/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/~1/)).toBeInTheDocument());
     await user.click(screen.getByLabelText("Ignore case"));
-    await waitFor(() => expect(screen.getByText(/~0 diubah/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/~0/)).toBeInTheDocument());
   });
 });

@@ -1529,3 +1529,80 @@ kbd {
 }
 
 .empty-state p { max-width: 52ch; }
+
+/* ---------- Hasil inline di dalam panel input (ADR-0012) ---------- */
+
+.panel--with-result .panel-body {
+  flex-direction: column;
+}
+
+.inline-result {
+  display: flex;
+  flex-direction: column;
+  max-height: 46vh;
+  border-top: 1px solid var(--border);
+  background: var(--bg-raised);
+}
+
+.inline-result-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 3px var(--space-3);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-sunken);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+}
+
+.inline-result-label { font-weight: 700; }
+
+.inline-result-meta {
+  font-family: var(--font-mono);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--fg-subtle);
+}
+
+.inline-result-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.inline-result-body {
+  overflow: auto;
+  min-height: 0;
+}
+
+.inline-result--error { border-top-color: var(--danger); }
+.inline-result--error .inline-result-head {
+  color: var(--danger);
+  border-bottom-color: color-mix(in srgb, var(--danger) 40%, transparent);
+}
+
+.inline-result--error .inline-result-body {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+}
+
+/* Hasil diff memakai grid baris tersendiri; strip tidak perlu scroll ganda. */
+.inline-result .diff-view {
+  border: 0;
+  border-radius: 0;
+  max-height: none;
+}
+
+.inline-result .diff-summary { margin: var(--space-2) var(--space-3) 0; }
+
+.inline-result .output-area {
+  max-height: none;
+  background: var(--bg-raised);
+}
+
+.inline-result .diff-legend { padding: var(--space-2) var(--space-3) 0; margin: 0; }

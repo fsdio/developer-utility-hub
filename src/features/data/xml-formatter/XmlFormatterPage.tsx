@@ -11,6 +11,12 @@ import { Button } from "@/components/common/Button";
 import { CheckboxField, SelectField } from "@/components/common/Field";
 import { MAX_INPUT_LENGTH } from "@/lib/limits";
 import { formatXml, minifyXml, validateXml, type XmlIndent } from "@/lib/xml/format";
+import {
+  escapeForFormatter,
+  unescapeForFormatter,
+  type FormatterEscapeTarget,
+} from "@/lib/encoding/escape";
+import { InlineResult } from "@/components/editor/InlineResult";
 import { ok, type Result } from "@/types/result";
 import { getTool } from "@/registry/tools";
 import { useLocalStoragePreference } from "@/hooks/useLocalStoragePreference";
@@ -59,7 +65,20 @@ const parsePrefs = (raw: string | null): XmlPrefs => {
   return DEFAULT_PREFS;
 };
 
-type Action = "format" | "minify" | "validate";
+type Action = "format" | "minify" | "validate" | "escape" | "unescape";
+
+const ESCAPE_OPTIONS: ReadonlyArray<{ value: FormatterEscapeTarget; label: string }> = [
+  { value: "xml-text", label: "Isi elemen/atribut" },
+  { value: "xml-document", label: "Dokumen XML" },
+];
+
+const ACTION_LABEL: Record<Action, string> = {
+  format: "Format",
+  minify: "Minify",
+  validate: "Validasi",
+  escape: "Escape",
+  unescape: "Unescape",
+};
 
 const browserParse = (text: string): Document =>
   new DOMParser().parseFromString(text, "application/xml");
@@ -67,6 +86,7 @@ const browserParse = (text: string): Document =>
 export default function XmlFormatterPage() {
   const [input, setInput] = useState("");
   const [action, setAction] = useState<Action>("format");
+  const [escapeTarget, setEscapeTarget] = useState<FormatterEscapeTarget>("xml-text");
   const [prefsRaw, setPrefsRaw] = useLocalStoragePreference<string>(
     PREFERENCE_KEYS.xmlOptions,
     JSON.stringify(DEFAULT_PREFS),
@@ -76,6 +96,7 @@ export default function XmlFormatterPage() {
   const prefs = parsePrefs(prefsRaw);
   const indent: XmlIndent = prefs.indent === "tab" ? "tab" : prefs.indent === "4" ? 4 : 2;
   const overLimit = input.length > MAX_INPUT_LENGTH;
+  const escaping = action === "escape" || action === "unescape";
 
   const updatePrefs = (next: Partial<XmlPrefs>): void => {
     setPrefsRaw(JSON.stringify({ ...prefs, ...next }));
@@ -93,15 +114,22 @@ export default function XmlFormatterPage() {
       const raw = minifyXml(input, browserParse, options);
       return raw.ok ? ok<XmlOutcome>({ kind: "text", text: raw.value.text }) : raw;
     }
-    const raw = validateXml(input, browserParse);
-    return raw.ok
-      ? ok<XmlOutcome>({
-          kind: "info",
-          rootName: raw.value.rootName,
-          elementCount: raw.value.elementCount,
-        })
-      : raw;
-  }, [input, action, indent, prefs.preserveComments, overLimit]);
+    if (action === "validate") {
+      const raw = validateXml(input, browserParse);
+      return raw.ok
+        ? ok<XmlOutcome>({
+            kind: "info",
+            rootName: raw.value.rootName,
+            elementCount: raw.value.elementCount,
+          })
+        : raw;
+    }
+    if (action === "escape") {
+      return ok<XmlOutcome>({ kind: "text", text: escapeForFormatter(input, escapeTarget) });
+    }
+    const unescaped = unescapeForFormatter(input, escapeTarget);
+    return unescaped.ok ? ok<XmlOutcome>({ kind: "text", text: unescaped.value }) : unescaped;
+  }, [input, action, indent, prefs.preserveComments, escapeTarget, overLimit]);
 
   const output = (() => {
     if (!result?.ok) return "";
@@ -129,62 +157,83 @@ export default function XmlFormatterPage() {
           <Button onClick={() => setAction("validate")} aria-pressed={action === "validate"}>
             Validasi struktur
           </Button>
-          <SelectField
-            id="xml-indent"
-            label="Indent"
-            value={prefs.indent}
-            options={INDENT_OPTIONS}
-            onChange={(value) => updatePrefs({ indent: value })}
-          />
-          <CheckboxField
-            id="xml-comments"
-            label="Pertahankan komentar"
-            checked={prefs.preserveComments}
-            onChange={(checked) => updatePrefs({ preserveComments: checked })}
-          />
+          <Button onClick={() => setAction("escape")} aria-pressed={action === "escape"}>
+            Escape
+          </Button>
+          <Button onClick={() => setAction("unescape")} aria-pressed={action === "unescape"}>
+            Unescape
+          </Button>
+          {escaping ? (
+            <SelectField
+              id="xml-escape-target"
+              label="Bentuk escape"
+              value={escapeTarget}
+              options={ESCAPE_OPTIONS}
+              onChange={setEscapeTarget}
+            />
+          ) : (
+            <>
+              <SelectField
+                id="xml-indent"
+                label="Indent"
+                value={prefs.indent}
+                options={INDENT_OPTIONS}
+                onChange={(value) => updatePrefs({ indent: value })}
+              />
+              <CheckboxField
+                id="xml-comments"
+                label="Pertahankan komentar"
+                checked={prefs.preserveComments}
+                onChange={(checked) => updatePrefs({ preserveComments: checked })}
+              />
+            </>
+          )}
           <span className="toolbar-spacer" />
-          <CopyButton text={output} />
+          <CopyButton text={output} context="hasil" />
           <DownloadButton text={output} baseName="xml-formatter" extension="xml" mime="application/xml" />
           <ResetButton onReset={() => setInput("")} disabled={input === ""} />
         </>
       }
     >
-      <div className="tool-grid">
-        <Panel
-          label="Input XML"
+      <Panel
+        label="Input XML"
+        stacked
+        tone={result && !result.ok ? "error" : "default"}
+        footer={`${input.length.toLocaleString("id-ID")} / ${MAX_INPUT_LENGTH.toLocaleString("id-ID")} karakter`}
+      >
+        <CodeArea
+          label="XML sumber"
+          value={input}
+          onChange={setInput}
+          placeholder={escaping ? "Tempel teks atau XML yang akan di-escape" : "<root><item>nilai</item></root>"}
+          hint="Tempel XML; formatter mempertahankan komentar dan processing instruction bila opsi aktif."
+          error={Boolean(result && !result.ok)}
+        />
+        <InlineResult
+          label={`Hasil ${ACTION_LABEL[action]}`}
           tone={result && !result.ok ? "error" : "default"}
-          footer={`${input.length.toLocaleString("id-ID")} / ${MAX_INPUT_LENGTH.toLocaleString("id-ID")} karakter`}
+          actions={<CopyButton text={output} label="Copy" compact context="hasil" />}
         >
-          <CodeArea
-            label="XML sumber"
-            value={input}
-            onChange={setInput}
-            placeholder="<root><item>nilai</item></root>"
-            hint="Tempel XML; formatter mempertahankan komentar dan processing instruction bila opsi aktif."
-            error={Boolean(result && !result.ok)}
-          />
-        </Panel>
-
-        <Panel label={action === "validate" ? "Ringkasan validasi" : "Hasil"}>
           {overLimit ? (
             <EmptyState>Input melebihi 1.000.000 karakter. Perkecil input untuk memproses.</EmptyState>
           ) : result === null ? (
-            <EmptyState example={{ label: "Coba contoh XML", onUse: () => setInput(EXAMPLE) }}>
-              Tempel XML untuk merapikan, meminify, atau memeriksa struktur.
+            <EmptyState
+              example={{
+                label: escaping ? "Coba teks contoh" : "Coba contoh XML",
+                onUse: () => setInput(escaping ? '<a href="x">Tom & Jerry</a>' : EXAMPLE),
+              }}
+            >
+              {escaping
+                ? "Tempel teks agar karakter berbahaya diubah menjadi entitas XML, atau sebaliknya."
+                : "Tempel XML untuk merapikan, meminify, atau memeriksa struktur."}
             </EmptyState>
           ) : result.ok ? (
-            <pre className="output-area">{output}</pre>
+            <pre className="output-area output-area--wrap">{output}</pre>
           ) : (
-            <EmptyState>Perbaiki error di input untuk melihat hasil.</EmptyState>
+            <ErrorMessage error={result.error} />
           )}
-        </Panel>
-      </div>
-
-      {result && !result.ok ? (
-        <div className="result-block">
-          <ErrorMessage error={result.error} />
-        </div>
-      ) : null}
+        </InlineResult>
+      </Panel>
     </ToolLayout>
   );
 }
