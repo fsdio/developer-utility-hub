@@ -17,9 +17,12 @@ dan [Semantic Versioning](https://semver.org/lang/id/).
   - **Unix Timestamp Converter** — UTC + lokal + relatif, validasi tanggal mustahil.
   - **Color Converter** — HEX/RGB/HSL dua arah, pratinjau, penentuan warna teks.
   - **Number Base Converter** — biner/oktal/desimal/heksadesimal dengan BigInt.
-- ADR-0007 (cakupan Phase 5) dan ADR-0008 (Regex Tester ditunda beserta prasyarat).
+  - **JWT Decoder** — decode saja dengan peringatan tiga lapis, peringatan keras untuk
+    `alg: none`, penolakan JWE, dan status claim waktu tanpa kata "valid" (ADR-0009).
+- ADR-0007 (cakupan Phase 5), ADR-0008 (Regex Tester ditunda), dan ADR-0009
+  (JWT decode-only, tanpa input kunci).
 - Navigasi header & filter beranda kini menampilkan kategori `Utilities`.
-- Test: 119 test baru (unit engine, component, a11y untuk semua halaman,
+- Test: 148 test baru (unit engine, component, a11y untuk semua halaman,
   registry-load, perluasan audit privasi).
 - Skrip `check-boundaries` diperluas ke `lib/encoding` dan `lib/dev`;
   `check-bundle` kini menghitung minimum 14 chunk tool.

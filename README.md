@@ -5,9 +5,11 @@ Tidak ada backend, tidak ada akun, dan isi input tidak pernah dikirim atau disim
 
 Produk ini adalah satu situs statis berisi banyak utility independen dengan
 pengalaman penggunaan yang konsisten. Lihat `docs/developer-utility-hub-blueprint.md`
-untuk arah produk, dan `docs/PRD.md` untuk spesifikasi MVP.
+untuk arah produk, dan `docs/PRD.md` untuk spesifikasi.
 
-## Tools (MVP)
+## Tools (15)
+
+**Inti (MVP)**
 
 | Tool | Kategori | Yang dilakukan |
 |---|---|---|
@@ -16,6 +18,25 @@ untuk arah produk, dan `docs/PRD.md` untuk spesifikasi MVP.
 | [XML Formatter](#/tools/xml-formatter) | Formatter | Format/minify dengan komentar & processing instruction dipertahankan |
 | [Text Diff](#/tools/text-diff) | Diff | Diff baris + highlight karakter, opsi ignore case/whitespace |
 | [JSON Diff](#/tools/json-diff) | Diff | Diff struktural per JSON Pointer + JSON Patch deskriptif |
+
+**Utilities**
+
+| Tool | Yang dilakukan |
+|---|---|
+| [Base64 Encode / Decode](#/tools/base64) | UTF-8 aman, varian URL-safe, wrap 76 karakter |
+| [URL Encode / Decode](#/tools/url-encoder) | Percent-encoding mode komponen dan form |
+| [HTML Entity Encode / Decode](#/tools/html-entity) | Named + numerik, tanpa menyentuh DOM |
+| [String Escape / Unescape](#/tools/escape) | JSON, JavaScript, HTML, SQL, XML |
+| [UUID Generator](#/tools/uuid) | v4 acak dan v7 berurutan waktu (Web Crypto) |
+| [Hash Generator](#/tools/hash) | SHA-256 / SHA-512 / SHA-1 dalam hex dan base64 |
+| [Unix Timestamp Converter](#/tools/timestamp) | Epoch ⇄ tanggal, UTC dan lokal berdampingan |
+| [Color Converter](#/tools/color) | HEX / RGB / HSL dua arah + pratinjau |
+| [Number Base Converter](#/tools/number-base) | Biner / oktal / desimal / heksadesimal (BigInt) |
+| [JWT Decoder](#/tools/jwt) | Decode header/payload — **signature tidak diverifikasi** |
+
+Sengaja **belum** ada, dengan alasan tertulis: Regex Tester (ADR-0008), SQL
+Formatter, dan XML Diff — lihat `docs/adr/0007-phase-5-scope.md`. JWT Decoder ada,
+tetapi **hanya untuk decode** dan tidak akan pernah menerima secret/key (ADR-0009).
 
 ## Menjalankan
 

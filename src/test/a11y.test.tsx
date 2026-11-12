@@ -17,6 +17,7 @@ import HashPage from "@/features/utilities/hash/HashPage";
 import TimestampPage from "@/features/utilities/timestamp/TimestampPage";
 import ColorPage from "@/features/utilities/color/ColorPage";
 import NumberBasePage from "@/features/utilities/number-base/NumberBasePage";
+import JwtPage from "@/features/utilities/jwt/JwtPage";
 import { AppShell } from "@/components/layout/AppShell";
 
 const pages: Array<[string, () => React.ReactElement]> = [
@@ -35,6 +36,7 @@ const pages: Array<[string, () => React.ReactElement]> = [
   ["timestamp", () => <TimestampPage />],
   ["color", () => <ColorPage />],
   ["number base", () => <NumberBasePage />],
+  ["jwt", () => <JwtPage />],
 ];
 
 describe("aksesibilitas (axe)", () => {

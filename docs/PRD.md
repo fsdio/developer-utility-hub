@@ -71,6 +71,7 @@ pencarian tools di header, copy, reset, dan download hasil.
 | `timestamp` | Unix Timestamp Converter | `#/tools/timestamp` |
 | `color` | Color Converter (HEX/RGB/HSL) | `#/tools/color` |
 | `number-base` | Number Base Converter | `#/tools/number-base` |
+| `jwt` | JWT Decoder (decode saja, ADR-0009) | `#/tools/jwt` |
 
 Aturan tambahan yang berlaku untuk seluruh tool di atas:
 
@@ -81,11 +82,14 @@ Aturan tambahan yang berlaku untuk seluruh tool di atas:
   ditampilkan sebagai pesan yang menjelaskan kebutuhan konteks aman.
 - Random hanya dari `crypto.randomUUID` / `crypto.getRandomValues`; tidak ada
   `Math.random` untuk identifier.
+- **JWT Decoder tidak menyediakan verifikasi**: tidak ada input secret/public key,
+  tidak ada kata "valid"/"verified" di UI untuk token yang berhasil di-decode,
+  dan `alg: none` diberi peringatan keras (ADR-0009).
 - Semua tetap patuh batas 1.000.000 karakter dan tidak menyimpan input.
 
 ### 4.1c Ditunda secara eksplisit
 
-Regex Tester (ADR-0008), SQL Formatter, JWT Decoder, XML Diff, JSON↔XML
+Regex Tester (ADR-0008), SQL Formatter, XML Diff, JSON↔XML
 conversion (ADR-0004), file comparison, favorites/recent, command palette penuh.
 
 ### 4.2 Out of scope (dieksplisitkan agar tidak menyelinap masuk)
@@ -93,7 +97,7 @@ conversion (ADR-0004), file comparison, favorites/recent, command palette penuh.
 - Akun, login, sinkronisasi, riwayat lintas sesi.
 - Backend, database, server-side rendering, analytics.
 - XML ↔ JSON conversion (backlog; lihat ADR-0004).
-- XML Diff, SQL Formatter, JWT Decoder, Regex Tester (lihat §4.1c).
+- XML Diff, SQL Formatter, Regex Tester (lihat §4.1c).
 - File comparison, favorites, recent tools, command palette `Ctrl+K`.
 - Upload file sebagai input (hanya paste/type di MVP; tombol *Load file* ditunda).
 - i18n: UI berbahasa **Indonesia**, istilah teknis dibiarkan dalam bahasa Inggris.

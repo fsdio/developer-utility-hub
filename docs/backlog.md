@@ -77,6 +77,7 @@ halaman, tanpa dependency baru.
 | 5.7 | Unix Timestamp Converter (UTC + lokal, relatif) | `lib/dev/timestamp.ts` | M | ✅ |
 | 5.8 | Color Converter HEX/RGB/HSL + pratinjau | `lib/dev/color.ts` | M | ✅ |
 | 5.9 | Number Base Converter (BigInt) | `lib/dev/number-base.ts` | S | ✅ |
+| 5.10 | JWT Decoder (decode saja, peringatan 3 lapis) | `lib/dev/jwt.ts` | M | ✅ |
 
 Gate tambahan yang dijalankan: registry-load test (semua 14 `load()` dirender),
 axe a11y untuk semua halaman, dan audit privasi diperluas ke tool Phase 5.
@@ -87,7 +88,7 @@ axe a11y untuk semua halaman, dan audit privasi diperluas ke tool Phase 5.
 |---|---|
 | Regex tester | **Ditunda** — ADR-0008: butuh Web Worker + terminasi, bukan `setTimeout` |
 | SQL formatter | **Ditunda** — hanya realistis dengan parser/dialek; dependency besar |
-| JWT decoder | **Ditunda** — butuh desain microcopy agar tidak disalahartikan sebagai verifikasi |
+| JWT verifikasi signature | **Tidak akan dibuat** — melanggar ADR-0009 (butuh kunci di browser) |
 | XML Diff | **Ditunda** — tentukan tekstual vs struktural lebih dulu (semangat ADR-0004) |
 | Base64 → file / file → Base64 | Butuh kebijakan ukuran file dan File API; belum ada permintaan |
 | Cron expression parser | Kandidat berikutnya setelah ada permintaan nyata |

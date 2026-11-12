@@ -17,8 +17,8 @@ Developer Utility Hub
 │       ├── Formatter       → JSON Formatter, XML Formatter
 │       ├── Diff            → Text Diff, JSON Diff
 │       └── Utilities       → Base64, URL Encoder, HTML Entity, Escape,
-│                             UUID, Hash, Timestamp, Color, Number Base
-├── Halaman tool (14)
+│                             UUID, Hash, Timestamp, Color, Number Base, JWT
+├── Halaman tool (15)
 ├── Community
 │   ├── Suggest a Feature   → GitHub Issue (template feature_request)
 │   └── Report a Bug        → GitHub Issue (template bug_report)
@@ -73,6 +73,7 @@ Tidak ada daftar tool kedua di tempat lain.
 | `#/tools/timestamp` | Unix Timestamp Converter |
 | `#/tools/color` | Color Converter |
 | `#/tools/number-base` | Number Base Converter |
+| `#/tools/jwt` | JWT Decoder (decode saja) |
 | `#/tools/<tidak-dikenal>` | 404 |
 | `#/community` | Community |
 | `#/privacy` | Privacy |

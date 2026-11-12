@@ -226,6 +226,22 @@ export const TOOLS: readonly ToolMeta[] = [
     status: "stable",
     load: () => import("@/features/utilities/number-base/NumberBasePage"),
   },
+  {
+    id: "jwt",
+    name: "JWT Decoder (decode saja)",
+    description:
+      "Baca header dan payload JWT. Signature tidak pernah diverifikasi dan tool ini tidak menerima kunci apa pun.",
+    category: "utilities",
+    keywords: ["jwt", "token", "decode", "jose", "jws", "claims", "bearer"],
+    route: "#/tools/jwt",
+    limitations: [
+      "Tidak memverifikasi signature: token palsu pun akan tampil.",
+      "Tidak menerima secret atau public key — decode bukan verifikasi.",
+      "Tidak memeriksa iss/aud/certificate chain, dan JWE (5 bagian) tidak didukung.",
+    ],
+    status: "stable",
+    load: () => import("@/features/utilities/jwt/JwtPage"),
+  },
 ];
 
 export function getTool(id: string): ToolMeta | undefined {
