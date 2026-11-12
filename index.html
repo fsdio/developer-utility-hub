@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="id" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <!-- CSP_PLACEHOLDER -->
+    <title>Developer Utility Hub</title>
+    <meta
+      name="description"
+      content="Kumpulan utility developer yang berjalan sepenuhnya di browser: case converter, JSON/XML formatter, text diff, dan JSON diff."
+    />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <script>
+      // Terapkan tema tersimpan sebelum render untuk menghindari kedip (FOUC).
+      (function () {
+        try {
+          var stored = localStorage.getItem("duh:v1:theme") || "system";
+          var dark =
+            stored === "dark" ||
+            (stored === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.dataset.theme = dark ? "dark" : "light";
+        } catch (error) {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

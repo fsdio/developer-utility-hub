@@ -1,0 +1,50 @@
+{
+  "name": "developer-utility-hub",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Kumpulan utility developer yang berjalan sepenuhnya di browser.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/postbuild.mjs",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "check:boundaries": "node scripts/check-boundaries.mjs",
+    "check:bundle": "node scripts/check-bundle.mjs",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "preview:check": "node scripts/preview-check.mjs",
+    "verify": "npm run lint && npm run typecheck && npm run test && npm run build && npm run check:boundaries && npm run check:bundle && npm run check:contrast && npm run preview:check"
+  },
+  "dependencies": {
+    "diff": "^9.0.0",
+    "lucide-react": "^1.72.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.10",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "@vitest/coverage-v8": "^5.1.0",
+    "eslint": "^10.14.0",
+    "jest-axe": "^11.0.0",
+    "jsdom": "^31.0.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.72.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
+  },
+  "overrides": {
+    "minimatch": "^11.0.8"
+  }
+}
