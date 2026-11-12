@@ -25,7 +25,7 @@ export function HomePage({ initialCategory }: HomePageProps) {
         </h1>
         <p>
           Format data, konversi teks, dan bandingkan dokumen tanpa membuka banyak tab atau menulis
-          script sementara. Lima tool inti, satu pengalaman yang konsisten.
+          script sementara. Lima belas tool, satu pengalaman yang konsisten.
         </p>
         <span className="privacy-note">
           Semua diproses di browser Anda. Tidak ada yang dikirim ke server.
