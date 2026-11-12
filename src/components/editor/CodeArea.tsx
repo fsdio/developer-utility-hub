@@ -1,5 +1,4 @@
 import { useId, type ChangeEvent } from "react";
-import { FieldLabel } from "@/components/common/Field";
 
 interface CodeAreaProps {
   label: string;
@@ -14,6 +13,14 @@ interface CodeAreaProps {
   rows?: number;
 }
 
+/**
+ * Area teks utama tool.
+ *
+ * Label tidak dirender terlihat: judul panel di atasnya sudah menyebut isinya,
+ * dan placeholder menjelaskan contoh nyata. Label tetap ada untuk pembaca layar
+ * lewat `sr-only`, `hint` juga `sr-only` — tidak ada teks yang mengapit input
+ * (ADR-0011). Area mengisi seluruh badan panel agar tidak ada ruang terbuang.
+ */
 export function CodeArea({
   label,
   value,
@@ -28,8 +35,10 @@ export function CodeArea({
   const id = useId();
   const hintId = `${id}-hint`;
   return (
-    <div style={{ display: "contents" }}>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+    <>
+      <label className="sr-only" htmlFor={id}>
+        {label}
+      </label>
       <textarea
         id={id}
         className="code-area"
@@ -40,7 +49,9 @@ export function CodeArea({
         autoCorrect="off"
         placeholder={placeholder}
         aria-invalid={error || undefined}
-        aria-describedby={[hint ? hintId : "", describedBy ?? ""].filter(Boolean).join(" ") || undefined}
+        aria-describedby={
+          [hint ? hintId : "", describedBy ?? ""].filter(Boolean).join(" ") || undefined
+        }
         onChange={(event: ChangeEvent<HTMLTextAreaElement>) => onChange(event.target.value)}
       />
       {hint ? (
@@ -48,6 +59,6 @@ export function CodeArea({
           {hint}
         </span>
       ) : null}
-    </div>
+    </>
   );
 }

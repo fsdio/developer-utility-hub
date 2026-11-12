@@ -39,13 +39,15 @@
   --space-7: 48px;
   --space-8: 64px;
 
-  /* Skala radius: kartu dan panel memakai --radius-lg agar tidak terasa kaku. */
-  --radius-xs: 6px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-pill: 999px;
+  /* Bentuk: tanpa sudut membulat (ADR-0011). Skala dipertahankan sebagai
+     variabel agar tidak ada angka radius liar di komponen, tetapi semua
+     nilainya 0 sehingga seluruh permukaan bersudut siku. */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-pill: 0px;
 
   /* Permukaan: membedakan kartu dari latar halaman tanpa garis tebal. */
   --surface-hover: #f4f4f1;
@@ -69,7 +71,7 @@
 
   --header-h: 56px;
   --container-max: 1180px;
-  --panel-min-h: 240px;
+  --panel-min-h: 200px;
   --panel-radius: var(--radius-lg);
 
   --motion: 120ms ease-out;

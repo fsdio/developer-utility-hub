@@ -58,10 +58,6 @@ export function HomePage({ initialCategory }: HomePageProps) {
             script sementara. Lima belas tool, satu pengalaman yang konsisten.
           </p>
         </div>
-        <span className="privacy-note">
-          <span aria-hidden="true">◍</span> Semua diproses di browser Anda — tidak ada yang dikirim
-          ke server.
-        </span>
       </section>
 
       <section className="quick-picks" aria-labelledby="quick-picks-heading">

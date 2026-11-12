@@ -5,6 +5,21 @@ dan [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Unreleased]
 
+### Changed — sudut siku & form ringkas (ADR-0011)
+
+- **Tidak ada sudut membulat**: semua token `--radius-*` = 0; chip, badge, keyword,
+  quick pick, dan tombol menjadi persegi. Dijaga oleh `design-guards.test.ts`.
+- **Form tanpa teks pengapit**: `CodeArea` dan `FieldLabel` tidak lagi merender
+  label terlihat; placeholder + judul panel memberi konteks, nama aksesibel tetap
+  ada lewat `sr-only` + `aria-describedby`.
+- **Input mengisi panel** (`.field-body`), tinggi minimum panel turun ke 200 px
+  sehingga input dan hasil sering terlihat dalam satu layar.
+- **Teks berlebih dihapus**: indikator privasi di hero (pindah ke footer), label
+  "Cepat:" pada swatch, "ATAU TULIS KODE WARNA", dan paragraf panjang di bawah
+  hasil UUID/JWT.
+- **Tanpa bayangan dekoratif dan tanpa gerak**: kartu/panel memakai border, hover
+  kartu tidak lagi mengangkat atau menambah bayangan.
+
 ### Changed — refresh visual & UX (ADR-0010)
 
 - **Kartu dan panel membulat** dengan skala radius baru (12/16/20 px); kartu katalog

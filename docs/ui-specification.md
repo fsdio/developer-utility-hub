@@ -34,6 +34,10 @@ Tidak ada nilai warna/spacing hard-coded di komponen.
 | `--danger` | `#b42318` | `#f97066` | error |
 | `--success` | `#067647` | `#4ade80` | status copy berhasil |
 
+**Bentuk (ADR-0011):** semua token `--radius-*` bernilai **0** — UI memakai sudut
+siku di seluruh permukaan. Input tunggal memakai `.field-body` tanpa label terlihat;
+label dan hint untuk pembaca layar dihubungkan lewat `sr-only` + `aria-describedby`.
+
 Token tambahan (ADR-0010): `--surface-hover`, `--surface-active`, `--focus-ring`,
 `--added/removed/changed-gutter`, `--added/removed/changed-edge`,
 `--added/removed/changed-mark`, `--shadow-2`, `--shadow-3`, serta skala radius
@@ -236,7 +240,7 @@ tidak punya tampilan.
 
 | Konteks | Teks |
 |---|---|
-| Indikator privasi (beranda) | "Semua diproses di browser Anda. Tidak ada yang dikirim ke server." |
+| Indikator privasi | "100% di browser" di footer situs (bukan di samping judul hero) |
 | Catatan JSON | "Angka di atas 2^53 bisa kehilangan presisi; key duplikat: yang terakhir menang." |
 | Catatan XML | "Formatter ini merapikan struktur, bukan penjamin round-trip. CDATA ditulis ulang sebagai teks." |
 | Catatan JSON Diff | "Patch bersifat deskriptif, tidak dijamin bisa di-apply." |

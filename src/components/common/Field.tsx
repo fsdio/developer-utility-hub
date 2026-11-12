@@ -50,9 +50,23 @@ export function SelectField<T extends string>({
   );
 }
 
-export function FieldLabel({ htmlFor, children }: { htmlFor: string; children: ReactNode }) {
+/**
+ * Label untuk input di luar CodeArea. Secara default hanya untuk pembaca layar
+ * (`sr-only`) karena judul panel sudah memberi konteks visual; teks di samping
+ * atau di atas input membuat UI penuh tanpa menambah informasi (ADR-0011).
+ * Pakai `visible` hanya bila tidak ada konteks visual lain.
+ */
+export function FieldLabel({
+  htmlFor,
+  children,
+  visible = false,
+}: {
+  htmlFor: string;
+  children: ReactNode;
+  visible?: boolean;
+}) {
   return (
-    <label className="field-label" htmlFor={htmlFor}>
+    <label className={visible ? "field-label" : "sr-only"} htmlFor={htmlFor}>
       {children}
     </label>
   );
