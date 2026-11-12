@@ -54,24 +54,23 @@ export default function NumberBasePage() {
     >
       <div className="tool-grid tool-grid--single">
         <Panel label="Input angka" tone={result && !result.ok ? "error" : "default"}>
-          <div style={{ padding: "var(--space-3)", width: "100%" }}>
+          <div className="field-body">
             <FieldLabel htmlFor="number-input">Angka dalam basis {base}</FieldLabel>
-            <div className="inline-input-row">
-              <input
-                id="number-input"
-                type="text"
-                value={input}
-                spellCheck={false}
-                inputMode={base === "10" ? "numeric" : "text"}
-                placeholder={base === "16" ? "0xFF" : base === "2" ? "1010" : "255"}
-                aria-invalid={result ? !result.ok : undefined}
-                onChange={(event) => setInput(event.target.value)}
-              />
-            </div>
-            <p className="hint-text" style={{ marginTop: "var(--space-2)" }}>
-              Prefix (0b, 0o, 0x) dan pemisah underscore diizinkan. Perhitungan memakai BigInt,
-              jadi angka besar tidak kehilangan presisi.
-            </p>
+            <input
+              id="number-input"
+              type="text"
+              value={input}
+              spellCheck={false}
+              inputMode={base === "10" ? "numeric" : "text"}
+              placeholder={base === "16" ? "0xFF" : base === "2" ? "1010" : "255"}
+              aria-invalid={result ? !result.ok : undefined}
+              aria-describedby="number-input-hint"
+              onChange={(event) => setInput(event.target.value)}
+            />
+            <span id="number-input-hint" className="sr-only">
+              Prefix 0b, 0o, 0x dan pemisah underscore diizinkan. Perhitungan memakai BigInt,
+              sehingga angka besar tidak kehilangan presisi.
+            </span>
           </div>
         </Panel>
       </div>

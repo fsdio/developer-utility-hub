@@ -4,7 +4,6 @@ import { Panel } from "@/components/editor/Panel";
 import { CopyButton } from "@/components/common/CopyButton";
 import { ResetButton } from "@/components/common/ResetButton";
 import { ErrorMessage } from "@/components/common/StatusMessage";
-import { FieldLabel } from "@/components/common/Field";
 import { convertColor, hexForColorInput, type ColorConversion } from "@/lib/dev/color";
 import { getTool } from "@/registry/tools";
 
@@ -46,7 +45,6 @@ export default function ColorPage() {
       tool={TOOL}
       toolbar={
         <>
-          <span className="toolbar-label">Cepat:</span>
           {PRESETS.map((preset) => (
             <button
               key={preset}
@@ -72,7 +70,6 @@ export default function ColorPage() {
       <div className="tool-grid tool-grid--color">
         <Panel label="Input warna" tone={result && !result.ok ? "error" : "default"}>
           <div className="color-input-body">
-            {/* Kontrol utama: warna dipilih langsung, bukan diketik. */}
             <div className="color-picker-row">
               <label className="color-picker-large">
                 <span className="sr-only">Pilih warna</span>
@@ -84,31 +81,34 @@ export default function ColorPage() {
                 />
               </label>
               <div className="color-picker-meta">
-                <FieldLabel htmlFor="color-input">ATAU TULIS KODE WARNA</FieldLabel>
+                <label className="sr-only" htmlFor="color-input">
+                  Kode warna (HEX, rgb, atau hsl)
+                </label>
                 <input
                   id="color-input"
                   className="text-input mono-input"
                   type="text"
                   value={input}
                   spellCheck={false}
-                  placeholder="#2563eb atau rgb(37, 99, 235)"
+                  placeholder="#2563eb · rgb(37, 99, 235) · hsl(217, 91%, 60%)"
                   aria-invalid={result ? !result.ok : undefined}
+                  aria-describedby="color-input-hint"
                   onChange={(event) => setInput(event.target.value)}
                 />
+                <span id="color-input-hint" className="sr-only">
+                  Mendukung HEX 3/4/6/8 digit, rgb()/rgba(), hsl()/hsla(), nilai persen, dan hue di
+                  luar 0–360. Pemilih warna selalu memberi HEX tanpa alpha.
+                </span>
               </div>
             </div>
-            <p className="hint-text">
-              Mendukung HEX 3/4/6/8 digit, rgb()/rgba(), hsl()/hsla(), nilai persen, dan hue di luar
-              0–360. Pemilih warna selalu memberi HEX tanpa alpha.
-            </p>
           </div>
         </Panel>
 
         <Panel label="Pratinjau & hasil">
           {value === null ? (
             <div className="color-empty">
-              <p className="hint-text">
-                Pilih warna di samping, atau klik salah satu contoh cepat di atas toolbar.
+              <p className="hint-text hint-text--tight">
+                Pilih warna, atau ketuk salah satu swatch di toolbar.
               </p>
             </div>
           ) : (

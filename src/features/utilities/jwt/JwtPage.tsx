@@ -134,11 +134,6 @@ export default function JwtPage() {
               </Panel>
             </div>
 
-            <p className="hint-text" style={{ marginTop: "var(--space-3)" }}>
-              Status <code>exp</code>/<code>nbf</code> di atas hanya perbandingan dengan jam
-              perangkat Anda, bukan validasi token. Claim <code>iss</code>, <code>aud</code>,
-              dan rantai sertifikat tidak diperiksa.
-            </p>
           </>
         )}
       </section>

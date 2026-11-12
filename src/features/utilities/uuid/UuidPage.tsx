@@ -79,10 +79,8 @@ export default function UuidPage() {
         )}
       </Panel>
 
-      <p className="hint-text" style={{ marginTop: "var(--space-3)" }}>
-        UUID v4 sepenuhnya acak. UUID v7 memuat timestamp milidetik di 48 bit awal sehingga
-        terurut secara waktu — berguna untuk primary key, tetapi <strong>tetap</strong> bukan
-        pengganti ID yang tidak bisa ditebak untuk data rahasia.
+      <p className="hint-text hint-text--tight">
+        v4 acak · v7 terurut waktu · keduanya bukan pengganti ID rahasia.
       </p>
     </ToolLayout>
   );

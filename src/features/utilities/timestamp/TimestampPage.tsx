@@ -68,23 +68,21 @@ export default function TimestampPage() {
     >
       <div className="tool-grid tool-grid--single">
         <Panel label="Input timestamp atau tanggal" footer={`Jam berjalan setiap detik · ${tick} pembaruan`}>
-          <div style={{ padding: "var(--space-3)", width: "100%" }}>
-            <FieldLabel htmlFor="timestamp-input">
-              Angka epoch (detik/milidetik) atau ISO 8601
-            </FieldLabel>
-            <div className="inline-input-row">
-              <input
-                id="timestamp-input"
-                type="text"
-                value={input}
-                spellCheck={false}
-                placeholder="1700000000 atau 2026-11-12T08:30:00Z"
-                onChange={(event) => setInput(event.target.value)}
-              />
-            </div>
-            <p className="hint-text" style={{ marginTop: "var(--space-2)" }}>
-              Angka ≥ 1e12 dibaca sebagai milidetik. Tanpa offset, tanggal dibaca sebagai waktu lokal.
-            </p>
+          <div className="field-body">
+            <FieldLabel htmlFor="timestamp-input">Angka epoch atau tanggal ISO 8601</FieldLabel>
+            <input
+              id="timestamp-input"
+              type="text"
+              value={input}
+              spellCheck={false}
+              placeholder="1700000000 atau 2026-11-12T08:30:00Z"
+              aria-describedby="timestamp-input-hint"
+              onChange={(event) => setInput(event.target.value)}
+            />
+            <span id="timestamp-input-hint" className="sr-only">
+              Angka ≥ 1e12 dibaca sebagai milidetik. Tanpa offset, tanggal dibaca sebagai waktu
+              lokal.
+            </span>
           </div>
         </Panel>
       </div>
