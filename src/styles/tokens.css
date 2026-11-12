@@ -1,0 +1,79 @@
+/* Design tokens — docs/ui-specification.md §1 */
+
+:root {
+  --bg: #fbfbfa;
+  --bg-raised: #ffffff;
+  --bg-sunken: #f2f2ef;
+  --border: #dcdcd6;
+  --border-strong: #c3c3bb;
+  --fg: #1b1d1f;
+  --fg-muted: #5c6166;
+  --fg-subtle: #878c92;
+  --accent: #2563eb;
+  --accent-fg: #ffffff;
+  --added-bg: #e6f6ec;
+  --added-fg: #14532d;
+  --removed-bg: #fdeaea;
+  --removed-fg: #7f1d1d;
+  --changed-bg: #fdf5e0;
+  --changed-fg: #713f12;
+  --danger: #b42318;
+  --success: #067647;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 26px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  --shadow-1: 0 4px 16px rgb(0 0 0 / 0.12);
+
+  --header-h: 56px;
+  --container-max: 1180px;
+  --panel-min-h: 240px;
+
+  --motion: 120ms ease-out;
+}
+
+[data-theme="dark"] {
+  --bg: #0f1115;
+  --bg-raised: #161a21;
+  --bg-sunken: #0a0c10;
+  --border: #2a3038;
+  --border-strong: #3a424d;
+  --fg: #e6e8eb;
+  --fg-muted: #9aa2ad;
+  --fg-subtle: #6b7280;
+  --accent: #6ea8fe;
+  --accent-fg: #0f1115;
+  --added-bg: #102b1c;
+  --added-fg: #7ee2a8;
+  --removed-bg: #331416;
+  --removed-fg: #f4a3a3;
+  --changed-bg: #2e2510;
+  --changed-fg: #e8c97a;
+  --danger: #f97066;
+  --success: #4ade80;
+  --shadow-1: 0 4px 16px rgb(0 0 0 / 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion: 0ms; }
+}

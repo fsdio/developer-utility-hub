@@ -1,0 +1,51 @@
+name: Report a Bug
+description: Laporkan perilaku yang salah.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Jangan lampirkan data sensitif.** Gunakan contoh minimal yang mereproduksi masalah.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Ringkasan masalah
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Langkah reproduksi
+      placeholder: |
+        1. Buka #/tools/json-formatter
+        2. Tempel {"a":}
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Hasil yang diharapkan
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Hasil aktual
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser / perangkat
+      placeholder: "Chrome 141, Windows 11 / Safari iOS 18"
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Screenshot atau log
+      description: Pastikan tidak berisi data sensitif.
+    validations:
+      required: false

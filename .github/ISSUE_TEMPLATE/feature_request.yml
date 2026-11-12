@@ -1,0 +1,44 @@
+name: Suggest a Feature
+description: Usulkan utility atau peningkatan baru.
+title: "[Feature] "
+labels: ["feature-request", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Terima kasih. Usulan dinilai berdasarkan kebutuhan nyata, bukan jumlah fitur.
+        Bacalah `docs/PRD.md` dan `docs/backlog.md` terlebih dahulu.
+  - type: input
+    id: feature-name
+    attributes:
+      label: Nama fitur
+      placeholder: "Contoh: Base64 encoder / decoder"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Masalah yang diselesaikan
+      description: Situasi apa yang membuat Anda membutuhkan ini?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Perilaku yang diharapkan
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case konkret
+      description: Contoh input dan output yang Anda harapkan.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Catatan tambahan
+      description: Alternatif yang sudah dicoba, tool lain, atau batasan penting.
+    validations:
+      required: false
