@@ -20,5 +20,6 @@ yang sebelumnya terbuka di blueprint (§14) dan tidak boleh dibuka kembali tanpa
 | [0013](0013-offline-mode-build-id.md) | Offline mode: service worker + ID build sebagai penentu | Accepted | §12 |
 | [0014](0014-single-form-single-action.md) | Satu form, satu aksi: hasil menggantikan isi form | Accepted | ui-spec |
 | [0015](0015-diff-in-form-and-formatter-in-place.md) | Diff di dalam kedua form, formatter mengubah isi form | Accepted | §3.2, §3.3 |
+| [0016](0016-custom-domain-base-path.md) | Custom domain: base path satu env var, CSP `connect-src 'self'` | Accepted | §12 |
 
 Format ADR: Konteks → Keputusan → Konsekuensi → Alternatif yang ditolak.

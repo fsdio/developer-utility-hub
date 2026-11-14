@@ -5,6 +5,19 @@ dan [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Unreleased]
 
+### Changed — custom domain (ADR-0016)
+
+- **Base path jadi satu sumber**: `scripts/site-base.mjs` (env `VITE_BASE_PATH`,
+  default `/`) dipakai `vite.config.ts`, `postbuild`, dan `preview-check`.
+  Situs kini disajikan dari root `https://developerutilityhub.web.id/`.
+- **`public/CNAME`** ditambahkan agar domain kustom bertahan di setiap deploy.
+- **CSP `connect-src`**: `'none'` → `'self'`. Tanpa ini cek `version.json`
+  (ADR-0013) diblokir browser sehingga build baru tak pernah terdeteksi.
+- **Smoke test** mengikuti base build-nya dan mewajibkan `version.json`, `sw.js`,
+  `manifest.webmanifest`, `404.html` 200.
+- `CACHE` service worker naik ke `duh-shell-v2` agar cache dengan path lama
+  dibuang setelah pindah domain.
+
 ### Changed — diff di dalam form, formatter di tempat (ADR-0015)
 
 - **Text Diff**: panel hasil, tabel diff, dan empty state "Menunggu input"

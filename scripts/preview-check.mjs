@@ -1,15 +1,19 @@
 #!/usr/bin/env node
 /**
- * Smoke test hasil build pada base path GitHub Pages (technical-design §12).
- * Memastikan index.html dan semua aset yang dirujuk dapat dilayani dari
- * subpath /developer-utility-hub/ dan tidak ada referensi absolut ke root.
+ * Smoke test hasil build pada base path yang dipakai build itu (technical-design
+ * §12). Memastikan index.html dan semua aset yang dirujuk dapat dilayani dari
+ * base tersebut dan tidak ada referensi absolut ke luar base.
+ *
+ * Base ditentukan oleh `scripts/site-base.mjs` (ADR-0016): "/" untuk custom
+ * domain, atau VITE_BASE_PATH=/developer-utility-hub/ untuk project page.
  */
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
+import { siteBase } from "./site-base.mjs";
 
 const ROOT = new URL("..", import.meta.url).pathname;
-const BASE = "/developer-utility-hub/";
+const BASE = siteBase();
 const DIST = join(ROOT, "dist");
 const PORT = Number(process.env.PREVIEW_PORT ?? 4319);
 const HOST = "127.0.0.1";
@@ -27,7 +31,7 @@ const server = createServer(async (request, response) => {
   const url = new URL(request.url ?? "/", `http://${HOST}`);
   let path = url.pathname;
 
-  if (path === BASE.slice(0, -1)) {
+  if (BASE !== "/" && path === BASE.slice(0, -1)) {
     response.writeHead(302, { Location: BASE });
     response.end();
     return;
@@ -86,19 +90,38 @@ const check = async () => {
     if (!ok) failures.push(`${ref} mengembalikan ${assetResponse.status}`);
   }
 
-  if (localAssets.length === 0) failures.push("Tidak ada aset dengan base path yang benar di index.html");
+  if (localAssets.length === 0 && BASE !== "/") {
+    failures.push("Tidak ada aset dengan base path yang benar di index.html");
+  }
 
-  const rootAbsolute = assetRefs.filter((ref) => ref.startsWith("/") && !ref.startsWith(BASE));
-  if (rootAbsolute.length > 0) {
-    failures.push(`Referensi absolut ke root (akan 404 di GitHub Pages): ${rootAbsolute.join(", ")}`);
+  // Berkas yang wajib ada di artefak apa pun base-nya (ADR-0013/ADR-0016).
+  for (const required of ["version.json", "sw.js", "manifest.webmanifest", "404.html"]) {
+    const response = await fetch(`${origin}${BASE}${required}`);
+    const ok = response.status === 200;
+    console.log(`${ok ? "✓" : "✗"} ${BASE}${required}: ${response.status}`);
+    if (!ok) failures.push(`${required} tidak tersedia di build`);
+  }
+
+  // Referensi absolut di luar base akan 404 di GitHub Pages (mis. build custom
+  // domain yang masih menunjuk /developer-utility-hub/).
+  const outsideBase = assetRefs.filter((ref) => ref.startsWith("/") && !ref.startsWith(BASE));
+  if (outsideBase.length > 0) {
+    failures.push(`Referensi di luar base ${BASE} (akan 404): ${outsideBase.join(", ")}`);
   }
 
   const csp = /http-equiv="Content-Security-Policy" content="([^"]+)"/.exec(html);
   if (!csp) {
     failures.push("Meta CSP tidak ditemukan di build produksi");
   } else {
-    if (!csp[1].includes("connect-src 'none'")) failures.push("CSP tidak menetapkan connect-src 'none'");
-    console.log("✓ Meta CSP tersuntik dengan connect-src 'none'");
+    // Harus 'self' agar cek versi (version.json) tidak diblokir, tetapi tidak
+    // boleh lebih longgar dari itu — privasi input tetap terjaga (ADR-0013).
+    if (!csp[1].includes("connect-src 'self'")) {
+      failures.push("CSP harus menetapkan connect-src 'self'");
+    }
+    if (/connect-src[^;]*(\*|https?:)/.test(csp[1])) {
+      failures.push("CSP connect-src terlalu longgar: hanya 'self' yang diizinkan");
+    }
+    console.log("✓ Meta CSP tersuntik dengan connect-src 'self'");
   }
 
   server.close();
@@ -107,7 +130,7 @@ const check = async () => {
     for (const failure of failures) console.error(`  - ${failure}`);
     process.exit(1);
   }
-  console.log("\n✓ Build berfungsi pada base path GitHub Pages.");
+  console.log(`\n✓ Build berfungsi pada base path "${BASE}".`);
 };
 
 check().catch((error) => {

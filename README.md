@@ -50,8 +50,15 @@ npm run dev            # http://localhost:5173
 Build dan verifikasi penuh (dipakai CI):
 
 ```bash
-npm run build          # dist/ + 404.html + .nojekyll
+npm run build          # dist/ + 404.html + .nojekyll + version.json
 npm run verify         # lint → typecheck → test → build → boundaries → bundle → kontras → preview
+```
+
+Base path situs **default `/`** (custom domain `developerutilityhub.web.id`,
+ADR-0016). Untuk membangun versi project page `fsdio.github.io/developer-utility-hub/`:
+
+```bash
+VITE_BASE_PATH=/developer-utility-hub/ npm run build
 ```
 
 Perintah lain:
@@ -84,7 +91,9 @@ engine di `src/lib/{text,json,xml,diff}` tidak boleh mengimpor React atau menyen
 
 ## Privasi
 
-- Isi input tidak dikirim ke server: CSP build menetapkan `connect-src 'none'`.
+- Isi input tidak dikirim ke server: CSP build menetapkan `connect-src 'self'`,
+  sehingga hanya origin situs ini yang boleh dihubungi — praktisnya satu berkas
+  `version.json` untuk cek build baru (tidak pernah membawa isi input).
 - Isi input tidak disimpan: tidak ada di `localStorage`, URL, atau riwayat.
 - Yang disimpan hanya preferensi tampilan (`duh:v1:theme`, indent, opsi diff).
   Daftar lengkap ada di halaman `#/privacy` dan berasal dari satu konstanta di kode.
@@ -94,6 +103,13 @@ engine di `src/lib/{text,json,xml,diff}` tidak boleh mengimpor React atau menyen
 
 Lihat `docs/adr/` — aturan case conversion, semantik JSON Diff, kebijakan fidelity
 XML, status XML↔JSON, batas ukuran input, dan pilihan stack/versi.
+
+## Deployment
+
+Situs produksi: **https://developerutilityhub.web.id/** (GitHub Pages + domain
+kustom, HTTPS enforced). Deploy otomatis dari `main` lewat
+`.github/workflows/deploy.yml`; `public/CNAME` menjaga domain tetap terpasang.
+Detail DNS dan langkah pindah domain ada di ADR-0016.
 
 ## Kontribusi
 

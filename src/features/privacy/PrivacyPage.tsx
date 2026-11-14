@@ -24,8 +24,10 @@ export function PrivacyPage() {
         <h2>Tidak pernah dikirim</h2>
         <p>
           Isi input Anda tidak dikirim ke server mana pun. Tidak ada backend, tidak ada analytics,
-          dan Content Security Policy aplikasi menetapkan <code>connect-src 'none'</code> sehingga
-          permintaan jaringan dari halaman ini diblokir oleh browser.
+          dan Content Security Policy aplikasi menetapkan <code>connect-src 'self'</code> sehingga
+          browser hanya mengizinkan permintaan ke origin ini sendiri — praktisnya satu berkas
+          <code>version.json</code> untuk memeriksa apakah ada build baru. Tidak ada permintaan
+          yang pernah membawa isi input Anda.
         </p>
 
         <h2>Tidak pernah disimpan</h2>

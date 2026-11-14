@@ -7,16 +7,19 @@
 import { writeFile, readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
+import { siteBase } from "./site-base.mjs";
 
 const ROOT = new URL("..", import.meta.url).pathname;
 const DIST = join(ROOT, "dist");
 
 const indexHtml = await readFile(join(DIST, "index.html"), "utf8");
+/** Base path build ini ("/" untuk custom domain). Dipakai skrip redirect 404. */
+const BASE = siteBase();
 const redirectScript = `
     <script>
       // GitHub Pages menyajikan 404.html untuk path tak dikenal; kembalikan ke hash route.
       (function () {
-        var fallbackBase = ${JSON.stringify("/developer-utility-hub/")};
+        var fallbackBase = ${JSON.stringify(BASE)};
         var target = location.pathname.indexOf(fallbackBase) === 0
           ? location.pathname.slice(fallbackBase.length - 1)
           : "/";

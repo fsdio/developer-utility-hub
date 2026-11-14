@@ -208,7 +208,7 @@ Aturan ini diuji dengan skrip impor sederhana di `scripts/check-boundaries.mjs`
 | Clipboard | Ditangani sebagai kegagalan yang terlihat, bukan error senyap. |
 | Dependency | `npm audit` di CI (gagal pada severity high), Dependabot mingguan, `package-lock.json` di-commit. |
 | Secret | Tidak ada secret di frontend; tautan GitHub Issues memakai URL publik saja. |
-| CSP | Meta CSP di `index.html`: `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'`. `connect-src 'none'` secara teknis **mencegah** pengiriman input ke mana pun. |
+| CSP | Meta CSP di `index.html`: `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'`. `connect-src 'self'` hanya mengizinkan permintaan ke origin sendiri — praktisnya `version.json` (ADR-0013). Dulu `'none'`, tetapi itu memblokir cek versi sehingga build baru tak pernah terdeteksi. |
 | Referrer | `<meta name="referrer" content="no-referrer">`. |
 
 Catatan: `style-src 'self'` tanpa `'unsafe-inline'` berarti tidak boleh ada atribut
@@ -237,10 +237,11 @@ per-ikon (`lucide-react/icons/...`) agar tree-shaking pasti.
 | Kontrak privasi | Vitest | tidak ada kunci storage berisi input; tidak ada `fetch`/`XHR` terpanggil (mock global) |
 | Batas modul | `scripts/check-boundaries.mjs` | lihat §7 |
 | Build | `scripts/check-bundle.mjs` | budget §10 |
-| Deployment | `scripts/preview-check.mjs` (Playwright opsional) | `index.html` + `assets/*` 200 saat di-serve dari `/developer-utility-hub/` |
+| Deployment | `scripts/preview-check.mjs` (Playwright opsional) | `index.html`, `assets/*`, `version.json`, `sw.js` 200 saat di-serve dari base path build-nya |
 
 Bukan E2E penuh di MVP (blueprint: Playwright "bila cakupan memadai"). Smoke test
-hasil build dijalankan di CI dengan `vite preview --base=/developer-utility-hub/`.
+hasil build dijalankan di CI pada base path yang sama dengan build itu
+(`scripts/site-base.mjs`).
 
 ## 12. CI/CD
 
@@ -262,6 +263,21 @@ checkout → setup-node 22 (cache npm) → npm ci
 (`dist`) → `deploy-pages`. Permission minimum: `contents: read`, `pages: write`,
 `id-token: write`; `concurrency: {group: pages, cancel-in-progress: false}`.
 Tidak ada deploy dari branch lain atau dari PR fork.
+
+### 12.0 Base path & custom domain (ADR-0016)
+
+Base path punya satu sumber kebenaran: `scripts/site-base.mjs`, yang membaca
+`VITE_BASE_PATH` (default `/`). Dipakai oleh `vite.config.ts`,
+`scripts/postbuild.mjs`, dan `scripts/preview-check.mjs`.
+
+| Skenario | `VITE_BASE_PATH` | URL |
+|---|---|---|
+| Custom domain (`public/CNAME` = `developerutilityhub.web.id`) | tidak diset → `/` | `https://developerutilityhub.web.id/` |
+| Project page `fsdio.github.io/developer-utility-hub/` | `/developer-utility-hub/` | `https://fsdio.github.io/developer-utility-hub/` |
+
+`public/CNAME` ikut tersalin ke `dist/` sehingga GitHub Pages mempertahankan
+domain kustom di setiap deploy. Bila base berubah, naikkan `CACHE` di
+`public/sw.js` agar cache service worker dengan path lama dibuang.
 
 ### 12.1 Offline mode (ADR-0013)
 

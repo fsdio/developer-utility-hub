@@ -10,7 +10,9 @@
  * - `version.json` TIDAK pernah di-cache: hanya berkas ini yang perlu ditanya ke
  *   server untuk menentukan apakah build berubah.
  */
-const CACHE = "duh-shell-v1";
+// Dinaikkan saat base path berubah (project page → custom domain) agar cache
+// lama dengan path berbeda dibuang pada event `activate` (ADR-0016).
+const CACHE = "duh-shell-v2";
 const PRECACHE = ["index.html", "manifest.webmanifest", "favicon.svg"];
 
 self.addEventListener("install", (event) => {
