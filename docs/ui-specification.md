@@ -211,6 +211,30 @@ Semua satu kolom. Panel satu-input tetap satu panel; strip hasil inline berada d
 bawah isi form, `min-height` panel 180 px. Toolbar membungkus ke beberapa baris
 (`.action-group` ikut wrap) agar tombol aksi tidak perlu digulir horizontal.
 
+### Kontrol form (ADR-0020)
+
+Semua kontrol teks memakai satu sistem: latar `--bg-raised`, border 1 px
+`--border-strong`, sudut 0, padding `7px 10px`, **tinggi minimum 34 px** sehingga
+sejajar dengan tombol di toolbar.
+
+```
+┌ Toolbar ─────────────────────────────────────────────────────────────┐
+│ [Generate]  Panjang [43 (256 bit) ▾]  Alfabet [Base64URL (64) ▾]     │
+│             └ semua kontrol 34 px, chevron --fg-subtle ┘             │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+- `select` memakai `appearance: none` + chevron buatan (dua gradien) agar
+  warnanya mengikuti tema; opsinya `background: --bg-raised`.
+- `textarea` minimal 84 px dan bisa di-resize vertikal; varian
+  `.control-input--area` (kunci PEM) memakai font mono `--text-xs`.
+- Fokus: `border-color: --accent` + `--focus-ring`; tidak ada outline bawaan.
+- Placeholder `--fg-subtle`; kontrol `:disabled` diredupkan + `cursor: not-allowed`.
+- Label tetap `sr-only` (ADR-0011); hint tetap `sr-only` lewat
+  `aria-describedby`. Tidak ada teks pengapit baru.
+- Pengecualian bergaya sendiri: `CodeArea`, kotak cari katalog, combobox
+  `Ctrl+K`, input file tersembunyi, dan pemilih warna.
+
 ### Katalog berbentuk daftar (ADR-0019)
 
 ```

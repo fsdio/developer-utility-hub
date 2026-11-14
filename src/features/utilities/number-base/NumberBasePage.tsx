@@ -6,7 +6,7 @@ import { InlineResult } from "@/components/editor/InlineResult";
 import { ResetButton } from "@/components/common/ResetButton";
 import { ErrorMessage } from "@/components/common/StatusMessage";
 import { Button } from "@/components/common/Button";
-import { FieldLabel, SelectField } from "@/components/common/Field";
+import { SelectField, TextField } from "@/components/common/Field";
 import { groupBinary, NUMBER_BASES, parseNumber, type NumberBase } from "@/lib/dev/number-base";
 import { getTool } from "@/registry/tools";
 
@@ -52,23 +52,17 @@ export default function NumberBasePage() {
       }
     >
       <Panel label="Angka" stacked tone={result && !result.ok ? "error" : "default"}>
-        <div className="field-body field-body--inline">
-          <FieldLabel htmlFor="number-input">Angka dalam basis {base}</FieldLabel>
-          <input
+        <div className="field-body">
+          <TextField
             id="number-input"
-            type="text"
+            label={`Angka dalam basis ${base}`}
             value={input}
-            spellCheck={false}
             inputMode={base === "10" ? "numeric" : "text"}
             placeholder={base === "16" ? "0xFF" : base === "2" ? "1010" : "255"}
-            aria-invalid={result ? !result.ok : undefined}
-            aria-describedby="number-input-hint"
-            onChange={(event) => setInput(event.target.value)}
+            error={result ? !result.ok : false}
+            hint="Prefix 0b, 0o, 0x dan pemisah underscore diizinkan. Perhitungan memakai BigInt, sehingga angka besar tidak kehilangan presisi."
+            onChange={setInput}
           />
-          <span id="number-input-hint" className="sr-only">
-            Prefix 0b, 0o, 0x dan pemisah underscore diizinkan. Perhitungan memakai BigInt,
-            sehingga angka besar tidak kehilangan presisi.
-          </span>
         </div>
         <InlineResult
           label="Semua basis"

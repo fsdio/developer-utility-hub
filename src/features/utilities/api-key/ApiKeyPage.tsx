@@ -5,7 +5,7 @@ import { CodeArea } from "@/components/editor/CodeArea";
 import { CopyButton } from "@/components/common/CopyButton";
 import { ResetButton } from "@/components/common/ResetButton";
 import { Button } from "@/components/common/Button";
-import { FieldLabel, SelectField } from "@/components/common/Field";
+import { SelectField, TextField } from "@/components/common/Field";
 import { ErrorMessage, StatusMessage } from "@/components/common/StatusMessage";
 import {
   TOKEN_ALPHABETS,
@@ -147,27 +147,20 @@ export default function ApiKeyPage() {
           readOnly
         />
         <div className="field-body field-body--inline">
-          <FieldLabel htmlFor="api-key-prefix">Awalan opsional</FieldLabel>
-          <input
+          <TextField
             id="api-key-prefix"
-            type="text"
+            label="Awalan opsional"
             value={prefix}
-            spellCheck={false}
             placeholder="sk_live_"
-            onChange={(event) => setPrefix(event.target.value)}
+            onChange={setPrefix}
           />
-          <FieldLabel htmlFor="api-key-digest-alg">Algoritma sidik jari</FieldLabel>
-          <select
+          <SelectField
             id="api-key-digest-alg"
+            label="Algoritma sidik jari"
             value={digestAlgorithm}
-            onChange={(event) => setDigestAlgorithm(event.target.value as DigestAlgorithm)}
-          >
-            {DIGEST_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            options={DIGEST_OPTIONS}
+            onChange={setDigestAlgorithm}
+          />
         </div>
       </Panel>
 

@@ -322,6 +322,24 @@ sama seperti tool lain, isi input hanya hidup di state React (PRD §3).
 sehingga tidak ada daftar kategori kedua. Katalog merender `ToolRow` di dalam
 `<ul class="tool-list">`; `ToolCard`/`card-grid` tidak lagi dipakai katalog.
 
+### 12.5 Kontrol form (ADR-0020)
+
+`src/components/common/Field.tsx` mengekspor `TextField`, `TextAreaField`,
+`SelectField`, `CheckboxField`, dan `FieldLabel`. Ketiganya merender pola
+`.control` → `.control-input` (+ `--mono`, `--area`) dengan label `sr-only`,
+hint `aria-describedby`, dan `aria-invalid` otomatis.
+
+`src/styles/base.css` menormalkan `select`, `textarea`, dan setiap `input`
+kecuali `checkbox`/`radio`/`range`/`file`/`color`: `font: inherit`, tinggi
+minimum 34 px, border `--border-strong`, `border-radius: 0`, serta state
+`:hover`, `:focus-visible` (`--focus-ring`), dan `:disabled`. `select` memakai
+`appearance: none` + chevron dua gradien.
+
+`src/test/form-controls.test.tsx` memindai seluruh `src/**/*.tsx` dan gagal bila
+ada `<input>/<select>/<textarea>` tanpa kelas di luar daftar pengecualian
+(`CodeArea`, `FileDropZone`, `ToolSearch`, kotak cari katalog, pemilih warna),
+lalu memeriksa stylesheet tetap memuat aturan normalisasi tersebut.
+
 ### 12.1 Offline mode (ADR-0013)
 
 `scripts/postbuild.mjs` menulis `dist/version.json` berisi `id` (sha256

@@ -5,7 +5,7 @@ import { CodeArea } from "@/components/editor/CodeArea";
 import { CopyButton } from "@/components/common/CopyButton";
 import { ResetButton } from "@/components/common/ResetButton";
 import { Button } from "@/components/common/Button";
-import { FieldLabel, SelectField } from "@/components/common/Field";
+import { SelectField, TextAreaField, TextField } from "@/components/common/Field";
 import { StatusMessage } from "@/components/common/StatusMessage";
 import {
   JWT_ALGORITHMS,
@@ -143,28 +143,23 @@ export default function JwtVerifyPage() {
           hint="Tempel token JWS (3 bagian). Decode langsung terlihat di bawah; tekan Verifikasi untuk memeriksa signature."
           rows={4}
         />
-        <div className="field-body field-body--inline">
-          <FieldLabel htmlFor="jwt-verify-key">Kunci verifikasi</FieldLabel>
-          <textarea
+        <div className="field-body">
+          <TextAreaField
             id="jwt-verify-key"
-            className="code-area code-area--key"
+            label="Kunci verifikasi"
             rows={algorithm.startsWith("HS") ? 2 : 6}
-            spellCheck={false}
             value={key}
             placeholder={
               algorithm.startsWith("HS")
                 ? "secret HMAC (teks biasa)"
                 : "-----BEGIN PUBLIC KEY-----\n…\n-----END PUBLIC KEY-----"
             }
-            aria-describedby="jwt-verify-key-hint"
-            onChange={(event) => {
-              setKey(event.target.value);
+            hint="Untuk HMAC tempel secret; untuk RSA/ECDSA/EdDSA tempel kunci publik PEM."
+            onChange={(value) => {
+              setKey(value);
               setCheck(null);
             }}
           />
-          <span id="jwt-verify-key-hint" className="sr-only">
-            Untuk HMAC tempel secret; untuk RSA/ECDSA/EdDSA tempel kunci publik PEM.
-          </span>
         </div>
       </Panel>
 
@@ -218,21 +213,19 @@ export default function JwtVerifyPage() {
             </ul>
           )}
           <div className="field-body field-body--inline">
-            <FieldLabel htmlFor="jwt-verify-iss">Issuer yang diharapkan</FieldLabel>
-            <input
+            <TextField
               id="jwt-verify-iss"
-              type="text"
+              label="Issuer yang diharapkan"
               value={expectedIssuer}
               placeholder="https://auth.contoh.com"
-              onChange={(event) => setExpectedIssuer(event.target.value)}
+              onChange={setExpectedIssuer}
             />
-            <FieldLabel htmlFor="jwt-verify-aud">Audience yang diharapkan</FieldLabel>
-            <input
+            <TextField
               id="jwt-verify-aud"
-              type="text"
+              label="Audience yang diharapkan"
               value={expectedAudience}
               placeholder="api-saya"
-              onChange={(event) => setExpectedAudience(event.target.value)}
+              onChange={setExpectedAudience}
             />
           </div>
         </Panel>

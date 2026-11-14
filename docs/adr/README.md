@@ -24,5 +24,6 @@ yang sebelumnya terbuka di blueprint (§14) dan tidak boleh dibuka kembali tanpa
 | [0017](0017-image-and-pdf-base64.md) | Konversi gambar & PDF ke Base64 dan sebaliknya | Accepted | §3.1, §12.2 |
 | [0018](0018-auth-tools-jwt-verify-basic-and-api-key.md) | Tool auth: verifikasi JWT, Basic Auth, generator API key | Accepted | §3.4 |
 | [0019](0019-catalog-list-and-task-grouping.md) | Katalog berbentuk daftar + enam kategori menurut tugas (menggantikan kartu di 0010) | Accepted | §15, IA §1 |
+| [0020](0020-form-control-system.md) | Satu sistem kontrol form: normalisasi CSS + `TextField`/`TextAreaField`/`SelectField` | Accepted | ui-spec |
 
 Format ADR: Konteks → Keputusan → Konsekuensi → Alternatif yang ditolak.

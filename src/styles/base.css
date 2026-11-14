@@ -378,6 +378,13 @@ code, pre, textarea {
 
 .toolbar-spacer { flex: 1; }
 
+/* Di toolbar, kontrol memakai tinggi seragam dengan tombol. */
+.toolbar .field,
+.toolbar select,
+.toolbar .button { min-height: 34px; }
+
+.toolbar .field + .field { margin-left: var(--space-1); }
+
 .tool-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -421,6 +428,17 @@ code, pre, textarea {
 
 /* ---------- Form controls ---------- */
 
+/*
+ * Satu sistem kontrol untuk seluruh situs (ADR-0020).
+ *
+ * Sebelumnya hanya `input[type=text]` dan `input[type=search]` yang diberi
+ * gaya, sehingga `password`, `textarea`, `select` di dalam panel, dan kontrol
+ * native lain tampil dengan gaya bawaan browser: tinggi beda, sudut membulat,
+ * dan cincin fokus biru sistem. Aturan di bawah menormalkan semuanya lewat
+ * satu set variabel, lalu `select` diberi chevron sendiri karena tampilan
+ * bawaan `appearance: auto` tidak bisa diwarnai sesuai tema.
+ */
+
 .field {
   display: inline-flex;
   align-items: center;
@@ -430,6 +448,11 @@ code, pre, textarea {
   white-space: nowrap;
 }
 
+.field-text {
+  color: var(--fg-subtle);
+  font-size: var(--text-xs);
+}
+
 .field-label {
   display: block;
   font-size: var(--text-sm);
@@ -437,39 +460,133 @@ code, pre, textarea {
   margin-bottom: var(--space-1);
 }
 
+/* Wadah vertikal untuk satu kontrol + hint tersembunyi. */
+.control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  min-width: 0;
+}
+
+/* Normalisasi semua kontrol teks, termasuk yang belum pernah diberi kelas. */
 select,
-input[type="text"],
-input[type="search"] {
+textarea,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]) {
   font: inherit;
   font-size: var(--text-sm);
+  line-height: 1.4;
   color: var(--fg);
   background: var(--bg-raised);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-md);
   padding: 7px 10px;
-  transition: border-color var(--motion), box-shadow var(--motion);
+  min-height: 34px;
+  transition: border-color var(--motion), box-shadow var(--motion), background var(--motion);
 }
 
 select:hover,
-input[type="text"]:hover,
-input[type="search"]:hover { border-color: var(--fg-subtle); }
+textarea:hover,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]):hover {
+  border-color: var(--fg-subtle);
+}
 
 select:focus-visible,
-input[type="text"]:focus-visible,
-input[type="search"]:focus-visible {
+textarea:focus-visible,
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]):focus-visible {
   outline: none;
   border-color: var(--accent);
   box-shadow: var(--focus-ring);
 }
 
+textarea {
+  resize: vertical;
+  min-height: 84px;
+}
+
+::placeholder { color: var(--fg-subtle); opacity: 1; }
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--bg-sunken);
+}
+
+/* Select: panah sendiri supaya warnanya mengikuti tema. */
+select {
+  appearance: none;
+  padding-right: 30px;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--fg-subtle) 50%),
+    linear-gradient(135deg, var(--fg-subtle) 50%, transparent 50%);
+  background-position:
+    calc(100% - 15px) calc(50% + 1px),
+    calc(100% - 10px) calc(50% + 1px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+select option {
+  background: var(--bg-raised);
+  color: var(--fg);
+}
+
+.select-wrap { display: inline-flex; min-width: 0; }
+
+select::-ms-expand { display: none; }
+
 .text-input { width: 100%; }
 .mono-input { font-family: var(--font-mono); }
 
-input[type="checkbox"] {
+/* Input di dalam panel isian: lebih tinggi dan monospace agar angka/kode terbaca. */
+.control-input {
+  width: 100%;
+  min-width: 0;
+}
+
+.control-input--mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  padding: 10px 12px;
+}
+
+.control-input--area {
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
   accent-color: var(--accent);
   width: 14px;
   height: 14px;
+  margin: 0;
+  flex: 0 0 auto;
 }
+
+/* File picker (dipakai FileDropZone lewat input tersembunyi). */
+input[type="file"] {
+  font: inherit;
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+}
+
+input[type="file"]::file-selector-button {
+  font: inherit;
+  font-size: var(--text-xs);
+  color: var(--fg);
+  background: var(--bg-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 5px 10px;
+  margin-right: var(--space-2);
+  cursor: pointer;
+}
+
+input[type="file"]::file-selector-button:hover { border-color: var(--fg-subtle); }
 
 /* ---------- Status messages ---------- */
 
@@ -950,8 +1067,11 @@ kbd {
   white-space: pre-wrap;
 }
 
-/* Satu input saja di dalam panel: tanpa label terlihat, mengisi lebar. */
-/* Input tunggal di atas strip hasil: menempel ke atas, bukan di tengah. */
+/*
+ * Satu-satunya definisi `.field-body` (ADR-0020). Sebelumnya `.field-body--inline`
+ * didefinisikan dua kali dan yang kedua menghapus `border-bottom`, sehingga
+ * pemisah antara area isian dan strip hasil hilang tanpa ketahuan.
+ */
 .field-body--inline {
   flex: 0 0 auto;
   justify-content: flex-start;
@@ -968,12 +1088,23 @@ kbd {
   width: 100%;
 }
 
-.field-body input[type="text"] {
-  width: 100%;
-  font-family: var(--font-mono);
-  font-size: var(--text-base);
-  padding: 10px 12px;
+/* Label di dalam panel isian tetap tersembunyi (ADR-0011): cukup judul panel. */
+.field-body .field-label { display: none; }
+
+/* Dua kontrol berdampingan (mis. username + password) membungkus rapi. */
+.field-body--inline {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-2);
 }
+
+.field-body--inline .control {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.field-body--inline .control-input--area { flex-basis: 100%; }
 
 .inline-input-row {
   display: flex;
@@ -1780,12 +1911,6 @@ kbd {
 
 .verify-body { padding: var(--space-3); }
 
-.code-area--key {
-  width: 100%;
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  resize: vertical;
-}
 
 /* Daftar katalog jadi satu kolom penuh di layar sempit. */
 @media (max-width: 760px) {

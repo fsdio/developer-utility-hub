@@ -25,6 +25,21 @@ dan [Semantic Versioning](https://semver.org/lang/id/).
 - Engine `src/lib/dev/auth.ts` dengan 32 unit test (sign/verify nyata, deteksi
   tamper, `alg: none`, kunci privat ditolak, bias generator, sidik jari).
 
+### Fixed — kontrol form yang masih tampil native (ADR-0020)
+
+- Stylesheet kini menormalkan **semua** kontrol, bukan hanya
+  `input[type=text]`/`search`: `password`, `textarea`, dan `select` (termasuk di
+  toolbar) memakai latar, border, dan tinggi yang sama (34 px) dengan tombol.
+- `select` digambar ulang dengan `appearance: none` + chevron buatan yang
+  mengikuti tema; opsi dropdown, `::placeholder`, `:disabled`, dan
+  `input[type=file]::file-selector-button` ikut diberi gaya.
+- Komponen baru `TextField`, `TextAreaField`, dan `SelectField` (selalu
+  `.select-wrap`) menggantikan markup ad-hoc di Number Base, Timestamp,
+  JWT Verifier, Basic Auth, dan API Key.
+- `src/test/form-controls.test.tsx` mengunci aturan: daftar berkas yang boleh
+  memakai kontrol mentah hanya `CodeArea`, kotak cari katalog/global,
+  `FileDropZone`, dan pemilih warna.
+
 ### Changed — katalog berbentuk daftar & enam kategori tugas (ADR-0019)
 
 - Katalog beranda kini **daftar baris** (`ToolRow`), bukan grid kartu: nama,

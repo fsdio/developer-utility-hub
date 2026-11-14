@@ -5,7 +5,7 @@ import { CodeArea } from "@/components/editor/CodeArea";
 import { CopyButton } from "@/components/common/CopyButton";
 import { ResetButton } from "@/components/common/ResetButton";
 import { Button } from "@/components/common/Button";
-import { FieldLabel } from "@/components/common/Field";
+import { TextField } from "@/components/common/Field";
 import { ErrorMessage, StatusMessage } from "@/components/common/StatusMessage";
 import { decodeBasicAuth, encodeBasicAuth } from "@/lib/dev/auth";
 import { getTool } from "@/registry/tools";
@@ -106,30 +106,23 @@ export default function BasicAuthPage() {
           rows={4}
         />
         <div className="field-body field-body--inline">
-          <FieldLabel htmlFor="basic-username">Username</FieldLabel>
-          <input
+          <TextField
             id="basic-username"
-            type="text"
-            autoComplete="off"
-            spellCheck={false}
+            label="Username"
             value={username}
             placeholder="rani"
-            onChange={(event) => setUsername(event.target.value)}
+            onChange={setUsername}
           />
-          <FieldLabel htmlFor="basic-password">Password</FieldLabel>
-          <input
+          <TextField
             id="basic-password"
+            label="Password"
             type="password"
-            autoComplete="off"
+            mono={false}
             value={password}
             placeholder="s3cret"
-            aria-describedby="basic-password-hint"
-            onChange={(event) => setPassword(event.target.value)}
+            hint="Basic Auth hanya Base64, bukan enkripsi: kata sandi tetap terbaca siapa pun yang memegang header. Selalu pakai HTTPS."
+            onChange={setPassword}
           />
-          <span id="basic-password-hint" className="sr-only">
-            Basic Auth hanya Base64, bukan enkripsi: kata sandi tetap terbaca siapa pun yang
-            memegang header. Selalu pakai HTTPS.
-          </span>
         </div>
       </Panel>
 
