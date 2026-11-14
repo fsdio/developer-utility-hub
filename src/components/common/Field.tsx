@@ -66,7 +66,7 @@ export function FieldLabel({
   visible?: boolean;
 }) {
   return (
-    <label className={visible ? "field-label" : "sr-only"} htmlFor={htmlFor}>
+    <label className={visible ? "field-label field-label--visible" : "sr-only"} htmlFor={htmlFor}>
       {children}
     </label>
   );

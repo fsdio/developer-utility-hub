@@ -11,58 +11,78 @@ const stubClipboard = (writeText: (text: string) => Promise<void>): void => {
   });
 };
 
-describe("CaseConverterPage", () => {
+const textbox = (): HTMLElement => screen.getByRole("textbox");
+
+describe("CaseConverterPage — satu form, satu aksi", () => {
   beforeEach(() => {
     stubClipboard(vi.fn().mockResolvedValue(undefined));
   });
 
-  it("menampilkan empty state saat input kosong", () => {
-    renderWithTheme(<CaseConverterPage />);
-    expect(screen.getByText(/Masukkan teks untuk melihat/i)).toBeInTheDocument();
+  it("memakai satu form, bukan panel hasil terpisah", () => {
+    const { container } = renderWithTheme(<CaseConverterPage />);
+    expect(screen.getAllByRole("textbox")).toHaveLength(1);
+    expect(container.querySelectorAll(".panel")).toHaveLength(1);
   });
 
-  it("mengonversi input ke sembilan gaya", async () => {
+  it("tombol gaya mengubah isi form di tempat", async () => {
     const user = userEvent.setup();
     renderWithTheme(<CaseConverterPage />);
 
-    await user.type(screen.getByLabelText("Teks sumber"), "HTTPResponse");
-    expect(await screen.findByLabelText("camelCase")).toHaveTextContent("httpResponse");
-    expect(screen.getByLabelText("snake_case")).toHaveTextContent("http_response");
-    expect(screen.getByLabelText("CONSTANT_CASE")).toHaveTextContent("HTTP_RESPONSE");
+    await user.type(textbox(), "HTTPResponse");
+    await user.click(screen.getByRole("button", { name: "snake_case" }));
+    expect(textbox()).toHaveValue("http_response");
+
+    await user.click(screen.getByRole("button", { name: "CONSTANT_CASE" }));
+    expect(textbox()).toHaveValue("HTTP_RESPONSE");
   });
 
-  it("tombol contoh mengisi input", async () => {
+  it("gaya bisa dirangkai karena hasil masuk kembali ke form", async () => {
     const user = userEvent.setup();
     renderWithTheme(<CaseConverterPage />);
 
-    await user.click(screen.getByRole("button", { name: /Coba contoh/i }));
-    expect(screen.getByLabelText("Teks sumber")).toHaveValue(
-      "Hello, World! userID from HTTPResponse",
-    );
+    await user.type(textbox(), "hello world");
+    await user.click(screen.getByRole("button", { name: "camelCase" }));
+    expect(textbox()).toHaveValue("helloWorld");
+
+    await user.click(screen.getByRole("button", { name: "kebab-case" }));
+    expect(textbox()).toHaveValue("hello-world");
   });
 
-  it("copy menyalin hasil satu gaya saja", async () => {
+  it("hanya ada SATU tombol salin di halaman", async () => {
+    const user = userEvent.setup();
+    renderWithTheme(<CaseConverterPage />);
+    await user.type(textbox(), "hello world");
+
+    expect(screen.getAllByRole("button", { name: /ke clipboard/i })).toHaveLength(1);
+  });
+
+  it("tombol salin menyalin isi form apa adanya", async () => {
     const user = userEvent.setup();
     const writeText = vi.fn().mockResolvedValue(undefined);
     stubClipboard(writeText);
     renderWithTheme(<CaseConverterPage />);
 
-    await user.type(screen.getByLabelText("Teks sumber"), "hello world");
-    const camelItem = (await screen.findByLabelText("camelCase")).closest(".case-item");
-    expect(camelItem).not.toBeNull();
-    const copyButton = camelItem!.querySelector("button");
-    expect(copyButton).not.toBeNull();
-    await user.click(copyButton!);
+    await user.type(textbox(), "hello world");
+    await user.click(screen.getByRole("button", { name: "camelCase" }));
+    await user.click(screen.getByRole("button", { name: /ke clipboard/i }));
 
     await waitFor(() => expect(writeText).toHaveBeenCalledWith("helloWorld"));
   });
 
-  it("reset mengosongkan input", async () => {
+  it("tombol contoh mengisi form", async () => {
     const user = userEvent.setup();
     renderWithTheme(<CaseConverterPage />);
 
-    await user.type(screen.getByLabelText("Teks sumber"), "hello");
+    await user.click(screen.getByRole("button", { name: /coba contoh/i }));
+    expect(textbox()).toHaveValue("Hello, World! userID from HTTPResponse");
+  });
+
+  it("reset mengosongkan form", async () => {
+    const user = userEvent.setup();
+    renderWithTheme(<CaseConverterPage />);
+
+    await user.type(textbox(), "hello");
     await user.click(screen.getByRole("button", { name: "Reset" }));
-    expect(screen.getByLabelText("Teks sumber")).toHaveValue("");
+    expect(textbox()).toHaveValue("");
   });
 });

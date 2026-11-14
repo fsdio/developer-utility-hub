@@ -20,6 +20,7 @@ const MODES = [
   { value: "form", label: "Form (+)" },
 ] as const;
 
+/** Satu form, satu aksi (ADR-0014): Encode/Decode mengubah isi form itu sendiri. */
 export default function UrlEncoderPage() {
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<"encode" | "decode">("encode");
@@ -32,19 +33,35 @@ export default function UrlEncoderPage() {
     return mode === "encode" ? encodeUrl(input, urlMode) : decodeUrl(input, { plusAsSpace });
   }, [input, mode, urlMode, plusAsSpace, overLimit]);
 
-  const output = result?.ok ? result.value : "";
+  const run = (next: "encode" | "decode"): void => {
+    setMode(next);
+    if (input.trim() === "") return;
+    const outcome =
+      next === "encode" ? encodeUrl(input, urlMode) : decodeUrl(input, { plusAsSpace });
+    if (outcome.ok) setInput(outcome.value);
+  };
 
   return (
     <ToolLayout
       tool={TOOL}
       toolbar={
         <>
-          <Button variant={mode === "encode" ? "primary" : "default"} onClick={() => setMode("encode")} aria-pressed={mode === "encode"}>
-            Encode
-          </Button>
-          <Button variant={mode === "decode" ? "primary" : "default"} onClick={() => setMode("decode")} aria-pressed={mode === "decode"}>
-            Decode
-          </Button>
+          <div className="action-group" role="group" aria-label="Arah konversi">
+            <Button
+              variant={mode === "encode" ? "primary" : "default"}
+              onClick={() => run("encode")}
+              aria-pressed={mode === "encode"}
+            >
+              Encode
+            </Button>
+            <Button
+              variant={mode === "decode" ? "primary" : "default"}
+              onClick={() => run("decode")}
+              aria-pressed={mode === "decode"}
+            >
+              Decode
+            </Button>
+          </div>
           {mode === "encode" ? (
             <SelectField id="url-mode" label="Gaya" value={urlMode} options={MODES} onChange={setUrlMode} />
           ) : (
@@ -56,42 +73,35 @@ export default function UrlEncoderPage() {
             />
           )}
           <span className="toolbar-spacer" />
-          <CopyButton text={output} />
-          <DownloadButton text={output} baseName="url-encoder" extension="txt" />
+          <CopyButton text={input} context="teks" />
+          <DownloadButton text={input} baseName="url-encoder" extension="txt" />
           <ResetButton onReset={() => setInput("")} disabled={input === ""} />
         </>
       }
     >
-      <div className="tool-grid">
-        <Panel
-          label="Input"
-          tone={result && !result.ok ? "error" : "default"}
-          footer={`${input.length.toLocaleString("id-ID")} / ${MAX_INPUT_LENGTH.toLocaleString("id-ID")} karakter`}
-        >
+      <Panel
+        label={mode === "encode" ? "Teks / URL" : "Teks ter-encode"}
+        tone={result && !result.ok ? "error" : "default"}
+        footer={`${input.length.toLocaleString("id-ID")} / ${MAX_INPUT_LENGTH.toLocaleString("id-ID")} karakter`}
+      >
+        {overLimit ? (
+          <EmptyState>Input melebihi 1.000.000 karakter. Perkecil input untuk memproses.</EmptyState>
+        ) : (
           <CodeArea
-            label={mode === "encode" ? "Teks atau URL yang akan di-encode" : "Teks ter-encode yang akan di-decode"}
+            label={
+              mode === "encode"
+                ? "Teks atau URL yang akan di-encode"
+                : "Teks ter-encode yang akan di-decode"
+            }
             value={input}
             onChange={setInput}
             placeholder={mode === "encode" ? "cari?q=satu dua&x=1" : "cari%3Fq%3Dsatu%20dua%26x%3D1"}
-            hint="encodeURIComponent meng-encode semua karakter kecuali A–Z a–z 0–9 - _ . ! ~ * ' ( )."
+            hint="Tekan Encode atau Decode; hasilnya menggantikan isi form. encodeURIComponent meng-encode semua karakter kecuali A–Z a–z 0–9 - _ . ! ~ * ' ( )."
             error={Boolean(result && !result.ok)}
+            rows={14}
           />
-        </Panel>
-
-        <Panel label="Hasil">
-          {overLimit ? (
-            <EmptyState>Input melebihi 1.000.000 karakter. Perkecil input untuk memproses.</EmptyState>
-          ) : result === null ? (
-            <EmptyState example={{ label: "Coba contoh", onUse: () => setInput("cari?q=satu dua&x=1") }}>
-              Percent-encoding untuk query string, path, atau nilai form.
-            </EmptyState>
-          ) : result.ok ? (
-            <pre className="output-area output-area--wrap">{result.value}</pre>
-          ) : (
-            <EmptyState>Perbaiki error untuk melihat hasil.</EmptyState>
-          )}
-        </Panel>
-      </div>
+        )}
+      </Panel>
 
       {result && !result.ok ? (
         <div className="result-block">

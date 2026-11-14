@@ -1,13 +1,11 @@
 import { useMemo, useState } from "react";
 import { ToolLayout } from "@/components/editor/ToolLayout";
 import { Panel } from "@/components/editor/Panel";
-import { DiffSummary } from "@/components/editor/DiffSummary";
 import { CodeArea } from "@/components/editor/CodeArea";
 import { CopyButton } from "@/components/common/CopyButton";
 import { DownloadButton } from "@/components/common/DownloadButton";
 import { ResetButton } from "@/components/common/ResetButton";
-import { EmptyState } from "@/components/common/EmptyState";
-import { ErrorMessage, StatusMessage } from "@/components/common/StatusMessage";
+import { ErrorMessage } from "@/components/common/StatusMessage";
 import { Button } from "@/components/common/Button";
 import { MAX_COMBINED_LENGTH } from "@/lib/limits";
 import { diffJson } from "@/lib/diff/json";
@@ -41,7 +39,11 @@ export default function JsonDiffPage() {
   }, [debouncedLeft, debouncedRight, overLimit, empty]);
 
   const patch = result?.ok ? patchToText(result.value.changes) : "";
-  const exportText = result?.ok ? (view === "patch" ? patch : JSON.stringify(result.value.changes, null, 2)) : "";
+  const exportText = result?.ok
+    ? view === "patch"
+      ? patch
+      : JSON.stringify(result.value.changes, null, 2)
+    : "";
 
   return (
     <ToolLayout
@@ -55,7 +57,7 @@ export default function JsonDiffPage() {
             Tampilan patch
           </Button>
           <span className="toolbar-spacer" />
-          <CopyButton text={exportText} />
+          <CopyButton text={exportText} context="hasil diff" />
           <DownloadButton
             text={exportText}
             baseName="json-diff"
@@ -82,7 +84,26 @@ export default function JsonDiffPage() {
             rows={10}
           />
         </Panel>
-        <Panel label="JSON kanan" footer={`${right.length.toLocaleString("id-ID")} karakter`}>
+
+        {/* Perubahan tampil di dalam panel kanan, tanpa strip/panel hasil
+            terpisah (ADR-0015). JSON tidak disorot per baris karena
+            perbandingannya struktural, jadi perubahannya didaftar per path. */}
+        <Panel
+          label="JSON kanan"
+          stacked
+          tone={result && !result.ok ? "error" : "default"}
+          footer={`${right.length.toLocaleString("id-ID")} karakter · ${
+            overLimit
+              ? "melebihi batas"
+              : empty
+                ? "menunggu input"
+                : result?.ok
+                  ? `+${result.value.added} −${result.value.removed} ~${result.value.changed}${
+                      result.value.identical ? " · identik" : ""
+                    }`
+                  : "error"
+          }`}
+        >
           <CodeArea
             label="JSON modified"
             value={right}
@@ -90,49 +111,33 @@ export default function JsonDiffPage() {
             placeholder='{"version": 2}'
             rows={10}
           />
-        </Panel>
-      </div>
-
-      <section className="result-block" aria-labelledby="json-diff-heading">
-        <h2 id="json-diff-heading" className="category-title">
-          Hasil perbandingan
-        </h2>
-
-        {overLimit ? (
-          <StatusMessage tone="error">
-            Total input melebihi 1.000.000 karakter. Perkecil input untuk membandingkan.
-          </StatusMessage>
-        ) : empty ? (
-          <EmptyState
-            example={{
-              label: "Isi kedua panel dengan contoh",
-              onUse: () => {
-                setLeft(EXAMPLE_LEFT);
-                setRight(EXAMPLE_RIGHT);
-              },
-            }}
-          >
-            Tempel dua JSON yang valid. Perbandingan dilakukan per struktur, bukan per baris.
-          </EmptyState>
-        ) : result && !result.ok ? (
-          <ErrorMessage error={result.error} />
-        ) : result?.ok ? (
-          <>
-            <DiffSummary
-              added={result.value.added}
-              removed={result.value.removed}
-              modified={result.value.changed}
-              note={result.value.identical ? "Kedua dokumen identik secara struktur." : undefined}
-            />
-
-            {result.value.identical ? null : view === "patch" ? (
-              <>
-                <StatusMessage tone="info">
-                  Patch bersifat deskriptif dan tidak dijamin bisa di-apply pada dokumen dengan
-                  urutan key berbeda.
-                </StatusMessage>
-                <pre className="output-area">{patch}</pre>
-              </>
+          {overLimit ? (
+            <p className="hint-text hint-text--tight">
+              Total input melebihi 1.000.000 karakter. Perkecil input untuk membandingkan.
+            </p>
+          ) : empty ? (
+            <p className="hint-text hint-text--tight">
+              Tempel dua JSON yang valid. Perbandingan dilakukan per struktur, bukan per baris.{" "}
+              <button
+                type="button"
+                className="link-button"
+                onClick={() => {
+                  setLeft(EXAMPLE_LEFT);
+                  setRight(EXAMPLE_RIGHT);
+                }}
+              >
+                Coba contoh
+              </button>
+            </p>
+          ) : result && !result.ok ? (
+            <div className="result-block">
+              <ErrorMessage error={result.error} />
+            </div>
+          ) : result?.ok ? (
+            result.value.identical ? (
+              <p className="hint-text hint-text--tight">Kedua dokumen identik secara struktur.</p>
+            ) : view === "patch" ? (
+              <pre className="output-area">{patch}</pre>
             ) : (
               <table className="change-table">
                 <caption className="sr-only">Daftar perubahan per JSON Pointer</caption>
@@ -168,10 +173,10 @@ export default function JsonDiffPage() {
                   ))}
                 </tbody>
               </table>
-            )}
-          </>
-        ) : null}
-      </section>
+            )
+          ) : null}
+        </Panel>
+      </div>
     </ToolLayout>
   );
 }

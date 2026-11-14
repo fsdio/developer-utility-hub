@@ -1,6 +1,7 @@
 /**
  * Text diff engine — murni, tanpa DOM.
- * Memakai `diff` untuk baris & karakter; menyusun model baris untuk DiffView.
+ * Memakai `diff` untuk baris & karakter; menyusun model baris yang dipakai
+ * `buildDiffOverlay` untuk menyorot kedua form (ADR-0015).
  */
 import { diffChars, diffLines } from "diff";
 

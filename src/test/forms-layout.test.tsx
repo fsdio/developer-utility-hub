@@ -14,8 +14,16 @@ import HashPage from "@/features/utilities/hash/HashPage";
  * sudah memberi konteks, dan sisa teks hanya menambah kebisingan visual.
  * Nama aksesibel tetap wajib ada, dibuktikan dengan getByLabelText.
  */
-const findsVisibleLabels = (container: HTMLElement): number =>
-  container.querySelectorAll(".field-label, .hint-text:not(.hint-text--tight)").length;
+/**
+ * Teks label/hint yang terlihat di sekitar input. Label tersembunyi (`sr-only`)
+ * tidak dihitung; `.hint-text--tight` adalah satu baris bantuan di bawah panel
+ * yang memang disengaja (bukan mengapit input).
+ */
+const findsVisibleLabels = (container: HTMLElement): number => {
+  const labels = container.querySelectorAll("label.field-label--visible");
+  const hints = container.querySelectorAll(".hint-text:not(.hint-text--tight)");
+  return labels.length + hints.length;
+};
 
 describe("tata letak form (ADR-0011)", () => {
   it("base64: tanpa label/hint terlihat, input tetap punya nama aksesibel", () => {
@@ -28,12 +36,14 @@ describe("tata letak form (ADR-0011)", () => {
     const { container } = renderWithTheme(<NumberBasePage />);
     expect(findsVisibleLabels(container)).toBe(0);
     expect(screen.getByLabelText(/Angka dalam basis/i)).toBeInTheDocument();
+    expect(screen.getAllByRole("textbox")).toHaveLength(1);
   });
 
   it("timestamp: tanpa label terlihat", () => {
     const { container } = renderWithTheme(<TimestampPage />);
     expect(findsVisibleLabels(container)).toBe(0);
     expect(screen.getByLabelText(/epoch atau tanggal/i)).toBeInTheDocument();
+    expect(screen.getAllByRole("textbox")).toHaveLength(1);
   });
 
   it("color: input teks tanpa label terlihat, hint ada untuk pembaca layar", () => {

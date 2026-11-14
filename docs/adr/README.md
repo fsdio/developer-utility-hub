@@ -16,5 +16,10 @@ yang sebelumnya terbuka di blueprint (§14) dan tidak boleh dibuka kembali tanpa
 | [0009](0009-jwt-decoder-decode-only.md) | JWT Decoder: decode saja, tanpa input kunci/secret | Accepted | §3.4, §7 |
 | [0010](0010-visual-refresh-cards-and-diff.md) | Refresh visual: kartu, panel, diff bergaya git, warna dinamis | Accepted | §15, ui-spec |
 | [0011](0011-square-corners-and-lean-forms.md) | Sudut siku, form tanpa teks pengapit (menggantikan radius di 0010) | Accepted | ui-spec |
+| [0012](0012-inline-results-and-formatter-escape.md) | Hasil inline di panel input + escape di formatter | Accepted | §3.2, §3.3 |
+| [0013](0013-offline-mode-build-id.md) | Offline mode: service worker + ID build sebagai penentu | Accepted | §12 |
+| [0014](0014-single-form-single-action.md) | Satu form, satu aksi: hasil menggantikan isi form | Accepted | ui-spec |
+| [0015](0015-diff-in-form-and-formatter-in-place.md) | Diff di dalam kedua form, formatter mengubah isi form | Accepted | §3.2, §3.3 |
+| [0016](0016-custom-domain-base-path.md) | Custom domain: base path satu env var, CSP `connect-src 'self'` | Accepted | §12 |
 
 Format ADR: Konteks → Keputusan → Konsekuensi → Alternatif yang ditolak.

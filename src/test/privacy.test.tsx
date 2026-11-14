@@ -47,8 +47,9 @@ describe("audit privasi", () => {
   it("case converter tidak menyimpan isi input", async () => {
     const user = userEvent.setup();
     renderWithTheme(<CaseConverterPage />);
-    await user.type(screen.getByLabelText("Teks sumber"), SECRET);
-    await waitFor(() => expect(screen.getByLabelText("camelCase")).not.toBeEmptyDOMElement());
+    await user.type(screen.getByRole("textbox"), SECRET);
+    await user.click(screen.getByRole("button", { name: "snake_case" }));
+    await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("isi_rahasia_pengguna_42"));
     expectNoSecret();
   });
 
@@ -57,7 +58,12 @@ describe("audit privasi", () => {
     renderWithTheme(<JsonFormatterPage />);
     await user.click(screen.getByRole("textbox", { name: "JSON sumber" }));
     await user.paste(`{"kunci":"${SECRET}"}`);
-    await screen.findByText((_, el) => el?.tagName === "PRE" && (el.textContent ?? "").includes("kunci"));
+    await user.click(screen.getByRole("button", { name: "Format" }));
+    await waitFor(() =>
+      expect(screen.getByRole("textbox", { name: "JSON sumber" })).toHaveValue(
+        `{\n  "kunci": "${SECRET}"\n}`,
+      ),
+    );
     expectNoSecret();
   });
 
@@ -68,7 +74,9 @@ describe("audit privasi", () => {
     await user.paste(SECRET);
     await user.click(screen.getByRole("textbox", { name: "Teks modified" }));
     await user.paste(`${SECRET}-berubah`);
-    await waitFor(() => expect(screen.getByText(/ditambah$/)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByTestId("overlay-Teks modified").children.length).toBeGreaterThan(0),
+    );
     expectNoSecret();
   });
 
@@ -77,7 +85,8 @@ describe("audit privasi", () => {
     const { unmount } = renderWithTheme(<Base64Page />);
     await user.click(screen.getByRole("textbox", { name: /akan di-encode/i }));
     await user.paste(SECRET);
-    await waitFor(() => expect(document.querySelector(".output-area")).not.toBeNull());
+    await user.click(screen.getByRole("button", { name: "Encode" }));
+    await waitFor(() => expect(screen.getByRole("textbox")).not.toHaveValue(SECRET));
     expectNoSecret();
     unmount();
 
@@ -111,7 +120,7 @@ describe("audit privasi", () => {
     renderWithTheme(<JsonFormatterPage />);
     await user.click(screen.getByRole("textbox", { name: "JSON sumber" }));
     await user.paste(`{"kunci":"${SECRET}"}`);
-    await screen.findAllByText(/kunci/);
+    await waitFor(() => expect(localStorage.getItem(PREFERENCE_KEYS.recentTools)).toContain("json-formatter"));
 
     const stored = localStorage.getItem(PREFERENCE_KEYS.recentTools);
     expect(stored).not.toBeNull();
@@ -125,7 +134,8 @@ describe("audit privasi", () => {
     renderWithTheme(<JsonFormatterPage />);
     await user.click(screen.getByRole("textbox", { name: "JSON sumber" }));
     await user.paste('{"a":1}');
-    await screen.findByText(/"a": 1/);
+    await user.click(screen.getByRole("button", { name: "Format" }));
+    expect(screen.getByRole("textbox", { name: "JSON sumber" })).toHaveValue('{\n  "a": 1\n}');
 
     const allowed = new Set(Object.values(PREFERENCE_KEYS));
     for (let index = 0; index < localStorage.length; index += 1) {
@@ -141,8 +151,9 @@ describe("audit privasi", () => {
 
     const user = userEvent.setup();
     renderWithTheme(<CaseConverterPage />);
-    await user.type(screen.getByLabelText("Teks sumber"), SECRET);
-    await waitFor(() => expect(screen.getByLabelText("snake_case")).not.toBeEmptyDOMElement());
+    await user.type(screen.getByRole("textbox"), SECRET);
+    await user.click(screen.getByRole("button", { name: "snake_case" }));
+    await waitFor(() => expect(screen.getByRole("textbox")).not.toHaveValue(""));
 
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(xhrOpen).not.toHaveBeenCalled();

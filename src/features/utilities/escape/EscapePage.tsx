@@ -37,56 +37,62 @@ export default function EscapePage() {
     return unescapeString(input, target);
   }, [input, target, mode, overLimit]);
 
-  const output = result?.ok ? result.value : "";
+  const run = (next: "escape" | "unescape"): void => {
+    setMode(next);
+    if (input === "" || overLimit) return;
+    const outcome =
+      next === "escape" ? { ok: true as const, value: escapeString(input, target) } : unescapeString(input, target);
+    // Hasil menggantikan isi form: escape lalu unescape bisa dirangkai.
+    if (outcome.ok) setInput(outcome.value);
+  };
 
   return (
     <ToolLayout
       tool={TOOL}
       toolbar={
         <>
-          <Button variant={mode === "escape" ? "primary" : "default"} onClick={() => setMode("escape")} aria-pressed={mode === "escape"}>
-            Escape
-          </Button>
-          <Button variant={mode === "unescape" ? "primary" : "default"} onClick={() => setMode("unescape")} aria-pressed={mode === "unescape"}>
-            Unescape
-          </Button>
+          <div className="action-group" role="group" aria-label="Arah escape">
+            <Button
+              variant={mode === "escape" ? "primary" : "default"}
+              onClick={() => run("escape")}
+              aria-pressed={mode === "escape"}
+            >
+              Escape
+            </Button>
+            <Button
+              variant={mode === "unescape" ? "primary" : "default"}
+              onClick={() => run("unescape")}
+              aria-pressed={mode === "unescape"}
+            >
+              Unescape
+            </Button>
+          </div>
           <SelectField id="escape-target" label="Konteks" value={target} options={TARGET_OPTIONS} onChange={setTarget} />
           <span className="toolbar-spacer" />
-          <CopyButton text={output} />
+          <CopyButton text={input} context="teks" />
           <ResetButton onReset={() => setInput("")} disabled={input === ""} />
         </>
       }
     >
-      <div className="tool-grid">
-        <Panel
-          label="Input"
-          tone={result && !result.ok ? "error" : "default"}
-          footer={`${input.length.toLocaleString("id-ID")} / ${MAX_INPUT_LENGTH.toLocaleString("id-ID")} karakter`}
-        >
+      <Panel
+        label={`Teks · ${ESCAPE_TARGET_LABELS[target]}`}
+        tone={result && !result.ok ? "error" : "default"}
+        footer={`${input.length.toLocaleString("id-ID")} / ${MAX_INPUT_LENGTH.toLocaleString("id-ID")} karakter`}
+      >
+        {overLimit ? (
+          <EmptyState>Input melebihi 1.000.000 karakter. Perkecil input untuk memproses.</EmptyState>
+        ) : (
           <CodeArea
             label="Teks sumber"
             value={input}
             onChange={setInput}
             placeholder={mode === "escape" ? `Tom & Jerry's "kutip"` : `Tom &amp; Jerry&#39;s`}
-            hint={`Konteks ${ESCAPE_TARGET_LABELS[target]}. Escape menghasilkan teks yang aman disisipkan ke konteks tersebut.`}
+            hint={`Tekan Escape atau Unescape; hasilnya menggantikan isi form. Konteks ${ESCAPE_TARGET_LABELS[target]}.`}
             error={Boolean(result && !result.ok)}
+            rows={14}
           />
-        </Panel>
-
-        <Panel label="Hasil">
-          {overLimit ? (
-            <EmptyState>Input melebihi 1.000.000 karakter. Perkecil input untuk memproses.</EmptyState>
-          ) : result === null ? (
-            <EmptyState example={{ label: "Coba contoh", onUse: () => setInput(`Tom & Jerry's "kutip"`) }}>
-              Pilih konteks (JSON, JS, HTML, SQL, XML) lalu escape atau unescape.
-            </EmptyState>
-          ) : result.ok ? (
-            <pre className="output-area output-area--wrap">{result.value}</pre>
-          ) : (
-            <EmptyState>Perbaiki error untuk melihat hasil.</EmptyState>
-          )}
-        </Panel>
-      </div>
+        )}
+      </Panel>
 
       {result && !result.ok ? (
         <div className="result-block">

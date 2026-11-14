@@ -126,9 +126,18 @@ Baris aksi: `Button` primer (aksi utama), grup opsi (`Checkbox`/`Radio`/`Select`
 lalu `CopyButton`, `ResetButton`, `DownloadButton` di kanan. Membungkus ke baris
 baru di < 768 px.
 
+Aksi yang setara (mis. `Encode`/`Decode`, sembilan gaya case) dibungkus
+`.action-group` (`role="group"`, `aria-label`), setiap tombol memakai
+`aria-pressed` untuk menandai mode aktif. Tautan contoh di dalam kalimat memakai
+`.link-button`, bukan tombol tersendiri (ADR-0014).
+
 ### 2.9 `CopyButton`
 Menyalin hasil; label berubah `Copy → Tersalin` selama 1,5 s atau `Gagal menyalin`
 bila clipboard ditolak. Memakai `aria-live="polite"` pada status.
+
+**Maksimal satu per halaman** (ADR-0014). Prop `context` mengisi nama aksesibel
+("Salin semua basis ke clipboard") sehingga jelas apa yang tersalin; teks tombol
+tetap `Copy`. Tidak ada tombol salin per baris atau per bagian.
 
 ### 2.10 `StatusMessage`
 `role="status"` (sukses/info) atau `role="alert"` (error). Tiga tone:
@@ -163,35 +172,62 @@ Penanda tombol keyboard (`Ctrl`/`K`), dipakai di search dan hint toolbar.
 │ ┌ Toolbar ────────────────────────────────────────────┐  │
 │ │ [Aksi utama]  [opsi …]        [Copy] [Reset] [Unduh] │  │
 │ └──────────────────────────────────────────────────────┘  │
-│ ┌ Panel input ──────┐  ┌ Panel output ────────────────┐  │
-│ │                   │  │                              │  │
-│ └───────────────────┘  └──────────────────────────────┘  │
+│ ┌ Panel input ───────────────────────────────────────┐  │
+│ │ [isi form — hasil menggantikan isi]                │  │
+│ │ ┌ strip hasil inline ────────────────────────────┐ │  │
+│ │ │ label · aksi salin · isi hasil                 │ │  │
+│ │ └────────────────────────────────────────────────┘ │  │
+│ └────────────────────────────────────────────────────┘  │
 │ Catatan keterbatasan                                     │
 └──────────────────────────────────────────────────────────┘
 ```
 
-Grid: `grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 16px`.
-Kolom `minmax(0,…)` wajib agar textarea tidak meledak lebarnya.
+Grid dua kolom `minmax(0,1fr) minmax(0,1fr); gap: 16px` hanya dipakai tool yang
+memang membandingkan dua masukan (Text Diff, JSON Diff). Tool satu-input memakai
+satu panel (`.tool-grid--single` / `Panel stacked`): hasil tampil sebagai strip
+`InlineResult` di dalam panel yang sama (ADR-0012, ADR-0014). Kolom
+`minmax(0,…)` wajib agar textarea tidak meledak lebarnya.
 
 ### Tablet (768–1023 px)
 
-Dua panel tetap berdampingan hanya untuk Text Diff (butuh perbandingan langsung);
-tool lain menjadi satu kolom bertumpuk (input di atas, output di bawah).
+Dua panel tetap berdampingan hanya untuk Text Diff dan JSON Diff (butuh
+perbandingan langsung); tool satu-input sudah satu panel sejak awal. Bagian
+bersebelahan di dalam strip hasil (mis. header + payload JWT) menumpuk di bawah
+900 px.
 
 ### Mobile (< 768 px)
 
-Semua satu kolom. Toolbar sticky di atas panel input. Panel output muncul dengan
-heading "Hasil" agar jelas. `min-height` panel 180 px.
+Semua satu kolom. Panel satu-input tetap satu panel; strip hasil inline berada di
+bawah isi form, `min-height` panel 180 px. Toolbar membungkus ke beberapa baris
+(`.action-group` ikut wrap) agar tombol aksi tidak perlu digulir horizontal.
 
 ### Diff (Text Diff & JSON Diff)
 
 ```
 Judul + toolbar
 ┌ Panel Original ────┐  ┌ Panel Modified ───┐
+│                    │  │ isi + diff inline │
+│                    │  │ +n −n ~n (header) │
 └────────────────────┘  └───────────────────┘
-┌ Hasil diff (lebar penuh) ───────────────────┐
-└─────────────────────────────────────────────┘
 ```
+
+Tidak ada panel/section hasil sama sekali (ADR-0015). Perbedaan disorot
+**langsung di dalam kedua form**:
+
+| Panel | Sorotan |
+|---|---|
+| Original | baris dihapus (merah), baris diubah (kuning + penanda karakter dihapus) |
+| Modified | baris ditambah (hijau), baris diubah (kuning + penanda karakter ditambah) |
+
+Ringkasan `+n −n ~n` berada di footer panel Modified. Textarea tetap satu-satunya
+elemen yang dapat diedit; sorotan adalah lapisan `aria-hidden` di belakangnya
+yang ikut bergulir, dan setiap baris membawa label `sr-only`. Nomor baris
+ditampilkan di kiri kedua panel. `Copy diff` menyalin bentuk unified untuk
+pengguna pembaca layar.
+
+Formatter (JSON/XML) mengikuti aturan yang sama: `Format`, `Minify`, `Escape`,
+dan `Unescape` menggantikan isi form; `Validasi` hanya melaporkan ringkasan atau
+error di bawah panel, bukan hasil di panel terpisah.
 
 ---
 

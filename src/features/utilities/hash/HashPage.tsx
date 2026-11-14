@@ -3,6 +3,7 @@ import { ToolLayout } from "@/components/editor/ToolLayout";
 import { Panel } from "@/components/editor/Panel";
 import { CodeArea } from "@/components/editor/CodeArea";
 import { CopyButton } from "@/components/common/CopyButton";
+import { InlineResult } from "@/components/editor/InlineResult";
 import { ResetButton } from "@/components/common/ResetButton";
 import { EmptyState } from "@/components/common/EmptyState";
 import { StatusMessage } from "@/components/common/StatusMessage";
@@ -74,35 +75,35 @@ export default function HashPage() {
             onChange={setAlgorithm}
           />
           <span className="toolbar-spacer" />
-          <CopyButton text={result?.hex ?? ""} label="Copy hex" />
-          <CopyButton text={result?.base64 ?? ""} label="Copy base64" />
           <ResetButton onReset={() => setInput("")} disabled={input === ""} />
         </>
       }
     >
-      <div className="tool-grid">
-        <Panel
-          label="Input"
-          footer={`${input.length.toLocaleString("id-ID")} / ${MAX_INPUT_LENGTH.toLocaleString("id-ID")} karakter · UTF-8`}
+      <Panel
+        label={pending ? "Teks · menghitung…" : "Teks"}
+        footer={`${input.length.toLocaleString("id-ID")} / ${MAX_INPUT_LENGTH.toLocaleString("id-ID")} karakter · UTF-8`}
+      >
+        <CodeArea
+          label="Teks yang akan di-hash"
+          value={input}
+          onChange={setInput}
+          placeholder="hello world"
+          hint="Hash dihitung dengan Web Crypto di perangkat Anda; input tidak dikirim ke mana pun."
+          rows={8}
+        />
+        <InlineResult
+          label={pending ? "Digest · menghitung…" : "Digest"}
+          tone={error ? "error" : "default"}
+          actions={<CopyButton text={result?.hex ?? ""} label="Copy" compact context="hash hex" />}
         >
-          <CodeArea
-            label="Teks yang akan di-hash"
-            value={input}
-            onChange={setInput}
-            placeholder="hello world"
-            hint="Hash dihitung dengan Web Crypto di perangkat Anda; input tidak dikirim ke mana pun."
-          />
-        </Panel>
-
-        <Panel label={pending ? "Hasil · menghitung…" : "Hasil"}>
           {error ? (
-            <div style={{ padding: "var(--space-3)", width: "100%" }}>
+            <div className="inline-result-pad">
               <StatusMessage tone="error">{error}</StatusMessage>
             </div>
           ) : overLimit ? (
             <EmptyState>Input melebihi 1.000.000 karakter. Perkecil input untuk memproses.</EmptyState>
           ) : result ? (
-            <dl className="stat-grid">
+            <dl className="stat-grid stat-grid--inline">
               <div className="stat-card">
                 <dt>Algoritma</dt>
                 <dd>
@@ -123,8 +124,8 @@ export default function HashPage() {
               Masukkan teks untuk melihat digest {algorithm}.
             </EmptyState>
           )}
-        </Panel>
-      </div>
+        </InlineResult>
+      </Panel>
     </ToolLayout>
   );
 }

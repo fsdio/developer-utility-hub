@@ -5,6 +5,66 @@ dan [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Unreleased]
 
+### Changed — custom domain (ADR-0016)
+
+- **Base path jadi satu sumber**: `scripts/site-base.mjs` (env `VITE_BASE_PATH`,
+  default `/`) dipakai `vite.config.ts`, `postbuild`, dan `preview-check`.
+  Situs kini disajikan dari root `https://developerutilityhub.web.id/`.
+- **`public/CNAME`** ditambahkan agar domain kustom bertahan di setiap deploy.
+- **CSP `connect-src`**: `'none'` → `'self'`. Tanpa ini cek `version.json`
+  (ADR-0013) diblokir browser sehingga build baru tak pernah terdeteksi.
+- **Smoke test** mengikuti base build-nya dan mewajibkan `version.json`, `sw.js`,
+  `manifest.webmanifest`, `404.html` 200.
+- `CACHE` service worker naik ke `duh-shell-v2` agar cache dengan path lama
+  dibuang setelah pindah domain.
+
+### Changed — diff di dalam form, formatter di tempat (ADR-0015)
+
+- **Text Diff**: panel hasil, tabel diff, dan empty state "Menunggu input"
+  dihapus. Perbedaan kini disorot langsung di kedua form (merah/hijau/kuning +
+  penanda karakter) dengan nomor baris, dan ringkasan `+n −n ~n` di footer panel
+  Modified.
+- **JSON/XML Formatter**: blok "Hasil Format" dihapus. `Format`, `Minify`,
+  `Escape`, dan `Unescape` menggantikan isi form sehingga hasilnya bisa langsung
+  disunting; `Validasi` melaporkan ringkasan/error tanpa mengubah teks.
+- `CodeArea` mendukung `overlay`, `gutter`, dan `autoGrow`; logika pemetaan diff
+  ke lapisan sorotan ada di `src/lib/diff/overlay.ts`.
+
+### Added — offline mode (ADR-0013)
+
+- **Service worker** (`public/sw.js`): aset ber-hash cache-first, HTML
+  network-first dengan fallback cache, sehingga aplikasi terbuka tanpa jaringan.
+- **`version.json`** ditulis setiap build berisi `id` (sha256 `index.html`) dan
+  `builtAt`. Klien membandingkannya dengan id tersimpan di
+  `duh:v1:build-version`: sama → pakai cache, beda → reload sekali.
+- **Satu-satunya permintaan jaringan rutin** adalah `version.json` (~70 byte).
+- `manifest.webmanifest` + `theme-color` agar bisa dipasang sebagai app.
+
+### Changed — satu form, satu aksi (ADR-0014)
+
+- **Hasil menggantikan isi form** pada Case Converter, Base64, URL Encode, HTML
+  Entity, dan String Escape: tidak ada panel hasil kedua, aksi bisa dirangkai
+  (encode → decode kembali ke teks asli).
+- **Case Converter** memakai sembilan tombol gaya di toolbar di atas form; satu
+  tombol salin untuk seluruh halaman (sebelumnya sembilan).
+- **Section "Hasil perbandingan" dihapus** dari Text Diff; diff tampil di dalam
+  panel Modified. Ringkasan `+n −n ~n` pindah ke header strip hasil.
+- **Satu tombol salin per halaman**: tombol salin per baris (UUID, warna) dan per
+  bagian (JWT header/payload) dihapus; nama aksesibel menyebut konteksnya.
+- Hash, JWT, Number Base, dan Timestamp memakai satu panel + strip hasil inline.
+
+### Changed — hasil inline & escape di formatter (ADR-0012)
+
+- **Hasil pindah ke dalam panel input** pada Text Diff, JSON Diff, JSON Formatter,
+  dan XML Formatter. Strip `InlineResult` menempel di bawah textarea dengan label,
+  ringkasan `+/−/~`, dan tombol salin sendiri. Section "Hasil" terpisah dihapus.
+- **Formatter bisa escape/unescape**: tombol Escape & Unescape pada JSON dan XML
+  Formatter, dengan target baru `json-string`, `json-document`, `xml-text`, dan
+  `xml-document`. Opsi indentasi/komentar disembunyikan saat mode escape aktif.
+- **Unescape JSON tidak lagi memakai `JSON.parse`**: escape ditafsirkan satu per
+  satu sehingga teks dengan baris baru nyata tidak lagi gagal, `\uXXXX`
+  divalidasi, dan escape tak dikenal dibiarkan apa adanya.
+
 ### Changed — sudut siku & form ringkas (ADR-0011)
 
 - **Tidak ada sudut membulat**: semua token `--radius-*` = 0; chip, badge, keyword,

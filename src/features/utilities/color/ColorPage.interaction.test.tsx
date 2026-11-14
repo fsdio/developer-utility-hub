@@ -20,21 +20,15 @@ describe("ColorPage — kontrol warna dinamis", () => {
     expect(picker?.value).toBe("#10b981");
   });
 
-  it("setiap baris hasil punya aksi salin sendiri", async () => {
+  it("hanya ada satu tombol salin untuk semua nilai warna", async () => {
     const user = userEvent.setup();
     renderWithTheme(<ColorPage />);
 
     await user.click(screen.getByRole("button", { name: /Pakai warna #0ea5e9/i }));
-
     await waitFor(() => expect(screen.getByText("rgb(14, 165, 233)")).toBeInTheDocument());
-    // Tiap baris punya tombol salin bernama unik, plus tombol "Copy semua".
-    for (const label of ["HEX", "RGB", "HSL", "Alpha"]) {
-      expect(
-        screen.getByRole("button", { name: new RegExp(`Salin nilai ${label} ke clipboard`) }),
-      ).toBeInTheDocument();
-    }
-    expect(
-      screen.getByRole("button", { name: /Salin semua nilai warna ke clipboard/i }),
-    ).toBeInTheDocument();
+
+    const copyButtons = screen.getAllByRole("button", { name: /ke clipboard/i });
+    expect(copyButtons).toHaveLength(1);
+    expect(copyButtons[0]).toHaveAccessibleName(/semua nilai warna/i);
   });
 });

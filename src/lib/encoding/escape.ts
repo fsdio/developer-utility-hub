@@ -119,3 +119,140 @@ export function unescapeString(input: string, target: EscapeTarget): Result<stri
       return ok(input);
   }
 }
+
+/**
+ * Escape untuk payload yang dibawa formatter (JSON/XML).
+ *
+ * `EscapeTarget` di atas ditujukan untuk *isi string* (HTML, SQL, dsb).
+ * Formatter butuh dua hal berbeda, dan keduanya diberi nama sendiri agar
+ * tidak tertukar (ADR-0012):
+ *
+ * - `json-string`    → strings: menghasilkan isi string JSON *tanpa* kutip,
+ *                      siap disisipkan ke dalam dokumen JSON.
+ * - `json-document`  → documents: membungkus teks mentah menjadi nilai string
+ *                      JSON berkutip, sah sebagai dokumen JSON utuh.
+ * - `xml-text`       → strings: escape lima entitas XML untuk isi elemen/atribut.
+ * - `xml-document`   → documents: membungkus teks sebagai elemen `<escaped>`.
+ */
+export type FormatterEscapeTarget = "json-string" | "json-document" | "xml-text" | "xml-document";
+
+export const FORMATTER_ESCAPE_TARGETS = [
+  "json-string",
+  "json-document",
+  "xml-text",
+  "xml-document",
+] as const satisfies readonly FormatterEscapeTarget[];
+
+export const FORMATTER_ESCAPE_LABELS: Record<FormatterEscapeTarget, string> = {
+  "json-string": "Isi string JSON (tanpa kutip)",
+  "json-document": "Dokumen JSON (dibungkus kutip)",
+  "xml-text": "Isi elemen/atribut XML",
+  "xml-document": "Dokumen XML (<escaped>…</escaped>)",
+};
+
+export function escapeForFormatter(input: string, target: FormatterEscapeTarget): string {
+  switch (target) {
+    case "json-string":
+      // JSON.stringify memberi hasil berkutip; kutip terluar dibuang sehingga
+      // hasilnya aman disisipkan sebagai isi string di dalam dokumen JSON.
+      return JSON.stringify(input).slice(1, -1);
+    case "json-document":
+      return JSON.stringify(input);
+    case "xml-text":
+      return XML_ESCAPES.reduce(
+        (text, [pattern, replacement]) => text.replace(pattern, replacement),
+        input,
+      );
+    case "xml-document":
+      return `<escaped>${XML_ESCAPES.reduce(
+        (text, [pattern, replacement]) => text.replace(pattern, replacement),
+        input,
+      )}</escaped>`;
+    default:
+      return input;
+  }
+}
+
+export function unescapeForFormatter(input: string, target: FormatterEscapeTarget): Result<string> {
+  switch (target) {
+    case "json-string":
+    case "json-document": {
+      const trimmed = input.trim();
+      if (trimmed === "") return ok("");
+      // Dokumen JSON datang dengan kutip terluar; isi string tidak.
+      const body =
+        target === "json-document" && trimmed.length >= 2 && trimmed.startsWith('"') && trimmed.endsWith('"')
+          ? trimmed.slice(1, -1)
+          : trimmed;
+      return unescapeJsonEscapes(body);
+    }
+    case "xml-text":
+    case "xml-document": {
+      const body =
+        target === "xml-document"
+          ? (/^\s*<escaped>([\s\S]*)<\/escaped>\s*$/.exec(input)?.[1] ?? input)
+          : input;
+      return ok(
+        body
+          .replace(/&apos;/g, "'")
+          .replace(/&quot;/g, '"')
+          .replace(/&gt;/g, ">")
+          .replace(/&lt;/g, "<")
+          .replace(/&amp;/g, "&"),
+      );
+    }
+    default:
+      return ok(input);
+  }
+}
+
+const SIMPLE_ESCAPES: Record<string, string> = {
+  '"': '"',
+  "\\": "\\",
+  "/": "/",
+  b: "\b",
+  f: "\f",
+  n: "\n",
+  r: "\r",
+  t: "\t",
+};
+
+/**
+ * Menafsirkan escape JSON satu per satu.
+ *
+ * Tidak memakai `JSON.parse` karena teks yang ditempel pengguna sering berisi
+ * baris baru nyata: `JSON.parse` menolaknya sebagai control character, padahal
+ * teks itu tidak sedang dalam bentuk dokumen JSON. Penafsir ini hanya mengubah
+ * escape yang dikenal; `\\uXXXX` divalidasi, escape tak dikenal dibiarkan apa
+ * adanya, dan backslash di akhir input dilaporkan sebagai error.
+ */
+export function unescapeJsonEscapes(body: string): Result<string> {
+  let out = "";
+  for (let index = 0; index < body.length; index += 1) {
+    const char = body[index];
+    if (char !== "\\") {
+      out += char;
+      continue;
+    }
+    const next = body[index + 1];
+    if (next === undefined) {
+      return err({
+        kind: "parse",
+        message: "Backslash di akhir input tidak diikuti karakter escape.",
+      });
+    }
+    if (next === "u") {
+      const hex = body.slice(index + 2, index + 6);
+      if (!/^[0-9a-fA-F]{4}$/.test(hex)) {
+        return err({ kind: "parse", message: "Escape \\u harus diikuti 4 digit heksadesimal." });
+      }
+      out += String.fromCharCode(Number.parseInt(hex, 16));
+      index += 5;
+      continue;
+    }
+    const simple = SIMPLE_ESCAPES[next];
+    out += simple ?? `\\${next}`;
+    index += 1;
+  }
+  return ok(out);
+}

@@ -2,17 +2,14 @@ import { useMemo, useState } from "react";
 import { ToolLayout } from "@/components/editor/ToolLayout";
 import { Panel } from "@/components/editor/Panel";
 import { CodeArea } from "@/components/editor/CodeArea";
-import { DiffView } from "@/components/editor/DiffView";
-import { DiffLegend, DiffSummary } from "@/components/editor/DiffSummary";
 import { CopyButton } from "@/components/common/CopyButton";
 import { DownloadButton } from "@/components/common/DownloadButton";
 import { ResetButton } from "@/components/common/ResetButton";
-import { EmptyState } from "@/components/common/EmptyState";
-import { StatusMessage } from "@/components/common/StatusMessage";
 import { Button } from "@/components/common/Button";
 import { CheckboxField } from "@/components/common/Field";
 import { MAX_COMBINED_LENGTH } from "@/lib/limits";
 import { diffText } from "@/lib/diff/text";
+import { buildDiffOverlay } from "@/lib/diff/overlay";
 import { getTool } from "@/registry/tools";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useLocalStoragePreference } from "@/hooks/useLocalStoragePreference";
@@ -53,6 +50,11 @@ const parsePrefs = (raw: string | null): DiffPrefs => {
   return DEFAULT_PREFS;
 };
 
+/**
+ * Perbedaan tidak punya panel hasil sendiri (ADR-0015): kedua panel adalah
+ * form, dan diff-nya disorot langsung di dalam masing-masing textarea. Dengan
+ * begitu pengguna melihat apa yang berubah sambil mengedit teksnya sendiri.
+ */
 export default function TextDiffPage() {
   const [left, setLeft] = useState("");
   const [right, setRight] = useState("");
@@ -75,6 +77,14 @@ export default function TextDiffPage() {
     if (overLimit || empty) return null;
     return diffText(debouncedLeft, debouncedRight, prefs);
   }, [debouncedLeft, debouncedRight, prefs, overLimit, empty]);
+
+  const overlay = useMemo(() => (result ? buildDiffOverlay(result) : null), [result]);
+
+  const summary = result
+    ? `+${result.added} −${result.removed} ~${result.modified}${result.identical ? " · identik" : ""}`
+    : overLimit
+      ? "melebihi batas"
+      : "menunggu input";
 
   const swap = (): void => {
     setLeft(right);
@@ -107,7 +117,7 @@ export default function TextDiffPage() {
             onChange={(checked) => updatePrefs({ ignoreWhitespace: checked })}
           />
           <span className="toolbar-spacer" />
-          <CopyButton text={result?.unified ?? ""} label="Copy diff" />
+          <CopyButton text={result?.unified ?? ""} label="Copy diff" context="diff" />
           <DownloadButton
             text={result?.unified ?? ""}
             baseName="text-diff"
@@ -128,57 +138,54 @@ export default function TextDiffPage() {
             value={left}
             onChange={setLeft}
             placeholder="Teks sebelum perubahan"
-            rows={10}
+            rows={12}
+            gutter
+            overlay={overlay?.left}
           />
         </Panel>
+
         <Panel
           label="Modified"
-          footer={`${right.length.toLocaleString("id-ID")} karakter`}
+          footer={
+            <>
+              {`${right.length.toLocaleString("id-ID")} karakter · `}
+              <span aria-live="polite">{summary}</span>
+            </>
+          }
         >
           <CodeArea
             label="Teks modified"
             value={right}
             onChange={setRight}
             placeholder="Teks sesudah perubahan"
-            rows={10}
+            rows={12}
+            gutter
+            overlay={overlay?.right}
           />
         </Panel>
       </div>
 
-      <section className="result-block" aria-labelledby="diff-result-heading">
-        <h2 id="diff-result-heading" className="category-title">
-          Hasil perbandingan
-        </h2>
-
-        {overLimit ? (
-          <StatusMessage tone="error">
-            Total input melebihi 1.000.000 karakter. Perkecil input untuk membandingkan.
-          </StatusMessage>
-        ) : empty ? (
-          <EmptyState
-            example={{
-              label: "Isi kedua panel dengan contoh",
-              onUse: () => {
-                setLeft(EXAMPLE_LEFT);
-                setRight(EXAMPLE_RIGHT);
-              },
+      {empty && !overLimit ? (
+        <p className="hint-text hint-text--tight">
+          Isi kedua panel untuk melihat perbedaan baris dan karakter.{" "}
+          <button
+            type="button"
+            className="link-button"
+            onClick={() => {
+              setLeft(EXAMPLE_LEFT);
+              setRight(EXAMPLE_RIGHT);
             }}
           >
-            Isi kedua panel untuk melihat perbedaan baris dan karakter.
-          </EmptyState>
-        ) : result ? (
-          <>
-            <DiffSummary
-              added={result.added}
-              removed={result.removed}
-              modified={result.modified}
-              note={result.identical ? "Kedua teks identik." : undefined}
-            />
-            <DiffLegend />
-            <DiffView lines={result.lines} />
-          </>
-        ) : null}
-      </section>
+            Coba contoh
+          </button>
+        </p>
+      ) : null}
+
+      {overLimit ? (
+        <p className="hint-text hint-text--tight">
+          Total input melebihi 1.000.000 karakter. Perkecil input untuk membandingkan.
+        </p>
+      ) : null}
     </ToolLayout>
   );
 }

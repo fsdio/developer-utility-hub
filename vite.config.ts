@@ -1,14 +1,20 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath, URL } from "node:url";
+// @ts-expect-error — modul .mjs tanpa deklarasi tipe; lihat scripts/site-base.mjs
+import { siteBase } from "./scripts/site-base.mjs";
+
 
 /**
- * Base path mengikuti nama repository (ADR-0006 §6).
- * - `vite build`  -> /developer-utility-hub/ (GitHub Pages project page)
- * - `vite dev`    -> / (agar preview lokal & sandbox tetap di root)
- * - override eksplisit: VITE_BASE_PATH=/
+ * Base path situs (ADR-0006 §6, diperbarui ADR-0016).
+ * - default      -> "/" (custom domain https://developerutilityhub.web.id/)
+ * - dev/preview  -> "/" (agar preview lokal & sandbox tetap di root)
+ * - project page -> VITE_BASE_PATH=/developer-utility-hub/
+ *
+ * Nilai yang sama dipakai `scripts/postbuild.mjs` dan `scripts/preview-check.mjs`
+ * lewat `scripts/site-base.mjs`, jadi berpindah domain cukup satu env var.
  */
-const PROJECT_BASE = "/developer-utility-hub/";
+const PROJECT_BASE = siteBase();
 
 const CSP = [
   "default-src 'self'",
@@ -16,7 +22,10 @@ const CSP = [
   "style-src 'self'",
   "img-src 'self' data:",
   "font-src 'self'",
-  "connect-src 'none'",
+  // `connect-src 'self'` (bukan 'none'): satu-satunya permintaan jaringan sah
+  // adalah `version.json` milik origin ini untuk cek versi (ADR-0013 §12.1).
+  // 'none' akan memblokir cek versi sehingga build baru tak pernah terdeteksi.
+  "connect-src 'self'",
   "object-src 'none'",
   "base-uri 'none'",
   "form-action 'none'",
@@ -37,7 +46,7 @@ function injectCsp() {
 }
 
 export default defineConfig(({ command }) => ({
-  base: process.env.VITE_BASE_PATH ?? (command === "build" ? PROJECT_BASE : "/"),
+  base: command === "build" ? PROJECT_BASE : "/",
   plugins: [react(), injectCsp()],
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },

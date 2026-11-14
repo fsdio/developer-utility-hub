@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { ToolLayout } from "@/components/editor/ToolLayout";
 import { Panel } from "@/components/editor/Panel";
 import { CopyButton } from "@/components/common/CopyButton";
+import { InlineResult } from "@/components/editor/InlineResult";
 import { ResetButton } from "@/components/common/ResetButton";
-import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorMessage } from "@/components/common/StatusMessage";
 import { Button } from "@/components/common/Button";
 import { FieldLabel } from "@/components/common/Field";
@@ -61,53 +61,66 @@ export default function TimestampPage() {
             {String(Math.abs(offsetMinutes) % 60).padStart(2, "0")}
           </span>
           <span className="toolbar-spacer" />
-          <CopyButton text={rows.map((row) => `${row.label}: ${row.value}`).join("\n")} label="Copy semua" />
           <ResetButton onReset={() => setInput("")} disabled={input === ""} />
         </>
       }
     >
-      <div className="tool-grid tool-grid--single">
-        <Panel label="Input timestamp atau tanggal" footer={`Jam berjalan setiap detik · ${tick} pembaruan`}>
-          <div className="field-body">
-            <FieldLabel htmlFor="timestamp-input">Angka epoch atau tanggal ISO 8601</FieldLabel>
-            <input
-              id="timestamp-input"
-              type="text"
-              value={input}
-              spellCheck={false}
-              placeholder="1700000000 atau 2026-11-12T08:30:00Z"
-              aria-describedby="timestamp-input-hint"
-              onChange={(event) => setInput(event.target.value)}
+      <Panel
+        label="Timestamp / tanggal"
+        stacked
+        footer={`Jam berjalan setiap detik · ${tick} pembaruan`}
+        tone={result && !result.ok ? "error" : "default"}
+      >
+        <div className="field-body field-body--inline">
+          <FieldLabel htmlFor="timestamp-input">Angka epoch atau tanggal ISO 8601</FieldLabel>
+          <input
+            id="timestamp-input"
+            type="text"
+            value={input}
+            spellCheck={false}
+            placeholder="1700000000 atau 2026-11-12T08:30:00Z"
+            aria-invalid={result ? !result.ok : undefined}
+            aria-describedby="timestamp-input-hint"
+            onChange={(event) => setInput(event.target.value)}
+          />
+          <span id="timestamp-input-hint" className="sr-only">
+            Angka ≥ 1e12 dibaca sebagai milidetik. Tanpa offset, tanggal dibaca sebagai waktu lokal.
+          </span>
+        </div>
+        <InlineResult
+          label="Semua format"
+          tone={result && !result.ok ? "error" : "default"}
+          actions={
+            <CopyButton
+              text={rows.map((row) => `${row.label}: ${row.value}`).join("\n")}
+              label="Copy"
+              compact
+              context="semua format"
             />
-            <span id="timestamp-input-hint" className="sr-only">
-              Angka ≥ 1e12 dibaca sebagai milidetik. Tanpa offset, tanggal dibaca sebagai waktu
-              lokal.
-            </span>
-          </div>
-        </Panel>
-      </div>
-
-      <section className="result-block" aria-labelledby="timestamp-result-heading">
-        <h2 id="timestamp-result-heading" className="category-title">
-          Hasil
-        </h2>
-        {result === null ? (
-          <EmptyState example={{ label: "Isi dengan waktu sekarang", onUse: setToNow }}>
-            Masukkan epoch atau tanggal ISO untuk melihat semua representasinya.
-          </EmptyState>
-        ) : !result.ok ? (
-          <ErrorMessage error={result.error} />
-        ) : (
-          <dl className="stat-grid">
-            {rows.map((row) => (
-              <div className="stat-card" key={row.label}>
-                <dt>{row.label}</dt>
-                <dd>{row.value}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
-      </section>
+          }
+        >
+          {result === null ? (
+            <div className="inline-result-pad">
+              <p className="hint-text hint-text--tight">
+                Masukkan epoch atau tanggal ISO untuk melihat semua representasinya.
+              </p>
+            </div>
+          ) : !result.ok ? (
+            <div className="inline-result-pad">
+              <ErrorMessage error={result.error} />
+            </div>
+          ) : (
+            <dl className="stat-grid stat-grid--inline">
+              {rows.map((row) => (
+                <div className="stat-card" key={row.label}>
+                  <dt>{row.label}</dt>
+                  <dd>{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </InlineResult>
+      </Panel>
     </ToolLayout>
   );
 }
