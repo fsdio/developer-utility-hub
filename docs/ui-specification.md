@@ -154,6 +154,16 @@ scroll sinkron; mode satu kolom di bawahnya.
 Ikon opsional + 1 kalimat petunjuk + contoh singkat yang dapat diklik
 (mengisi input dengan contoh). Contoh **tidak** boleh berisi data sensitif nyata.
 
+### 2.12b `FileDropZone`
+Area bergaris putus-putus untuk memilih atau menjatuhkan satu berkas
+(ADR-0017). Isinya: satu kalimat petunjuk, tombol **Pilih berkas**, dan daftar
+format + batas ukuran dalam teks mono kecil. Saat berkas diseret di atasnya,
+latar berubah (`--bg-sunken`) dan garis tepi menjadi `--accent`. Berkas yang
+terlalu besar ditolak dengan `role="alert"` di bawah area, tanpa mengubah apa pun.
+
+Pratinjau hasil decode memakai `<img>` (gambar) atau `<object type="application/pdf">`
+(PDF), dengan tinggi maksimum 52vh.
+
 ### 2.13 `Kbd`
 Penanda tombol keyboard (`Ctrl`/`K`), dipakai di search dan hint toolbar.
 

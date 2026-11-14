@@ -126,6 +126,40 @@ export const TOOLS: readonly ToolMeta[] = [
     load: () => import("@/features/utilities/base64/Base64Page"),
   },
   {
+    id: "image-base64",
+    name: "Gambar ⇄ Base64",
+    description:
+      "Ubah gambar (PNG, JPEG, GIF, WEBP, SVG, BMP, AVIF) menjadi Base64 dan kembalikan Base64 menjadi berkas gambar.",
+    category: "utilities",
+    keywords: ["image", "gambar", "base64", "png", "jpeg", "svg", "webp", "data url", "encode", "decode"],
+    route: "#/tools/image-base64",
+    limitations: [
+      "Berkas dibaca langsung dari perangkat Anda; tidak ada unggahan dan tidak ada permintaan jaringan.",
+      "Batas 20 MB per berkas agar tab tidak kehabisan memori; Base64 menambah sekitar 33% ukuran.",
+      "Jenis berkas ditentukan dari magic bytes, bukan nama berkasnya.",
+      "Menempel Base64 yang salah ke tool ini selalu ditolak walau datanya valid untuk tool lain.",
+    ],
+    status: "stable",
+    load: () => import("@/features/utilities/image-base64/ImageBase64Page"),
+  },
+  {
+    id: "pdf-base64",
+    name: "PDF ⇄ Base64",
+    description:
+      "Ubah berkas PDF menjadi Base64 (atau data URL) dan kembalikan Base64 menjadi berkas PDF yang bisa diunduh.",
+    category: "utilities",
+    keywords: ["pdf", "base64", "data url", "encode", "decode", "dokumen", "attachment"],
+    route: "#/tools/pdf-base64",
+    limitations: [
+      "Dokumen dibaca langsung dari perangkat Anda; tidak ada unggahan dan tidak ada permintaan jaringan.",
+      "Batas 20 MB per berkas agar tab tidak kehabisan memori; Base64 menambah sekitar 33% ukuran.",
+      "Tidak memvalidasi isi PDF di luar tanda tangan %PDF di awal berkas.",
+      "Pratinjau memakai penampil PDF bawaan browser; bila tidak ada, berkas tetap bisa diunduh.",
+    ],
+    status: "stable",
+    load: () => import("@/features/utilities/pdf-base64/PdfBase64Page"),
+  },
+  {
     id: "url-encoder",
     name: "URL Encode / Decode",
     description: "Percent-encoding untuk query string dan path, termasuk gaya form dengan tanda +.",

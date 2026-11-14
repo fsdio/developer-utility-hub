@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { CATEGORY_ORDER, getTool, searchTools, TOOLS, toolsByCategory } from "@/registry/tools";
 
 describe("registry", () => {
-  it("berisi 5 tool MVP + 9 tool Phase 5 + JWT", () => {
-    expect(TOOLS).toHaveLength(15);
+  it("berisi 5 tool MVP + 9 tool Phase 5 + JWT + 2 tool berkas", () => {
+    expect(TOOLS).toHaveLength(17);
     expect(TOOLS.slice(0, 5).map((tool) => tool.id)).toEqual([
       "case-converter",
       "json-formatter",
@@ -13,6 +13,8 @@ describe("registry", () => {
     ]);
     expect(TOOLS.slice(5).map((tool) => tool.id)).toEqual([
       "base64",
+      "image-base64",
+      "pdf-base64",
       "url-encoder",
       "html-entity",
       "escape",
@@ -27,7 +29,7 @@ describe("registry", () => {
 
   it("kategori utilities kini terisi dan muncul di grup", () => {
     const utilities = toolsByCategory().find((group) => group.category === "utilities");
-    expect(utilities?.tools.length).toBe(10);
+    expect(utilities?.tools.length).toBe(12);
   });
 
   it("tool yang sengaja ditunda tidak terdaftar", () => {

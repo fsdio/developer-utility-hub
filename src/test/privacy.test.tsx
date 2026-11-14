@@ -10,6 +10,7 @@ import Base64Page from "@/features/utilities/base64/Base64Page";
 import TimestampPage from "@/features/utilities/timestamp/TimestampPage";
 import UuidPage from "@/features/utilities/uuid/UuidPage";
 import ColorPage from "@/features/utilities/color/ColorPage";
+import ImageBase64Page from "@/features/utilities/image-base64/ImageBase64Page";
 
 /**
  * Audit privasi (technical-design §11): isi input tidak boleh masuk ke
@@ -102,6 +103,30 @@ describe("audit privasi", () => {
     await user.paste("#2563eb");
     await waitFor(() => expect(document.querySelector(".swatch")).not.toBeNull());
     expectAllStorageClean();
+  });
+
+  it("tool berkas tidak mengunggah dan tidak menyimpan isi berkas", async () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal("fetch", fetchSpy);
+
+    const user = userEvent.setup();
+    renderWithTheme(<ImageBase64Page />);
+
+    // "Berkas" kecil berisi teks rahasia — tidak boleh bocor ke mana pun.
+    const file = new File([new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])], `${SECRET}.png`, {
+      type: "image/png",
+    });
+    const input = document.querySelector<HTMLInputElement>('input[type="file"]');
+    if (!input) throw new Error("input file tidak ditemukan");
+    await user.upload(input, file);
+
+    await waitFor(() =>
+      expect(screen.getByRole("textbox", { name: /Base64 hasil konversi/i })).not.toHaveValue(""),
+    );
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expectNoSecret();
+
+    vi.unstubAllGlobals();
   });
 
   it("UUID generator tidak menyimpan UUID yang dihasilkan", async () => {

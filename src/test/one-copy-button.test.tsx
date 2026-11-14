@@ -18,6 +18,8 @@ import TimestampPage from "@/features/utilities/timestamp/TimestampPage";
 import ColorPage from "@/features/utilities/color/ColorPage";
 import NumberBasePage from "@/features/utilities/number-base/NumberBasePage";
 import JwtPage from "@/features/utilities/jwt/JwtPage";
+import ImageBase64Page from "@/features/utilities/image-base64/ImageBase64Page";
+import PdfBase64Page from "@/features/utilities/pdf-base64/PdfBase64Page";
 
 const PAGES: Array<[string, () => ReactElement]> = [
   ["case-converter", () => <CaseConverterPage />],
@@ -35,6 +37,8 @@ const PAGES: Array<[string, () => ReactElement]> = [
   ["color", () => <ColorPage />],
   ["number-base", () => <NumberBasePage />],
   ["jwt", () => <JwtPage />],
+  ["image-base64", () => <ImageBase64Page />],
+  ["pdf-base64", () => <PdfBase64Page />],
 ];
 
 /**

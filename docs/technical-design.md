@@ -279,6 +279,21 @@ Base path punya satu sumber kebenaran: `scripts/site-base.mjs`, yang membaca
 domain kustom di setiap deploy. Bila base berubah, naikkan `CACHE` di
 `public/sw.js` agar cache service worker dengan path lama dibuang.
 
+### 12.2 Tool berkas (ADR-0017)
+
+`src/lib/encoding/file-base64.ts` (murni, tanpa DOM) berisi deteksi jenis dari
+magic bytes, parser data URL, dan konversi Base64 ⇄ byte. `src/lib/browser/file-io.ts`
+membaca `File` → `Uint8Array` dan mengunduh byte; keduanya tidak memakai `fetch`.
+
+| Batas | Nilai |
+|---|---|
+| Ukuran berkas | 20 MB (ditolak via `File.size` sebelum dibaca) |
+| Teks Base64 | 20 MB karakter |
+| Isi textarea | 4 MB karakter (di atas ini area menjadi baca-saja + unduhan) |
+
+Area teks hasil konversi berkas bersifat **baca-saja**: menyunting Base64 gambar
+secara manual hampir selalu merusak berkas, dan tombol salin sudah tersedia.
+
 ### 12.1 Offline mode (ADR-0013)
 
 `scripts/postbuild.mjs` menulis `dist/version.json` berisi `id` (sha256

@@ -7,7 +7,7 @@ Produk ini adalah satu situs statis berisi banyak utility independen dengan
 pengalaman penggunaan yang konsisten. Lihat `docs/developer-utility-hub-blueprint.md`
 untuk arah produk, dan `docs/PRD.md` untuk spesifikasi.
 
-## Tools (15)
+## Tools (17)
 
 **Inti (MVP)**
 
@@ -24,6 +24,8 @@ untuk arah produk, dan `docs/PRD.md` untuk spesifikasi.
 | Tool | Yang dilakukan |
 |---|---|
 | [Base64 Encode / Decode](#/tools/base64) | UTF-8 aman, varian URL-safe, wrap 76 karakter |
+| [Gambar ⇄ Base64](#/tools/image-base64) | PNG/JPEG/GIF/WEBP/SVG/BMP/AVIF ke Base64 dan sebaliknya |
+| [PDF ⇄ Base64](#/tools/pdf-base64) | PDF ke Base64/data URL dan sebaliknya, dengan pratinjau |
 | [URL Encode / Decode](#/tools/url-encoder) | Percent-encoding mode komponen dan form |
 | [HTML Entity Encode / Decode](#/tools/html-entity) | Named + numerik, tanpa menyentuh DOM |
 | [String Escape / Unescape](#/tools/escape) | JSON, JavaScript, HTML, SQL, XML |
@@ -95,6 +97,8 @@ engine di `src/lib/{text,json,xml,diff}` tidak boleh mengimpor React atau menyen
   sehingga hanya origin situs ini yang boleh dihubungi — praktisnya satu berkas
   `version.json` untuk cek build baru (tidak pernah membawa isi input).
 - Isi input tidak disimpan: tidak ada di `localStorage`, URL, atau riwayat.
+- Berkas (gambar/PDF) dibaca dari disk Anda dan diproses di memori — tidak
+  pernah diunggah, tidak pernah masuk storage (ADR-0017).
 - Yang disimpan hanya preferensi tampilan (`duh:v1:theme`, indent, opsi diff).
   Daftar lengkap ada di halaman `#/privacy` dan berasal dari satu konstanta di kode.
 - Audit ini otomatis: `src/test/privacy.test.tsx`.

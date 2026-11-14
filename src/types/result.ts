@@ -3,7 +3,7 @@
 export interface ToolError {
   /** Pesan untuk manusia, bahasa Indonesia. */
   message: string;
-  kind: "parse" | "limit" | "depth" | "internal";
+  kind: "parse" | "limit" | "depth" | "internal" | "validation";
   line?: number;
   column?: number;
   /** Cuplikan teks dengan penanda posisi error. */

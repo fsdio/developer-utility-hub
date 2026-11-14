@@ -5,6 +5,19 @@ dan [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Unreleased]
 
+### Added — konversi berkas ke Base64 (ADR-0017)
+
+- **Gambar ⇄ Base64** (`#/tools/image-base64`): PNG, JPEG, GIF, WEBP, SVG, BMP,
+  AVIF. Arah encode membaca berkas lokal (pilih atau jatuhkan) dan menghasilkan
+  Base64 atau data URL; arah decode menerima Base64/data URL dan menampilkan
+  pratinjau + tombol unduh.
+- **PDF ⇄ Base64** (`#/tools/pdf-base64`): sama, khusus PDF, dengan pratinjau
+  `<object>` memakai penampil bawaan browser.
+- Jenis berkas ditentukan dari **magic bytes**, bukan nama berkas; tool menolak
+  berkas di luar cakupannya dengan pesan jelas.
+- Batas 20 MB per berkas, dibaca di memori tanpa unggahan dan tanpa `fetch`.
+- `CodeArea` mendapat prop `readOnly`; komponen baru `FileDropZone`.
+
 ### Changed — custom domain (ADR-0016)
 
 - **Base path jadi satu sumber**: `scripts/site-base.mjs` (env `VITE_BASE_PATH`,
