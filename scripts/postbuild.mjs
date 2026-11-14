@@ -4,7 +4,8 @@
  * - 404.html  : deep link tak dikenal tetap mendarat di aplikasi
  * - .nojekyll : agar folder assets/ tidak diabaikan Jekyll
  */
-import { copyFile, writeFile, readFile } from "node:fs/promises";
+import { writeFile, readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { join } from "node:path";
 
 const ROOT = new URL("..", import.meta.url).pathname;
@@ -26,6 +27,18 @@ const redirectScript = `
 const notFound = indexHtml.replace("</body>", `${redirectScript}\n  </body>`);
 await writeFile(join(DIST, "404.html"), notFound, "utf8");
 await writeFile(join(DIST, ".nojekyll"), "", "utf8");
-await copyFile(join(DIST, "404.html"), join(DIST, "404.html"));
 
-console.log("✓ dist/404.html dan dist/.nojekyll dibuat.");
+/**
+ * version.json — ID penentu build (ADR-0013).
+ * Hash dari index.html: berubah bila chunk utama berubah, karena nama berkas
+ * ber-hash ikut tertulis di dalamnya.
+ */
+const version = {
+  id: createHash("sha256").update(indexHtml).digest("hex").slice(0, 16),
+  builtAt: new Date().toISOString(),
+};
+await writeFile(join(DIST, "version.json"), `${JSON.stringify(version, null, 2)}\n`, "utf8");
+
+console.log(
+  `✓ dist/404.html, dist/.nojekyll, dan dist/version.json (id ${version.id}) dibuat.`,
+);

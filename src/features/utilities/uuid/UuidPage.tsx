@@ -53,7 +53,7 @@ export default function UuidPage() {
             Buat ulang
           </Button>
           <span className="toolbar-spacer" />
-          <CopyButton text={uuids.join("\n")} label="Copy semua" />
+          <CopyButton text={uuids.join("\n")} context="semua UUID" />
         </>
       }
     >
@@ -72,7 +72,6 @@ export default function UuidPage() {
             {uuids.map((uuid, index) => (
               <li className="uuid-row" key={`${uuid}-${index}`}>
                 <code>{uuid}</code>
-                <CopyButton text={uuid} label="Copy" />
               </li>
             ))}
           </ol>

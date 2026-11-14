@@ -108,7 +108,6 @@ export default function TextDiffPage() {
             onChange={(checked) => updatePrefs({ ignoreWhitespace: checked })}
           />
           <span className="toolbar-spacer" />
-          <CopyButton text={result?.unified ?? ""} label="Copy diff" context="diff" />
           <DownloadButton
             text={result?.unified ?? ""}
             baseName="text-diff"

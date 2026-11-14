@@ -38,6 +38,8 @@ export const TOOLS: readonly ToolMeta[] = [
     keywords: ["case", "camel", "snake", "kebab", "pascal", "constant", "uppercase", "title"],
     route: "#/tools/case-converter",
     limitations: [
+      "Hasil menggantikan isi form, jadi teks asli hilang setelah konversi (pakai Reset untuk mengosongkan).",
+      "Satu tombol salin untuk seluruh halaman; gaya bisa dirangkai karena hasil menjadi input berikutnya.",
       "Akronim tidak dipertahankan: userID menjadi userId.",
       "Diakritik tidak dinormalisasi: café tetap café.",
     ],
@@ -113,6 +115,7 @@ export const TOOLS: readonly ToolMeta[] = [
     keywords: ["base64", "encode", "decode", "url-safe", "utf-8"],
     route: "#/tools/base64",
     limitations: [
+      "Hasil menggantikan isi form, jadi teks asli hilang setelah konversi (pakai Reset untuk mengosongkan).",
       "Base64 adalah encoding, bukan enkripsi — siapa pun bisa men-decode-nya.",
       "Decode hanya menerima hasil yang valid sebagai teks UTF-8.",
     ],
@@ -127,6 +130,7 @@ export const TOOLS: readonly ToolMeta[] = [
     keywords: ["url", "uri", "percent", "encode", "decode", "query", "escape"],
     route: "#/tools/url-encoder",
     limitations: [
+      "Hasil menggantikan isi form, jadi teks asli hilang setelah konversi (pakai Reset untuk mengosongkan).",
       "Encode mengikuti encodeURIComponent, bukan encodeURI untuk URL utuh.",
       "Tanda + hanya berarti spasi pada mode form; di path ia tetap literal.",
     ],
@@ -141,6 +145,7 @@ export const TOOLS: readonly ToolMeta[] = [
     keywords: ["html", "entity", "escape", "decode", "amp", "nbsp"],
     route: "#/tools/html-entity",
     limitations: [
+      "Hasil menggantikan isi form, jadi teks asli hilang setelah konversi (pakai Reset untuk mengosongkan).",
       "Decode hanya mengenal entity bernama yang umum; entity tak dikenal dibiarkan apa adanya.",
       "Encode bukan sanitizer: jangan andalkan untuk membersihkan HTML dari pengguna.",
     ],
@@ -155,6 +160,7 @@ export const TOOLS: readonly ToolMeta[] = [
     keywords: ["escape", "unescape", "json", "javascript", "sql", "xml", "quote"],
     route: "#/tools/escape",
     limitations: [
+      "Hasil menggantikan isi form, jadi teks asli hilang setelah konversi (pakai Reset untuk mengosongkan).",
       "SQL hanya menangani kutip tunggal standar; dialek dengan escape khusus perlu penanganan sendiri.",
       "Unescape JS menerima string literal, bukan mengeksekusi kode.",
     ],
@@ -169,6 +175,7 @@ export const TOOLS: readonly ToolMeta[] = [
     keywords: ["uuid", "guid", "v4", "v7", "random", "identifier"],
     route: "#/tools/uuid",
     limitations: [
+      "Satu tombol salin menyalin seluruh daftar; UUID tunggal bisa dipilih dengan seleksi teks.",
       "UUID bukan rahasia: jangan dijadikan satu-satunya pengaman akses.",
       "UUID v7 memuat timestamp sehingga dapat mengungkap waktu pembuatan.",
     ],
@@ -183,6 +190,7 @@ export const TOOLS: readonly ToolMeta[] = [
     keywords: ["hash", "sha256", "sha512", "sha1", "digest", "crypto"],
     route: "#/tools/hash",
     limitations: [
+      "Satu tombol salin menyalin digest hex; bentuk Base64 terlihat tetapi tidak punya tombol sendiri.",
       "Hash bukan enkripsi dan tidak dapat dibalik.",
       "Memerlukan konteks aman (HTTPS atau localhost) agar Web Crypto tersedia.",
     ],
@@ -197,6 +205,7 @@ export const TOOLS: readonly ToolMeta[] = [
     keywords: ["timestamp", "epoch", "unix", "iso8601", "timezone", "utc"],
     route: "#/tools/timestamp",
     limitations: [
+      "Satu tombol salin menyalin semua representasi sekaligus sebagai teks berlabel.",
       "Angka ≥ 1e12 dibaca sebagai milidetik; selain itu detik.",
       "Tanggal tanpa offset dibaca sebagai waktu lokal perangkat Anda.",
     ],
@@ -211,6 +220,7 @@ export const TOOLS: readonly ToolMeta[] = [
     keywords: ["color", "warna", "hex", "rgb", "hsl", "contrast"],
     route: "#/tools/color",
     limitations: [
+      "Satu tombol salin menyalin semua nilai warna; tidak ada tombol salin per baris.",
       "Tidak mendukung nama warna CSS (mis. tomato) atau ruang warna seperti lab()/oklch().",
       "Alpha dipertahankan, tetapi dibulatkan ke 3 desimal.",
     ],
@@ -225,6 +235,7 @@ export const TOOLS: readonly ToolMeta[] = [
     keywords: ["number", "base", "binary", "octal", "decimal", "hex", "bigint"],
     route: "#/tools/number-base",
     limitations: [
+      "Satu tombol salin menyalin semua basis sekaligus sebagai teks berlabel.",
       "Input negatif direpresentasikan dengan tanda minus, bukan two's complement.",
       "Basis selain 2/8/10/16 tidak didukung di MVP.",
     ],
@@ -240,6 +251,7 @@ export const TOOLS: readonly ToolMeta[] = [
     keywords: ["jwt", "token", "decode", "jose", "jws", "claims", "bearer"],
     route: "#/tools/jwt",
     limitations: [
+      "Satu tombol salin menyalin payload; header dan payload tetap tampil berdampingan.",
       "Tidak memverifikasi signature: token palsu pun akan tampil.",
       "Tidak menerima secret atau public key — decode bukan verifikasi.",
       "Tidak memeriksa iss/aud/certificate chain, dan JWE (5 bagian) tidak didukung.",

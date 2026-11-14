@@ -98,21 +98,23 @@ export default function JsonFormatterPage() {
       tool={TOOL}
       toolbar={
         <>
-          <Button variant="primary" onClick={() => setAction("format")} aria-pressed={action === "format"}>
-            Format
-          </Button>
-          <Button onClick={() => setAction("minify")} aria-pressed={action === "minify"}>
-            Minify
-          </Button>
-          <Button onClick={() => setAction("validate")} aria-pressed={action === "validate"}>
-            Validasi
-          </Button>
-          <Button onClick={() => setAction("escape")} aria-pressed={action === "escape"}>
-            Escape
-          </Button>
-          <Button onClick={() => setAction("unescape")} aria-pressed={action === "unescape"}>
-            Unescape
-          </Button>
+          <div className="action-group" role="group" aria-label="Aksi">
+            <Button variant="primary" onClick={() => setAction("format")} aria-pressed={action === "format"}>
+              Format
+            </Button>
+            <Button onClick={() => setAction("minify")} aria-pressed={action === "minify"}>
+              Minify
+            </Button>
+            <Button onClick={() => setAction("validate")} aria-pressed={action === "validate"}>
+              Validasi
+            </Button>
+            <Button onClick={() => setAction("escape")} aria-pressed={action === "escape"}>
+              Escape
+            </Button>
+            <Button onClick={() => setAction("unescape")} aria-pressed={action === "unescape"}>
+              Unescape
+            </Button>
+          </div>
           {escaping ? (
             <SelectField
               id="json-escape-target"
@@ -131,7 +133,6 @@ export default function JsonFormatterPage() {
             />
           )}
           <span className="toolbar-spacer" />
-          <CopyButton text={output} context="hasil" />
           <DownloadButton
             text={output}
             baseName="json-formatter"

@@ -10,7 +10,8 @@ describe("UrlEncoderPage", () => {
     renderWithTheme(<UrlEncoderPage />);
     await user.click(screen.getByRole("textbox", { name: /akan di-encode/i }));
     await user.paste("a b&c");
-    expect(await screen.findByText("a%20b%26c")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Encode" }));
+    expect(screen.getByRole("textbox")).toHaveValue("a%20b%26c");
   });
 
   it("menampilkan error untuk escape tidak lengkap", async () => {

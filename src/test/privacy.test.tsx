@@ -47,8 +47,9 @@ describe("audit privasi", () => {
   it("case converter tidak menyimpan isi input", async () => {
     const user = userEvent.setup();
     renderWithTheme(<CaseConverterPage />);
-    await user.type(screen.getByLabelText("Teks sumber"), SECRET);
-    await waitFor(() => expect(screen.getByLabelText("camelCase")).not.toBeEmptyDOMElement());
+    await user.type(screen.getByRole("textbox"), SECRET);
+    await user.click(screen.getByRole("button", { name: "snake_case" }));
+    await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("isi_rahasia_pengguna_42"));
     expectNoSecret();
   });
 
@@ -77,7 +78,8 @@ describe("audit privasi", () => {
     const { unmount } = renderWithTheme(<Base64Page />);
     await user.click(screen.getByRole("textbox", { name: /akan di-encode/i }));
     await user.paste(SECRET);
-    await waitFor(() => expect(document.querySelector(".output-area")).not.toBeNull());
+    await user.click(screen.getByRole("button", { name: "Encode" }));
+    await waitFor(() => expect(screen.getByRole("textbox")).not.toHaveValue(SECRET));
     expectNoSecret();
     unmount();
 
@@ -141,8 +143,9 @@ describe("audit privasi", () => {
 
     const user = userEvent.setup();
     renderWithTheme(<CaseConverterPage />);
-    await user.type(screen.getByLabelText("Teks sumber"), SECRET);
-    await waitFor(() => expect(screen.getByLabelText("snake_case")).not.toBeEmptyDOMElement());
+    await user.type(screen.getByRole("textbox"), SECRET);
+    await user.click(screen.getByRole("button", { name: "snake_case" }));
+    await waitFor(() => expect(screen.getByRole("textbox")).not.toHaveValue(""));
 
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(xhrOpen).not.toHaveBeenCalled();

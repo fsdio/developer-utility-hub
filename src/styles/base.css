@@ -1098,6 +1098,14 @@ kbd {
 }
 
 /* Satu input saja di dalam panel: tanpa label terlihat, mengisi lebar. */
+/* Input tunggal di atas strip hasil: menempel ke atas, bukan di tengah. */
+.field-body--inline {
+  flex: 0 0 auto;
+  justify-content: flex-start;
+  padding: var(--space-3) var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
 .field-body {
   display: flex;
   flex-direction: column;
@@ -1606,3 +1614,57 @@ kbd {
 }
 
 .inline-result .diff-legend { padding: var(--space-2) var(--space-3) 0; margin: 0; }
+
+/* ---------- Satu form, satu aksi (ADR-0014) ---------- */
+
+/* Kelompok aksi di toolbar: kontrol yang mengubah isi form yang sama. */
+.action-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.action-group .button { font-family: var(--font-mono); font-size: var(--text-xs); }
+
+/* Tautan di dalam kalimat bantuan, bukan tombol penuh. */
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Bagian di dalam strip hasil inline */
+.inline-result-pad { padding: var(--space-2) var(--space-3); }
+
+.stat-grid--inline { padding: var(--space-2) var(--space-3); }
+
+.jwt-parts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  border-top: 1px solid var(--border);
+}
+
+.jwt-part { min-width: 0; }
+.jwt-part + .jwt-part { border-left: 1px solid var(--border); }
+
+.jwt-part-label {
+  display: block;
+  padding: 3px var(--space-3);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-sunken);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+}
+
+@media (max-width: 900px) {
+  .jwt-parts { grid-template-columns: minmax(0, 1fr); }
+  .jwt-part + .jwt-part { border-left: 0; border-top: 1px solid var(--border); }
+}

@@ -5,6 +5,29 @@ dan [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Unreleased]
 
+### Added — offline mode (ADR-0013)
+
+- **Service worker** (`public/sw.js`): aset ber-hash cache-first, HTML
+  network-first dengan fallback cache, sehingga aplikasi terbuka tanpa jaringan.
+- **`version.json`** ditulis setiap build berisi `id` (sha256 `index.html`) dan
+  `builtAt`. Klien membandingkannya dengan id tersimpan di
+  `duh:v1:build-version`: sama → pakai cache, beda → reload sekali.
+- **Satu-satunya permintaan jaringan rutin** adalah `version.json` (~70 byte).
+- `manifest.webmanifest` + `theme-color` agar bisa dipasang sebagai app.
+
+### Changed — satu form, satu aksi (ADR-0014)
+
+- **Hasil menggantikan isi form** pada Case Converter, Base64, URL Encode, HTML
+  Entity, dan String Escape: tidak ada panel hasil kedua, aksi bisa dirangkai
+  (encode → decode kembali ke teks asli).
+- **Case Converter** memakai sembilan tombol gaya di toolbar di atas form; satu
+  tombol salin untuk seluruh halaman (sebelumnya sembilan).
+- **Section "Hasil perbandingan" dihapus** dari Text Diff; diff tampil di dalam
+  panel Modified. Ringkasan `+n −n ~n` pindah ke header strip hasil.
+- **Satu tombol salin per halaman**: tombol salin per baris (UUID, warna) dan per
+  bagian (JWT header/payload) dihapus; nama aksesibel menyebut konteksnya.
+- Hash, JWT, Number Base, dan Timestamp memakai satu panel + strip hasil inline.
+
 ### Changed — hasil inline & escape di formatter (ADR-0012)
 
 - **Hasil pindah ke dalam panel input** pada Text Diff, JSON Diff, JSON Formatter,

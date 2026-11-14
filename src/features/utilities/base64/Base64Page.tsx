@@ -20,6 +20,10 @@ const VARIANTS = [
   { value: "urlsafe", label: "URL-safe (- _)" },
 ] as const;
 
+/**
+ * Satu form, satu aksi (ADR-0014): tombol Encode/Decode mengubah isi form itu
+ * sendiri, jadi tidak ada panel hasil dan hanya ada satu tombol salin.
+ */
 export default function Base64Page() {
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<"encode" | "decode">("encode");
@@ -34,10 +38,14 @@ export default function Base64Page() {
       : decodeBase64(input, { variant });
   }, [input, mode, variant, wrap, overLimit]);
 
-  const output = result?.ok ? result.value : "";
-  const swap = (): void => {
-    if (result?.ok) setInput(result.value);
-    setMode(mode === "encode" ? "decode" : "encode");
+  const run = (next: "encode" | "decode"): void => {
+    setMode(next);
+    if (input.trim() === "") return;
+    const outcome =
+      next === "encode" ? encodeBase64(input, { variant, wrap }) : decodeBase64(input, { variant });
+    // Hasil menggantikan isi form: pengguna bisa bolak-balik encode/decode
+    // tanpa memindahkan teks secara manual.
+    if (outcome.ok) setInput(outcome.value);
   };
 
   return (
@@ -45,12 +53,22 @@ export default function Base64Page() {
       tool={TOOL}
       toolbar={
         <>
-          <Button variant={mode === "encode" ? "primary" : "default"} onClick={() => setMode("encode")} aria-pressed={mode === "encode"}>
-            Encode
-          </Button>
-          <Button variant={mode === "decode" ? "primary" : "default"} onClick={() => setMode("decode")} aria-pressed={mode === "decode"}>
-            Decode
-          </Button>
+          <div className="action-group" role="group" aria-label="Arah konversi">
+            <Button
+              variant={mode === "encode" ? "primary" : "default"}
+              onClick={() => run("encode")}
+              aria-pressed={mode === "encode"}
+            >
+              Encode
+            </Button>
+            <Button
+              variant={mode === "decode" ? "primary" : "default"}
+              onClick={() => run("decode")}
+              aria-pressed={mode === "decode"}
+            >
+              Decode
+            </Button>
+          </div>
           <SelectField
             id="base64-variant"
             label="Varian"
@@ -59,48 +77,39 @@ export default function Base64Page() {
             onChange={setVariant}
           />
           {mode === "encode" ? (
-            <CheckboxField id="base64-wrap" label="Bungkus 76 karakter" checked={wrap} onChange={setWrap} />
+            <CheckboxField
+              id="base64-wrap"
+              label="Bungkus 76 karakter"
+              checked={wrap}
+              onChange={setWrap}
+            />
           ) : null}
           <span className="toolbar-spacer" />
-          <Button onClick={swap} disabled={!result?.ok}>
-            Tukar ke {mode === "encode" ? "decode" : "encode"}
-          </Button>
-          <CopyButton text={output} />
-          <DownloadButton text={output} baseName="base64" extension="txt" />
+          <CopyButton text={input} context="teks" />
+          <DownloadButton text={input} baseName="base64" extension="txt" />
           <ResetButton onReset={() => setInput("")} disabled={input === ""} />
         </>
       }
     >
-      <div className="tool-grid">
-        <Panel
-          label={mode === "encode" ? "Teks input" : "Base64 input"}
-          tone={result && !result.ok ? "error" : "default"}
-          footer={`${input.length.toLocaleString("id-ID")} / ${MAX_INPUT_LENGTH.toLocaleString("id-ID")} karakter · UTF-8`}
-        >
+      <Panel
+        label={mode === "encode" ? "Teks" : "Base64"}
+        tone={result && !result.ok ? "error" : "default"}
+        footer={`${input.length.toLocaleString("id-ID")} / ${MAX_INPUT_LENGTH.toLocaleString("id-ID")} karakter · UTF-8`}
+      >
+        {overLimit ? (
+          <EmptyState>Input melebihi 1.000.000 karakter. Perkecil input untuk memproses.</EmptyState>
+        ) : (
           <CodeArea
             label={mode === "encode" ? "Teks yang akan di-encode" : "Base64 yang akan di-decode"}
             value={input}
             onChange={setInput}
             placeholder={mode === "encode" ? "café ☕" : "Y2Fmw6kg4piV"}
-            hint="Base64 memakai UTF-8, sehingga karakter non-ASCII aman."
+            hint="Tekan Encode atau Decode; hasilnya menggantikan isi form. Base64 memakai UTF-8."
             error={Boolean(result && !result.ok)}
+            rows={14}
           />
-        </Panel>
-
-        <Panel label="Hasil">
-          {overLimit ? (
-            <EmptyState>Input melebihi 1.000.000 karakter. Perkecil input untuk memproses.</EmptyState>
-          ) : result === null ? (
-            <EmptyState example={{ label: "Coba contoh", onUse: () => setInput("café ☕") }}>
-              Base64 mengubah data biner menjadi teks ASCII. Pilih Encode atau Decode.
-            </EmptyState>
-          ) : result.ok ? (
-            <pre className="output-area output-area--wrap">{result.value}</pre>
-          ) : (
-            <EmptyState>Perbaiki error untuk melihat hasil.</EmptyState>
-          )}
-        </Panel>
-      </div>
+        )}
+      </Panel>
 
       {result && !result.ok ? (
         <div className="result-block">

@@ -60,7 +60,6 @@ export default function ColorPage() {
           <span className="toolbar-spacer" />
           <CopyButton
             text={rows.map((row) => `${row.label}: ${row.value}`).join("\n")}
-            label="Copy semua"
             context="semua nilai warna"
           />
           <ResetButton onReset={() => setInput("")} disabled={input === ""} />
@@ -133,7 +132,6 @@ export default function ColorPage() {
                     <span className="color-row-label">{row.label}</span>
                     <code className="color-row-value">{row.value}</code>
                     <span className="color-row-actions">
-                      <CopyButton text={row.value} label="Copy" compact context={`nilai ${row.label}`} />
                       {row.picker ? (
                         <label
                           className="mini-picker"

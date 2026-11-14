@@ -263,6 +263,30 @@ checkout → setup-node 22 (cache npm) → npm ci
 `id-token: write`; `concurrency: {group: pages, cancel-in-progress: false}`.
 Tidak ada deploy dari branch lain atau dari PR fork.
 
+### 12.1 Offline mode (ADR-0013)
+
+`scripts/postbuild.mjs` menulis `dist/version.json` berisi `id` (sha256
+`index.html`, 16 heksadesimal) dan `builtAt`. `public/sw.js` menyalin dirinya ke
+`dist/`:
+
+| Permintaan | Strategi |
+|---|---|
+| `assets/*` | cache-first (nama berkas ber-hash = immutable) |
+| HTML / navigasi | network-first, fallback `index.html` dari cache |
+| `version.json` | selalu jaringan, `cache: "no-store"` |
+
+`registerOfflineMode()` (`src/lib/browser/register-sw.ts`) didaftarkan setelah
+paint pertama **hanya pada `import.meta.env.PROD`**, membandingkan id server
+dengan `duh:v1:build-version` di localStorage lewat `decideVersion()`. Beda id →
+reload sekali dengan guard `sessionStorage` (`duh:reloaded-for-version`) agar
+tidak terjadi loop. Offline → `unknown`, cache dipakai apa adanya.
+
+Yang **tidak** boleh masuk cache/penyimpanan: isi input pengguna. Aturan ini
+dijaga `src/test/privacy.test.tsx`.
+
+Untuk menguji: `npm run build && npm run preview`, buka DevTools → Application →
+Service Workers. Di mode dev, service worker tidak didaftarkan.
+
 ## 13. Traceability
 
 | Blueprint | Dokumen ini |

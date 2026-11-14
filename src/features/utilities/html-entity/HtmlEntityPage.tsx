@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { ToolLayout } from "@/components/editor/ToolLayout";
 import { Panel } from "@/components/editor/Panel";
 import { CodeArea } from "@/components/editor/CodeArea";
@@ -13,60 +13,64 @@ import { getTool } from "@/registry/tools";
 
 const TOOL = getTool("html-entity")!;
 
+/** Satu form, satu aksi (ADR-0014). */
 export default function HtmlEntityPage() {
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<"encode" | "decode">("encode");
   const overLimit = input.length > MAX_INPUT_LENGTH;
 
-  const output = useMemo(() => {
-    if (input === "" || overLimit) return null;
-    return mode === "encode" ? encodeHtmlEntities(input) : decodeHtmlEntities(input);
-  }, [input, mode, overLimit]);
+
+  const run = (next: "encode" | "decode"): void => {
+    setMode(next);
+    if (input === "") return;
+    setInput(next === "encode" ? encodeHtmlEntities(input) : decodeHtmlEntities(input));
+  };
 
   return (
     <ToolLayout
       tool={TOOL}
       toolbar={
         <>
-          <Button variant={mode === "encode" ? "primary" : "default"} onClick={() => setMode("encode")} aria-pressed={mode === "encode"}>
-            Encode
-          </Button>
-          <Button variant={mode === "decode" ? "primary" : "default"} onClick={() => setMode("decode")} aria-pressed={mode === "decode"}>
-            Decode
-          </Button>
+          <div className="action-group" role="group" aria-label="Arah konversi">
+            <Button
+              variant={mode === "encode" ? "primary" : "default"}
+              onClick={() => run("encode")}
+              aria-pressed={mode === "encode"}
+            >
+              Encode
+            </Button>
+            <Button
+              variant={mode === "decode" ? "primary" : "default"}
+              onClick={() => run("decode")}
+              aria-pressed={mode === "decode"}
+            >
+              Decode
+            </Button>
+          </div>
           <span className="toolbar-spacer" />
-          <CopyButton text={output ?? ""} />
-          <DownloadButton text={output ?? ""} baseName="html-entity" extension="html" mime="text/html" />
+          <CopyButton text={input} context="teks" />
+          <DownloadButton text={input} baseName="html-entity" extension="html" mime="text/html" />
           <ResetButton onReset={() => setInput("")} disabled={input === ""} />
         </>
       }
     >
-      <div className="tool-grid">
-        <Panel
-          label="Input"
-          footer={`${input.length.toLocaleString("id-ID")} / ${MAX_INPUT_LENGTH.toLocaleString("id-ID")} karakter`}
-        >
+      <Panel
+        label={mode === "encode" ? "HTML mentah" : "HTML dengan entity"}
+        footer={`${input.length.toLocaleString("id-ID")} / ${MAX_INPUT_LENGTH.toLocaleString("id-ID")} karakter`}
+      >
+        {overLimit ? (
+          <EmptyState>Input melebihi 1.000.000 karakter. Perkecil input untuk memproses.</EmptyState>
+        ) : (
           <CodeArea
             label={mode === "encode" ? "HTML mentah" : "HTML dengan entity"}
             value={input}
             onChange={setInput}
             placeholder={mode === "encode" ? `<a href="x">Tom & Jerry's</a>` : "&lt;a href=&quot;x&quot;&gt;"}
-            hint="Encode mengubah & < > &quot; dan ' menjadi entity. Decode menangani entity bernama umum serta numerik."
+            hint="Tekan Encode atau Decode; hasilnya menggantikan isi form. Encode mengubah & < > &quot; dan ' menjadi entity; decode menangani entity bernama umum serta numerik."
+            rows={14}
           />
-        </Panel>
-
-        <Panel label="Hasil">
-          {overLimit ? (
-            <EmptyState>Input melebihi 1.000.000 karakter. Perkecil input untuk memproses.</EmptyState>
-          ) : output === null ? (
-            <EmptyState example={{ label: "Coba contoh", onUse: () => setInput("<p>Tom & Jerry's</p>") }}>
-              Encode teks agar aman ditampilkan sebagai teks, bukan HTML.
-            </EmptyState>
-          ) : (
-            <pre className="output-area output-area--wrap">{output}</pre>
-          )}
-        </Panel>
-      </div>
+        )}
+      </Panel>
     </ToolLayout>
   );
 }

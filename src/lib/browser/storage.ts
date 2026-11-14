@@ -12,6 +12,8 @@ export const PREFERENCE_KEYS = {
   xmlOptions: "duh:v1:xml-formatter:options",
   textDiffOptions: "duh:v1:text-diff:options",
   recentTools: "duh:v1:recent-tools",
+  /** ID build yang terakhir dipakai; dipakai offline mode (ADR-0013). */
+  buildVersion: "duh:v1:build-version",
 } as const;
 
 export type PreferenceKey = (typeof PREFERENCE_KEYS)[keyof typeof PREFERENCE_KEYS];

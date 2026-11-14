@@ -37,6 +37,20 @@ export default tseslint.config(
     },
   },
   {
+    // Service worker berjalan di ServiceWorkerGlobalScope, bukan di window.
+    files: ["public/sw.js"],
+    languageOptions: {
+      globals: {
+        self: "readonly",
+        caches: "readonly",
+        fetch: "readonly",
+        URL: "readonly",
+        Response: "readonly",
+        console: "readonly",
+      },
+    },
+  },
+  {
     files: ["scripts/**/*.mjs", "*.config.{js,ts}"],
     languageOptions: {
       globals: {

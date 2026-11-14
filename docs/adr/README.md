@@ -17,5 +17,7 @@ yang sebelumnya terbuka di blueprint (§14) dan tidak boleh dibuka kembali tanpa
 | [0010](0010-visual-refresh-cards-and-diff.md) | Refresh visual: kartu, panel, diff bergaya git, warna dinamis | Accepted | §15, ui-spec |
 | [0011](0011-square-corners-and-lean-forms.md) | Sudut siku, form tanpa teks pengapit (menggantikan radius di 0010) | Accepted | ui-spec |
 | [0012](0012-inline-results-and-formatter-escape.md) | Hasil inline di panel input + escape di formatter | Accepted | §3.2, §3.3 |
+| [0013](0013-offline-mode-build-id.md) | Offline mode: service worker + ID build sebagai penentu | Accepted | §12 |
+| [0014](0014-single-form-single-action.md) | Satu form, satu aksi: hasil menggantikan isi form | Accepted | ui-spec |
 
 Format ADR: Konteks → Keputusan → Konsekuensi → Alternatif yang ditolak.

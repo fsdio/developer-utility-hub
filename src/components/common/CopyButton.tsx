@@ -8,8 +8,8 @@ interface CopyButtonProps {
   /** Tombol rapat tanpa teks label — untuk baris hasil yang padat. */
   compact?: boolean;
   /**
-   * Konteks tambahan untuk nama aksesibel, mis. "nilai HEX". Wajib ketika
-   * beberapa CopyButton tampil berjajar agar pembaca layar bisa membedakan.
+   * Konteks untuk nama aksesibel, mis. "semua basis". Tetap wajib walau hanya
+   * ada satu tombol per halaman (ADR-0014) supaya jelas apa yang tersalin.
    */
   context?: string;
 }

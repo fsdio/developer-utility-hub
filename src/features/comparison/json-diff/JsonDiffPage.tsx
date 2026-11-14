@@ -59,7 +59,6 @@ export default function JsonDiffPage() {
             Tampilan patch
           </Button>
           <span className="toolbar-spacer" />
-          <CopyButton text={exportText} context="hasil diff" />
           <DownloadButton
             text={exportText}
             baseName="json-diff"
