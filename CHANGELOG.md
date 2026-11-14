@@ -5,6 +5,18 @@ dan [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Unreleased]
 
+### Changed — diff di dalam form, formatter di tempat (ADR-0015)
+
+- **Text Diff**: panel hasil, tabel diff, dan empty state "Menunggu input"
+  dihapus. Perbedaan kini disorot langsung di kedua form (merah/hijau/kuning +
+  penanda karakter) dengan nomor baris, dan ringkasan `+n −n ~n` di footer panel
+  Modified.
+- **JSON/XML Formatter**: blok "Hasil Format" dihapus. `Format`, `Minify`,
+  `Escape`, dan `Unescape` menggantikan isi form sehingga hasilnya bisa langsung
+  disunting; `Validasi` melaporkan ringkasan/error tanpa mengubah teks.
+- `CodeArea` mendukung `overlay`, `gutter`, dan `autoGrow`; logika pemetaan diff
+  ke lapisan sorotan ada di `src/lib/diff/overlay.ts`.
+
 ### Added — offline mode (ADR-0013)
 
 - **Service worker** (`public/sw.js`): aset ber-hash cache-first, HTML

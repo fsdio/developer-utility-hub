@@ -14,8 +14,9 @@ describe("XmlFormatterPage — escape", () => {
     await user.paste(RAW);
     await user.click(screen.getByRole("button", { name: "Escape" }));
 
-    const output = await screen.findByText((_, el) => el?.tagName === "PRE");
-    expect(output.textContent).toBe("&lt;a href=&quot;x&quot;&gt;Tom &amp; Jerry&lt;/a&gt;");
+    expect(screen.getByRole("textbox", { name: "XML sumber" })).toHaveValue(
+      "&lt;a href=&quot;x&quot;&gt;Tom &amp; Jerry&lt;/a&gt;",
+    );
   });
 
   it("Unescape mengembalikan teks asli", async () => {
@@ -26,8 +27,7 @@ describe("XmlFormatterPage — escape", () => {
     await user.click(screen.getByRole("button", { name: "Escape" }));
     await user.click(screen.getByRole("button", { name: "Unescape" }));
 
-    const output = await screen.findByText((_, el) => el?.tagName === "PRE");
-    expect(output.textContent).toBe(RAW);
+    expect(screen.getByRole("textbox", { name: "XML sumber" })).toHaveValue(RAW);
   });
 
   it("mode escape menyembunyikan opsi formatter yang tidak relevan", async () => {

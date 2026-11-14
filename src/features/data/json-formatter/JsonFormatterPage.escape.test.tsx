@@ -18,8 +18,9 @@ describe("JsonFormatterPage — escape", () => {
     await pasteRaw(user);
     await user.click(screen.getByRole("button", { name: "Escape" }));
 
-    const output = await screen.findByText((_, el) => el?.tagName === "PRE");
-    expect(output.textContent).toBe('satu\\n\\"dua\\"');
+    expect(screen.getByRole("textbox", { name: "JSON sumber" })).toHaveValue(
+      'satu\\n\\"dua\\"',
+    );
   });
 
   it("Unescape mengembalikan teks asli", async () => {
@@ -29,8 +30,7 @@ describe("JsonFormatterPage — escape", () => {
     await user.click(screen.getByRole("button", { name: "Escape" }));
     await user.click(screen.getByRole("button", { name: "Unescape" }));
 
-    const output = await screen.findByText((_, el) => el?.tagName === "PRE");
-    expect(output.textContent).toBe(RAW);
+    expect(screen.getByRole("textbox", { name: "JSON sumber" })).toHaveValue(RAW);
   });
 
   it("mode escape menampilkan pilihan bentuk, bukan indentasi", async () => {

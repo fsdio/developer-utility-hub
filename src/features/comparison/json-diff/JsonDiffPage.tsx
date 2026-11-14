@@ -2,12 +2,10 @@ import { useMemo, useState } from "react";
 import { ToolLayout } from "@/components/editor/ToolLayout";
 import { Panel } from "@/components/editor/Panel";
 import { CodeArea } from "@/components/editor/CodeArea";
-import { InlineResult } from "@/components/editor/InlineResult";
 import { CopyButton } from "@/components/common/CopyButton";
 import { DownloadButton } from "@/components/common/DownloadButton";
 import { ResetButton } from "@/components/common/ResetButton";
-import { EmptyState } from "@/components/common/EmptyState";
-import { ErrorMessage, StatusMessage } from "@/components/common/StatusMessage";
+import { ErrorMessage } from "@/components/common/StatusMessage";
 import { Button } from "@/components/common/Button";
 import { MAX_COMBINED_LENGTH } from "@/lib/limits";
 import { diffJson } from "@/lib/diff/json";
@@ -59,6 +57,7 @@ export default function JsonDiffPage() {
             Tampilan patch
           </Button>
           <span className="toolbar-spacer" />
+          <CopyButton text={exportText} context="hasil diff" />
           <DownloadButton
             text={exportText}
             baseName="json-diff"
@@ -86,12 +85,24 @@ export default function JsonDiffPage() {
           />
         </Panel>
 
-        {/* Hasil perbedaan menempel di panel kanan, bukan section terpisah di
-            bawah form, agar perbandingan terlihat tanpa menggulir. */}
+        {/* Perubahan tampil di dalam panel kanan, tanpa strip/panel hasil
+            terpisah (ADR-0015). JSON tidak disorot per baris karena
+            perbandingannya struktural, jadi perubahannya didaftar per path. */}
         <Panel
           label="JSON kanan"
           stacked
-          footer={`${right.length.toLocaleString("id-ID")} karakter`}
+          tone={result && !result.ok ? "error" : "default"}
+          footer={`${right.length.toLocaleString("id-ID")} karakter · ${
+            overLimit
+              ? "melebihi batas"
+              : empty
+                ? "menunggu input"
+                : result?.ok
+                  ? `+${result.value.added} −${result.value.removed} ~${result.value.changed}${
+                      result.value.identical ? " · identik" : ""
+                    }`
+                  : "error"
+          }`}
         >
           <CodeArea
             label="JSON modified"
@@ -100,85 +111,70 @@ export default function JsonDiffPage() {
             placeholder='{"version": 2}'
             rows={10}
           />
-          <InlineResult
-            label={
-              overLimit ? "Batas input" : empty ? "Menunggu input" : view === "patch" ? "Patch" : "Perubahan"
-            }
-            tone={overLimit || (result && !result.ok) ? "error" : "default"}
-            meta={
-              result?.ok
-                ? `+${result.value.added} −${result.value.removed} ~${result.value.changed}${
-                    result.value.identical ? " · identik" : ""
-                  }`
-                : undefined
-            }
-            actions={
-              result?.ok ? (
-                <CopyButton text={exportText} label="Copy" compact context="hasil diff" />
-              ) : undefined
-            }
-          >
-            {overLimit ? (
-              <StatusMessage tone="error">
-                Total input melebihi 1.000.000 karakter. Perkecil input untuk membandingkan.
-              </StatusMessage>
-            ) : empty ? (
-              <EmptyState
-                example={{
-                  label: "Isi kedua panel dengan contoh",
-                  onUse: () => {
-                    setLeft(EXAMPLE_LEFT);
-                    setRight(EXAMPLE_RIGHT);
-                  },
+          {overLimit ? (
+            <p className="hint-text hint-text--tight">
+              Total input melebihi 1.000.000 karakter. Perkecil input untuk membandingkan.
+            </p>
+          ) : empty ? (
+            <p className="hint-text hint-text--tight">
+              Tempel dua JSON yang valid. Perbandingan dilakukan per struktur, bukan per baris.{" "}
+              <button
+                type="button"
+                className="link-button"
+                onClick={() => {
+                  setLeft(EXAMPLE_LEFT);
+                  setRight(EXAMPLE_RIGHT);
                 }}
               >
-                Tempel dua JSON yang valid. Perbandingan dilakukan per struktur, bukan per baris.
-              </EmptyState>
-            ) : result && !result.ok ? (
+                Coba contoh
+              </button>
+            </p>
+          ) : result && !result.ok ? (
+            <div className="result-block">
               <ErrorMessage error={result.error} />
-            ) : result?.ok ? (
-              result.value.identical ? (
-                <p className="hint-text hint-text--tight">Kedua dokumen identik secara struktur.</p>
-              ) : view === "patch" ? (
-                <pre className="output-area">{patch}</pre>
-              ) : (
-                <table className="change-table">
-                  <caption className="sr-only">Daftar perubahan per JSON Pointer</caption>
-                  <thead>
-                    <tr>
-                      <th scope="col">Path</th>
-                      <th scope="col">Jenis</th>
-                      <th scope="col">Sebelum</th>
-                      <th scope="col">Sesudah</th>
+            </div>
+          ) : result?.ok ? (
+            result.value.identical ? (
+              <p className="hint-text hint-text--tight">Kedua dokumen identik secara struktur.</p>
+            ) : view === "patch" ? (
+              <pre className="output-area">{patch}</pre>
+            ) : (
+              <table className="change-table">
+                <caption className="sr-only">Daftar perubahan per JSON Pointer</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Path</th>
+                    <th scope="col">Jenis</th>
+                    <th scope="col">Sebelum</th>
+                    <th scope="col">Sesudah</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {result.value.changes.map((change, index) => (
+                    <tr key={`${change.path}-${change.kind}-${index}`}>
+                      <td>
+                        <code>{change.path === "" ? "(root)" : change.path}</code>
+                      </td>
+                      <td>
+                        <span className={`kind kind--${change.kind}`}>{change.kind}</span>
+                        {change.typeChange ? (
+                          <span className="keyword" style={{ marginLeft: 6 }}>
+                            {change.typeChange.from} → {change.typeChange.to}
+                          </span>
+                        ) : null}
+                      </td>
+                      <td>
+                        <code>{formatValue(change.before)}</code>
+                      </td>
+                      <td>
+                        <code>{formatValue(change.after)}</code>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {result.value.changes.map((change, index) => (
-                      <tr key={`${change.path}-${change.kind}-${index}`}>
-                        <td>
-                          <code>{change.path === "" ? "(root)" : change.path}</code>
-                        </td>
-                        <td>
-                          <span className={`kind kind--${change.kind}`}>{change.kind}</span>
-                          {change.typeChange ? (
-                            <span className="keyword" style={{ marginLeft: 6 }}>
-                              {change.typeChange.from} → {change.typeChange.to}
-                            </span>
-                          ) : null}
-                        </td>
-                        <td>
-                          <code>{formatValue(change.before)}</code>
-                        </td>
-                        <td>
-                          <code>{formatValue(change.after)}</code>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )
-            ) : null}
-          </InlineResult>
+                  ))}
+                </tbody>
+              </table>
+            )
+          ) : null}
         </Panel>
       </div>
     </ToolLayout>

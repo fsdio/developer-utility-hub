@@ -59,6 +59,7 @@ export const TOOLS: readonly ToolMeta[] = [
       "Key duplikat: yang terakhir menang.",
       "Escape menghasilkan bentuk untuk disisipkan, bukan JSON yang di-parse balik.",
       "Unescape menafsirkan escape JSON satu per satu; escape tak dikenal dibiarkan apa adanya.",
+      "Format/Minify/Escape mengganti isi form; simpan salinan dulu bila teks asli masih dibutuhkan.",
     ],
     status: "stable",
     load: () => import("@/features/data/json-formatter/JsonFormatterPage"),
@@ -74,6 +75,7 @@ export const TOOLS: readonly ToolMeta[] = [
     limitations: [
       "Bukan penjamin round-trip: CDATA ditulis ulang sebagai teks ter-escape.",
       "DTD dan entity kustom tidak didukung; akan dilaporkan sebagai error parse.",
+      "Format/Minify/Escape mengganti isi form; komentar mengikuti opsi yang aktif saat aksi ditekan.",
     ],
     status: "stable",
     load: () => import("@/features/data/xml-formatter/XmlFormatterPage"),
@@ -88,7 +90,7 @@ export const TOOLS: readonly ToolMeta[] = [
     limitations: [
       "Batas 1.000.000 karakter gabungan untuk kedua panel.",
       "Opsi ignore hanya memengaruhi pembandingan, bukan teks yang ditampilkan.",
-      "Perbedaan ditampilkan di panel Modified agar terlihat tanpa menggulir.",
+      "Perbedaan tampil sebagai sorotan baris/karakter di dalam kedua form, bukan panel hasil.",
     ],
     status: "stable",
     load: () => import("@/features/comparison/text-diff/TextDiffPage"),
@@ -103,6 +105,7 @@ export const TOOLS: readonly ToolMeta[] = [
     limitations: [
       "Urutan key object diabaikan; urutan elemen array dianggap bermakna.",
       "JSON Patch bersifat deskriptif, tidak dijamin bisa di-apply.",
+      "Perubahan per path tampil di dalam panel kanan; tidak ada sorotan per baris karena perbandingannya struktural.",
     ],
     status: "stable",
     load: () => import("@/features/comparison/json-diff/JsonDiffPage"),

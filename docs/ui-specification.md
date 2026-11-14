@@ -211,8 +211,23 @@ Judul + toolbar
 └────────────────────┘  └───────────────────┘
 ```
 
-Tidak ada lagi section hasil di bawah form: diff tampil di dalam panel Modified
-(ADR-0012), dan ringkasan `+n −n ~n` berada di header strip hasil.
+Tidak ada panel/section hasil sama sekali (ADR-0015). Perbedaan disorot
+**langsung di dalam kedua form**:
+
+| Panel | Sorotan |
+|---|---|
+| Original | baris dihapus (merah), baris diubah (kuning + penanda karakter dihapus) |
+| Modified | baris ditambah (hijau), baris diubah (kuning + penanda karakter ditambah) |
+
+Ringkasan `+n −n ~n` berada di footer panel Modified. Textarea tetap satu-satunya
+elemen yang dapat diedit; sorotan adalah lapisan `aria-hidden` di belakangnya
+yang ikut bergulir, dan setiap baris membawa label `sr-only`. Nomor baris
+ditampilkan di kiri kedua panel. `Copy diff` menyalin bentuk unified untuk
+pengguna pembaca layar.
+
+Formatter (JSON/XML) mengikuti aturan yang sama: `Format`, `Minify`, `Escape`,
+dan `Unescape` menggantikan isi form; `Validasi` hanya melaporkan ringkasan atau
+error di bawah panel, bukan hasil di panel terpisah.
 
 ---
 

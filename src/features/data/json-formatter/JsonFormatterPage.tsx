@@ -1,15 +1,13 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { ToolLayout } from "@/components/editor/ToolLayout";
 import { Panel } from "@/components/editor/Panel";
 import { CodeArea } from "@/components/editor/CodeArea";
-import { InlineResult } from "@/components/editor/InlineResult";
 import { CopyButton } from "@/components/common/CopyButton";
 import { DownloadButton } from "@/components/common/DownloadButton";
 import { ResetButton } from "@/components/common/ResetButton";
-import { EmptyState } from "@/components/common/EmptyState";
-import { ErrorMessage } from "@/components/common/StatusMessage";
 import { Button } from "@/components/common/Button";
 import { SelectField } from "@/components/common/Field";
+import { ErrorMessage, StatusMessage } from "@/components/common/StatusMessage";
 import { MAX_INPUT_LENGTH } from "@/lib/limits";
 import { formatJson, minifyJson, validateJson, type JsonIndent } from "@/lib/json/format";
 import {
@@ -20,6 +18,7 @@ import {
 import { getTool } from "@/registry/tools";
 import { useLocalStoragePreference } from "@/hooks/useLocalStoragePreference";
 import { PREFERENCE_KEYS } from "@/lib/browser/storage";
+import type { ToolError } from "@/types/result";
 
 const TOOL = getTool("json-formatter")!;
 
@@ -43,18 +42,19 @@ const ESCAPE_OPTIONS: ReadonlyArray<{ value: FormatterEscapeTarget; label: strin
 
 type Action = "format" | "minify" | "validate" | "escape" | "unescape";
 
-const ACTION_LABEL: Record<Action, string> = {
-  format: "Format",
-  minify: "Minify",
-  validate: "Validasi",
-  escape: "Escape",
-  unescape: "Unescape",
-};
-
+/**
+ * Formatter bekerja pada isi form, bukan panel hasil (ADR-0015).
+ *
+ * Menekan Format/Minify/Escape/Unescape **menggantikan teks di textarea**, jadi
+ * hasilnya langsung bisa disunting di tempat yang sama. Validasi tidak mengubah
+ * teks; ia hanya melaporkan ringkasan/kesalahan sebagai satu baris status.
+ */
 export default function JsonFormatterPage() {
   const [input, setInput] = useState("");
   const [action, setAction] = useState<Action>("format");
   const [escapeTarget, setEscapeTarget] = useState<FormatterEscapeTarget>("json-string");
+  const [error, setError] = useState<ToolError | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [indentRaw, setIndentRaw] = useLocalStoragePreference<string>(
     PREFERENCE_KEYS.jsonIndent,
     "2",
@@ -65,55 +65,88 @@ export default function JsonFormatterPage() {
   const overLimit = input.length > MAX_INPUT_LENGTH;
   const escaping = action === "escape" || action === "unescape";
 
-  const result = useMemo(() => {
-    if (input.trim() === "" || overLimit) return null;
-    if (action === "format") return formatJson(input, indent);
-    if (action === "minify") return minifyJson(input);
-    if (action === "validate") return validateJson(input);
-    if (action === "escape") {
-      return { ok: true as const, value: { text: escapeForFormatter(input, escapeTarget) } };
+  const run = (next: Action): void => {
+    setAction(next);
+    setStatus(null);
+    setError(null);
+    if (input.trim() === "" || overLimit) return;
+
+    if (next === "validate") {
+      const checked = validateJson(input);
+      if (checked.ok) {
+        setStatus(
+          [
+            "JSON valid.",
+            `Tipe root: ${checked.value.rootType}`,
+            `Jumlah key: ${checked.value.keys}`,
+            `Kedalaman maksimum: ${checked.value.maxDepth}`,
+          ].join(" · "),
+        );
+      } else {
+        setError(checked.error);
+      }
+      return;
     }
-    const unescaped = unescapeForFormatter(input, escapeTarget);
-    return unescaped.ok
-      ? { ok: true as const, value: { text: unescaped.value } }
-      : unescaped;
-  }, [input, action, indent, escapeTarget, overLimit]);
 
-  const output = (() => {
-    if (!result?.ok) return "";
-    if ("text" in result.value) return result.value.text;
-    const stats = result.value;
-    return [
-      "JSON valid.",
-      `Tipe root: ${stats.rootType}`,
-      `Jumlah key: ${stats.keys}`,
-      `Kedalaman maksimum: ${stats.maxDepth}`,
-    ].join("\n");
-  })();
+    // Setiap aksi menghasilkan teks baru atau error; teks langsung dipakai
+    // sebagai isi form sehingga aksi berikutnya bekerja pada hasil sebelumnya.
+    if (next === "format") {
+      const outcome = formatJson(input, indent);
+      if (outcome.ok) setInput(outcome.value.text);
+      else setError(outcome.error);
+      return;
+    }
+    if (next === "minify") {
+      const outcome = minifyJson(input);
+      if (outcome.ok) setInput(outcome.value.text);
+      else setError(outcome.error);
+      return;
+    }
+    if (next === "escape") {
+      setInput(escapeForFormatter(input, escapeTarget));
+      return;
+    }
+    const outcome = unescapeForFormatter(input, escapeTarget);
+    if (outcome.ok) setInput(outcome.value);
+    else setError(outcome.error);
+  };
 
-  const reset = (): void => setInput("");
+  const useExample = (): void => {
+    setInput(escaping ? EXAMPLE_RAW : EXAMPLE);
+    setError(null);
+    setStatus(null);
+  };
+
+  const reset = (): void => {
+    setInput("");
+    setError(null);
+    setStatus(null);
+  };
 
   return (
     <ToolLayout
       tool={TOOL}
       toolbar={
         <>
-          <div className="action-group" role="group" aria-label="Aksi">
-            <Button variant="primary" onClick={() => setAction("format")} aria-pressed={action === "format"}>
-              Format
-            </Button>
-            <Button onClick={() => setAction("minify")} aria-pressed={action === "minify"}>
-              Minify
-            </Button>
-            <Button onClick={() => setAction("validate")} aria-pressed={action === "validate"}>
-              Validasi
-            </Button>
-            <Button onClick={() => setAction("escape")} aria-pressed={action === "escape"}>
-              Escape
-            </Button>
-            <Button onClick={() => setAction("unescape")} aria-pressed={action === "unescape"}>
-              Unescape
-            </Button>
+          <div className="action-group" role="group" aria-label="Aksi JSON">
+            {(["format", "minify", "validate", "escape", "unescape"] as const).map((item) => (
+              <Button
+                key={item}
+                variant={action === item ? "primary" : "default"}
+                onClick={() => run(item)}
+                aria-pressed={action === item}
+              >
+                {item === "format"
+                  ? "Format"
+                  : item === "minify"
+                    ? "Minify"
+                    : item === "validate"
+                      ? "Validasi"
+                      : item === "escape"
+                        ? "Escape"
+                        : "Unescape"}
+              </Button>
+            ))}
           </div>
           {escaping ? (
             <SelectField
@@ -133,8 +166,9 @@ export default function JsonFormatterPage() {
             />
           )}
           <span className="toolbar-spacer" />
+          <CopyButton text={input} context="JSON di form" />
           <DownloadButton
-            text={output}
+            text={input}
             baseName="json-formatter"
             extension="json"
             mime="application/json"
@@ -143,46 +177,53 @@ export default function JsonFormatterPage() {
         </>
       }
     >
-      {/* Satu panel: input dan hasilnya berada dalam blok pandang yang sama. */}
       <Panel
-        label="Input JSON"
-        stacked
-        tone={result && !result.ok ? "error" : "default"}
+        label="JSON"
+        tone={error ? "error" : "default"}
         footer={`${input.length.toLocaleString("id-ID")} / ${MAX_INPUT_LENGTH.toLocaleString("id-ID")} karakter`}
       >
         <CodeArea
           label="JSON sumber"
           value={input}
-          onChange={setInput}
+          onChange={(value) => {
+            setInput(value);
+            setError(null);
+            setStatus(null);
+          }}
           placeholder={escaping ? "Tempel teks mentah atau escape yang akan diubah" : '{"hello": "world"}'}
-          hint="Tempel JSON; format, minify, validasi, atau escape sesuai tombol yang aktif."
-          error={Boolean(result && !result.ok)}
+          hint="Tekan Format, Minify, Escape, atau Unescape; hasilnya menggantikan isi form ini."
+          error={Boolean(error)}
+          rows={16}
+          autoGrow
         />
-        <InlineResult
-          label={`Hasil ${ACTION_LABEL[action]}`}
-          tone={result && !result.ok ? "error" : "default"}
-          actions={<CopyButton text={output} label="Copy" compact context="hasil" />}
-        >
-          {overLimit ? (
-            <EmptyState>Input melebihi 1.000.000 karakter. Perkecil input untuk memproses.</EmptyState>
-          ) : result === null ? (
-            <EmptyState
-              example={{
-                label: escaping ? "Coba teks contoh" : "Coba contoh JSON",
-                onUse: () => setInput(escaping ? EXAMPLE_RAW : EXAMPLE),
-              }}
-            >
-              {escaping
-                ? "Tempel teks untuk melihat bentuk escape-nya, atau escape untuk mengembalikan teks asli."
-                : "Tempel JSON untuk memformat, meminify, atau memvalidasi."}
-            </EmptyState>
-          ) : result.ok ? (
-            <pre className="output-area output-area--wrap">{output}</pre>
-          ) : (
-            <ErrorMessage error={result.error} />
-          )}
-        </InlineResult>
       </Panel>
+
+      {status ? (
+        <div className="result-block">
+          <StatusMessage tone="success">{status}</StatusMessage>
+        </div>
+      ) : null}
+
+      {error ? (
+        <div className="result-block">
+          <ErrorMessage error={error} />
+        </div>
+      ) : null}
+
+      {input.trim() === "" ? (
+        <p className="hint-text hint-text--tight">
+          Tempel JSON untuk memformat, meminify, memvalidasi, atau meng-escape.{" "}
+          <button type="button" className="link-button" onClick={useExample}>
+            {escaping ? "Coba teks contoh" : "Coba contoh JSON"}
+          </button>
+        </p>
+      ) : null}
+
+      {overLimit ? (
+        <p className="hint-text hint-text--tight">
+          Input melebihi 1.000.000 karakter. Perkecil input untuk memproses.
+        </p>
+      ) : null}
     </ToolLayout>
   );
 }
