@@ -25,6 +25,11 @@ interface CodeAreaProps {
   gutter?: boolean;
   /** Area tumbuh mengikuti jumlah baris, bukan tinggi tetap. */
   autoGrow?: boolean;
+  /**
+   * Hanya-baca: dipakai hasil konversi berkas, yang bukan untuk disunting
+   * (teks Base64 sepanjang jutaan karakter tidak masuk akal diketik manual).
+   */
+  readOnly?: boolean;
 }
 
 /**
@@ -48,6 +53,7 @@ export function CodeArea({
   overlay,
   gutter = false,
   autoGrow = false,
+  readOnly = false,
 }: CodeAreaProps) {
   const id = useId();
   const hintId = `${id}-hint`;
@@ -89,6 +95,7 @@ export function CodeArea({
       className={className}
       value={value}
       rows={height}
+      readOnly={readOnly}
       spellCheck={spellCheck}
       autoCapitalize="off"
       autoCorrect="off"

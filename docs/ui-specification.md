@@ -154,6 +154,16 @@ scroll sinkron; mode satu kolom di bawahnya.
 Ikon opsional + 1 kalimat petunjuk + contoh singkat yang dapat diklik
 (mengisi input dengan contoh). Contoh **tidak** boleh berisi data sensitif nyata.
 
+### 2.12b `FileDropZone`
+Area bergaris putus-putus untuk memilih atau menjatuhkan satu berkas
+(ADR-0017). Isinya: satu kalimat petunjuk, tombol **Pilih berkas**, dan daftar
+format + batas ukuran dalam teks mono kecil. Saat berkas diseret di atasnya,
+latar berubah (`--bg-sunken`) dan garis tepi menjadi `--accent`. Berkas yang
+terlalu besar ditolak dengan `role="alert"` di bawah area, tanpa mengubah apa pun.
+
+Pratinjau hasil decode memakai `<img>` (gambar) atau `<object type="application/pdf">`
+(PDF), dengan tinggi maksimum 52vh.
+
 ### 2.13 `Kbd`
 Penanda tombol keyboard (`Ctrl`/`K`), dipakai di search dan hint toolbar.
 
@@ -200,6 +210,51 @@ bersebelahan di dalam strip hasil (mis. header + payload JWT) menumpuk di bawah
 Semua satu kolom. Panel satu-input tetap satu panel; strip hasil inline berada di
 bawah isi form, `min-height` panel 180 px. Toolbar membungkus ke beberapa baris
 (`.action-group` ikut wrap) agar tombol aksi tidak perlu digulir horizontal.
+
+### Kontrol form (ADR-0020)
+
+Semua kontrol teks memakai satu sistem: latar `--bg-raised`, border 1 px
+`--border-strong`, sudut 0, padding `7px 10px`, **tinggi minimum 34 px** sehingga
+sejajar dengan tombol di toolbar.
+
+```
+┌ Toolbar ─────────────────────────────────────────────────────────────┐
+│ [Generate]  Panjang [43 (256 bit) ▾]  Alfabet [Base64URL (64) ▾]     │
+│             └ semua kontrol 34 px, chevron --fg-subtle ┘             │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+- `select` memakai `appearance: none` + chevron buatan (dua gradien) agar
+  warnanya mengikuti tema; opsinya `background: --bg-raised`.
+- `textarea` minimal 84 px dan bisa di-resize vertikal; varian
+  `.control-input--area` (kunci PEM) memakai font mono `--text-xs`.
+- Fokus: `border-color: --accent` + `--focus-ring`; tidak ada outline bawaan.
+- Placeholder `--fg-subtle`; kontrol `:disabled` diredupkan + `cursor: not-allowed`.
+- Label tetap `sr-only` (ADR-0011); hint tetap `sr-only` lewat
+  `aria-describedby`. Tidak ada teks pengapit baru.
+- Pengecualian bergaya sendiri: `CodeArea`, kotak cari katalog, combobox
+  `Ctrl+K`, input file tersembunyi, dan pemilih warna.
+
+### Katalog berbentuk daftar (ADR-0019)
+
+```
+Judul grup  4        subjudul tugas                              [Lipat]
+──────────────────────────────────────────────────────────────────────
+JSON Formatter      Format, minify, validasi, error berposisi   json  → 
+XML Formatter       Format, minify, escape, komentar tetap      xml   → 
+──────────────────────────────────────────────────────────────────────
+```
+
+- `.tool-list` tanpa border luar, tiap `.tool-row` dipisah 1 px `--border`,
+  padding vertikal `--space-2` — tinggi baris ± 28 px, tanpa sudut membulat.
+- Grid `.tool-row`: `minmax(160px,15rem) minmax(0,1fr) auto auto`
+  (nama · deskripsi · meta · panah). Deskripsi satu baris dengan `ellipsis`
+  pada layar lebar; < 760 px ia membungkus dan grid menjadi dua kolom.
+- Hover/fokus: latar `--surface-hover`, panah `--accent` muncul. Tidak ada
+  shadow, tidak ada `transform` skala.
+- Nama tool 600 `--text-sm`; deskripsi `--fg-muted`; kata kunci chip 10 px;
+  badge kategori hanya pada hasil pencarian.
+- `.category-hint` (subjudul tugas) `--fg-subtle` `--text-xs`.
 
 ### Diff (Text Diff & JSON Diff)
 

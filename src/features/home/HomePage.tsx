@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { ToolCard } from "@/features/home/ToolCard";
+import { ToolRow } from "@/features/home/ToolRow";
 import { useRecentTools } from "@/hooks/useRecentTools";
 import {
+  CATEGORY_HINTS,
   CATEGORY_LABELS,
   isToolCategory,
   searchTools,
@@ -15,13 +16,21 @@ interface HomePageProps {
 }
 
 /** Tool yang paling sering dipakai developer sehari-hari, urut prioritas. */
-const QUICK_PICKS = ["json-formatter", "text-diff", "base64", "jwt", "hash", "timestamp"] as const;
+const QUICK_PICKS = ["json-formatter", "text-diff", "base64", "jwt-verify", "hash", "timestamp"] as const;
 
+/**
+ * Katalog beranda berbentuk daftar (ADR-0019).
+ *
+ * Grup = tugas, bukan jenis berkas, sehingga satu baris selalu menjawab "saya
+ * mau apa". Setiap grup bisa dilipat supaya halaman tetap pendek: jumlah klik
+ * untuk membuka tool tetap satu, sama seperti kartu.
+ */
 export function HomePage({ initialCategory }: HomePageProps) {
   const [filter, setFilter] = useState<ToolCategory | "all">(
     initialCategory && isToolCategory(initialCategory) ? initialCategory : "all",
   );
   const [query, setQuery] = useState("");
+  const [collapsed, setCollapsed] = useState<ReadonlySet<ToolCategory>>(() => new Set());
   const { recent } = useRecentTools();
 
   useEffect(() => {
@@ -46,6 +55,15 @@ export function HomePage({ initialCategory }: HomePageProps) {
   const searchResults = searching ? searchTools(trimmedQuery).slice(0, 12) : [];
   const groups = toolsByCategory().filter((group) => filter === "all" || group.category === filter);
 
+  const toggleGroup = (category: ToolCategory): void => {
+    setCollapsed((current) => {
+      const next = new Set(current);
+      if (next.has(category)) next.delete(category);
+      else next.add(category);
+      return next;
+    });
+  };
+
   return (
     <>
       <section className="hero">
@@ -54,8 +72,8 @@ export function HomePage({ initialCategory }: HomePageProps) {
             Utility developer, langsung di browser
           </h1>
           <p>
-            Format data, konversi teks, dan bandingkan dokumen tanpa membuka banyak tab atau menulis
-            script sementara. Lima belas tool, satu pengalaman yang konsisten.
+            {TOOLS.length} tool untuk memformat, membandingkan, meng-encode, dan memeriksa token —
+            tanpa membuka banyak tab atau menulis script sementara. Semua berjalan di perangkat kamu.
           </p>
         </div>
       </section>
@@ -116,7 +134,7 @@ export function HomePage({ initialCategory }: HomePageProps) {
           <input
             type="search"
             value={query}
-            placeholder="Cari: json, base64, diff…"
+            placeholder="Cari: json, base64, jwt…"
             onChange={(event) => setQuery(event.target.value)}
           />
         </label>
@@ -130,46 +148,77 @@ export function HomePage({ initialCategory }: HomePageProps) {
           {searchResults.length === 0 ? (
             <p className="hint-text">Tidak ada tool yang cocok. Coba kata kunci lain.</p>
           ) : (
-            <div className="card-grid">
+            <ul className="tool-list">
               {searchResults.map((tool) => (
-                <ToolCard key={tool.id} tool={tool} />
+                <li key={tool.id}>
+                  <ToolRow tool={tool} showCategory />
+                </li>
               ))}
-            </div>
+            </ul>
           )}
         </section>
       ) : (
-        groups.map((group) => (
-          <section
-            className="category-block"
-            key={group.category}
-            aria-labelledby={`cat-${group.category}`}
-          >
-            <h2 className="category-title" id={`cat-${group.category}`}>
-              {group.label}
-            </h2>
-            <div className="card-grid">
-              {group.tools.map((tool) => (
-                <ToolCard key={tool.id} tool={tool} />
-              ))}
-            </div>
-          </section>
-        ))
+        groups.map((group) => {
+          const isCollapsed = collapsed.has(group.category);
+          const headingId = `cat-${group.category}`;
+          return (
+            <section
+              className="category-block"
+              key={group.category}
+              aria-labelledby={headingId}
+            >
+              <div className="category-head">
+                <h2 className="category-title" id={headingId}>
+                  {group.label}
+                  <span className="category-count">{group.tools.length}</span>
+                </h2>
+                <p className="category-hint">{CATEGORY_HINTS[group.category]}</p>
+                <button
+                  type="button"
+                  className="link-button"
+                  aria-expanded={!isCollapsed}
+                  aria-controls={`list-${group.category}`}
+                  onClick={() => toggleGroup(group.category)}
+                >
+                  {isCollapsed ? "Buka" : "Lipat"}
+                </button>
+              </div>
+              <ul className="tool-list" id={`list-${group.category}`} hidden={isCollapsed}>
+                {group.tools.map((tool) => (
+                  <li key={tool.id}>
+                    <ToolRow tool={tool} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })
       )}
 
       <section className="category-block" aria-labelledby="community-heading">
         <h2 className="category-title" id="community-heading">
           Community
         </h2>
-        <div className="card-row">
-          <a className="tool-card" href="#/community">
-            <h3>Suggest a Feature</h3>
-            <p>Usulkan utility baru lewat GitHub Issues, lengkap dengan use case.</p>
-          </a>
-          <a className="tool-card" href="#/community">
-            <h3>Report a Bug</h3>
-            <p>Laporkan perilaku yang salah dengan langkah reproduksi yang jelas.</p>
-          </a>
-        </div>
+        <ul className="tool-list">
+          <li>
+            <a className="tool-row" href="#/community">
+              <span className="tool-row-name">Suggest a Feature</span>
+              <span className="tool-row-desc">Usulkan utility baru lewat GitHub Issues, lengkap dengan use case.</span>
+              <span className="tool-row-action" aria-hidden="true">
+                →
+              </span>
+            </a>
+          </li>
+          <li>
+            <a className="tool-row" href="#/community">
+              <span className="tool-row-name">Report a Bug</span>
+              <span className="tool-row-desc">Laporkan perilaku yang salah dengan langkah reproduksi yang jelas.</span>
+              <span className="tool-row-action" aria-hidden="true">
+                →
+              </span>
+            </a>
+          </li>
+        </ul>
       </section>
     </>
   );

@@ -5,6 +5,67 @@ dan [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Unreleased]
 
+### Added — tool autentikasi (ADR-0018)
+
+- **JWT Verifier** (`#/tools/jwt-verify`): decode + verifikasi signature dengan
+  kunci yang ditempel pengguna — HMAC (HS256/384/512), RSA (RS/PS),
+  ECDSA (ES256/384/512), dan EdDSA lewat WebCrypto. Tanpa JWKS, tanpa `fetch`,
+  dan kunci privat PEM ditolak dengan pesan yang menjelaskan.
+- **Audit klaim** di halaman yang sama: `exp`, `nbf`, `iat`, `iss`, `aud` dengan
+  status `ok`/`warn`/`fail`/`gap`; selalu menyebut bahwa `exp` dibandingkan
+  dengan jam perangkat dan `iss`/`aud` hanya cocok dengan nilai yang diketik.
+- **Basic Auth Encode / Decode** (`#/tools/basic-auth`): `user:pass` ⇄
+  `Authorization: Basic …` dalam satu panel dua arah, menerima salinan header
+  utuh maupun nilai Base64 saja.
+- **API Key Generator** (`#/tools/api-key`): token acak `crypto.getRandomValues`
+  dengan rejection sampling, alfabet base64url/alnum/hex, panjang 24–64, awalan
+  opsional, plus sidik jari SHA-256/512/1 (hex + Base64).
+- JWT Decoder tetap **decode-only** sesuai ADR-0009; verifikasi hidup di tool
+  terpisah supaya keduanya tidak tertukar.
+- Engine `src/lib/dev/auth.ts` dengan 32 unit test (sign/verify nyata, deteksi
+  tamper, `alg: none`, kunci privat ditolak, bias generator, sidik jari).
+
+### Fixed — kontrol form yang masih tampil native (ADR-0020)
+
+- Stylesheet kini menormalkan **semua** kontrol, bukan hanya
+  `input[type=text]`/`search`: `password`, `textarea`, dan `select` (termasuk di
+  toolbar) memakai latar, border, dan tinggi yang sama (34 px) dengan tombol.
+- `select` digambar ulang dengan `appearance: none` + chevron buatan yang
+  mengikuti tema; opsi dropdown, `::placeholder`, `:disabled`, dan
+  `input[type=file]::file-selector-button` ikut diberi gaya.
+- Komponen baru `TextField`, `TextAreaField`, dan `SelectField` (selalu
+  `.select-wrap`) menggantikan markup ad-hoc di Number Base, Timestamp,
+  JWT Verifier, Basic Auth, dan API Key.
+- `src/test/form-controls.test.tsx` mengunci aturan: daftar berkas yang boleh
+  memakai kontrol mentah hanya `CodeArea`, kotak cari katalog/global,
+  `FileDropZone`, dan pemilih warna.
+
+### Changed — katalog berbentuk daftar & enam kategori tugas (ADR-0019)
+
+- Katalog beranda kini **daftar baris** (`ToolRow`), bukan grid kartu: nama,
+  satu kalimat, kata kunci, panah saat hover. Beranda turun dari ±1.300 px ke
+  ±430 px untuk 20 tool.
+- Kategori `utilities` dipecah menjadi **Encode & Decode** (6), **Auth & Token**
+  (5), dan **Konversi** (4); label `text` menjadi "Teks". Navigasi header
+  membaca `CATEGORY_ORDER` sehingga tidak ada daftar kategori kedua.
+- Tiap grup punya subjudul tugas (`CATEGORY_HINTS`), hitungan tool, dan tombol
+  `Lipat`/`Buka` (`aria-expanded`).
+- `ToolCard` dihapus dari katalog; `ToolRow` dipakai juga oleh hasil pencarian
+  (dengan badge kategori).
+
+### Added — konversi berkas ke Base64 (ADR-0017)
+
+- **Gambar ⇄ Base64** (`#/tools/image-base64`): PNG, JPEG, GIF, WEBP, SVG, BMP,
+  AVIF. Arah encode membaca berkas lokal (pilih atau jatuhkan) dan menghasilkan
+  Base64 atau data URL; arah decode menerima Base64/data URL dan menampilkan
+  pratinjau + tombol unduh.
+- **PDF ⇄ Base64** (`#/tools/pdf-base64`): sama, khusus PDF, dengan pratinjau
+  `<object>` memakai penampil bawaan browser.
+- Jenis berkas ditentukan dari **magic bytes**, bukan nama berkas; tool menolak
+  berkas di luar cakupannya dengan pesan jelas.
+- Batas 20 MB per berkas, dibaca di memori tanpa unggahan dan tanpa `fetch`.
+- `CodeArea` mendapat prop `readOnly`; komponen baru `FileDropZone`.
+
 ### Changed — custom domain (ADR-0016)
 
 - **Base path jadi satu sumber**: `scripts/site-base.mjs` (env `VITE_BASE_PATH`,

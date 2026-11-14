@@ -21,5 +21,9 @@ yang sebelumnya terbuka di blueprint (§14) dan tidak boleh dibuka kembali tanpa
 | [0014](0014-single-form-single-action.md) | Satu form, satu aksi: hasil menggantikan isi form | Accepted | ui-spec |
 | [0015](0015-diff-in-form-and-formatter-in-place.md) | Diff di dalam kedua form, formatter mengubah isi form | Accepted | §3.2, §3.3 |
 | [0016](0016-custom-domain-base-path.md) | Custom domain: base path satu env var, CSP `connect-src 'self'` | Accepted | §12 |
+| [0017](0017-image-and-pdf-base64.md) | Konversi gambar & PDF ke Base64 dan sebaliknya | Accepted | §3.1, §12.2 |
+| [0018](0018-auth-tools-jwt-verify-basic-and-api-key.md) | Tool auth: verifikasi JWT, Basic Auth, generator API key | Accepted | §3.4 |
+| [0019](0019-catalog-list-and-task-grouping.md) | Katalog berbentuk daftar + enam kategori menurut tugas (menggantikan kartu di 0010) | Accepted | §15, IA §1 |
+| [0020](0020-form-control-system.md) | Satu sistem kontrol form: normalisasi CSS + `TextField`/`TextAreaField`/`SelectField` | Accepted | ui-spec |
 
 Format ADR: Konteks → Keputusan → Konsekuensi → Alternatif yang ditolak.

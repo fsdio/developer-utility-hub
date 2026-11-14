@@ -6,7 +6,7 @@ import { InlineResult } from "@/components/editor/InlineResult";
 import { ResetButton } from "@/components/common/ResetButton";
 import { ErrorMessage } from "@/components/common/StatusMessage";
 import { Button } from "@/components/common/Button";
-import { FieldLabel } from "@/components/common/Field";
+import { TextField } from "@/components/common/Field";
 import { parseTimestamp } from "@/lib/dev/timestamp";
 import { getTool } from "@/registry/tools";
 
@@ -71,21 +71,16 @@ export default function TimestampPage() {
         footer={`Jam berjalan setiap detik · ${tick} pembaruan`}
         tone={result && !result.ok ? "error" : "default"}
       >
-        <div className="field-body field-body--inline">
-          <FieldLabel htmlFor="timestamp-input">Angka epoch atau tanggal ISO 8601</FieldLabel>
-          <input
+        <div className="field-body">
+          <TextField
             id="timestamp-input"
-            type="text"
+            label="Angka epoch atau tanggal ISO 8601"
             value={input}
-            spellCheck={false}
             placeholder="1700000000 atau 2026-11-12T08:30:00Z"
-            aria-invalid={result ? !result.ok : undefined}
-            aria-describedby="timestamp-input-hint"
-            onChange={(event) => setInput(event.target.value)}
+            error={result ? !result.ok : false}
+            hint="Angka ≥ 1e12 dibaca sebagai milidetik. Tanpa offset, tanggal dibaca sebagai waktu lokal."
+            onChange={setInput}
           />
-          <span id="timestamp-input-hint" className="sr-only">
-            Angka ≥ 1e12 dibaca sebagai milidetik. Tanpa offset, tanggal dibaca sebagai waktu lokal.
-          </span>
         </div>
         <InlineResult
           label="Semua format"

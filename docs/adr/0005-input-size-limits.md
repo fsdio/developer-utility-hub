@@ -44,9 +44,10 @@ dipindahkan ke Worker tanpa mengubah engine itu sendiri.
 
 ### 4. File
 
-Tidak ada upload file di MVP. Input hanya lewat paste/type. Tombol *Load file*
-ditunda sampai ada permintaan nyata; bila dibuat, ia harus menghormati batas yang
-sama dan tidak mengunggah apa pun.
+**Diperbarui oleh ADR-0017:** berkas lokal kini didukung pada dua tool khusus
+(Gambar ⇄ Base64, PDF ⇄ Base64), dengan batas 20 MB per berkas dan tanpa
+mengunggah apa pun. Tool berbasis teks tetap hanya menerima paste/type, dan
+batas 1.000.000 karakter tidak berubah.
 
 ## Konsekuensi
 
