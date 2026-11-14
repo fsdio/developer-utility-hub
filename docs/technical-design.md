@@ -294,6 +294,34 @@ membaca `File` → `Uint8Array` dan mengunduh byte; keduanya tidak memakai `fetc
 Area teks hasil konversi berkas bersifat **baca-saja**: menyunting Base64 gambar
 secara manual hampir selalu merusak berkas, dan tombol salin sudah tersedia.
 
+### 12.3 Tool autentikasi (ADR-0018)
+
+`src/lib/dev/auth.ts` adalah modul murni + WebCrypto, tanpa DOM dan tanpa
+dependensi baru:
+
+| Fungsi | Perilaku |
+|---|---|
+| `readJwt(source)` | Pecah 3 bagian, decode Base64URL manual per karakter, kembalikan `Result<JwtParts>` (header, payload, signature, `asigningInput`) |
+| `verifyJwtSignature(parts, {algorithm, key})` | HMAC memakai secret UTF-8; RS/PS/ES/EdDSA memakai PEM SPKI lewat `crypto.subtle.importKey`. Verdict: `valid` · `invalid` · `unverified` (`alg: none`) · `wrong-algorithm` · `error` |
+| `auditClaims(payload, opts)` | `exp`/`nbf`/`iat`/`iss`/`aud` → `ok` · `warn` · `fail` · `gap`; jam = perangkat, toleransi default 0 |
+| `encodeBasicAuth` / `decodeBasicAuth` | UTF-8 (TextEncoder), menolak username berisi `:`, menerima header utuh atau Base64 saja |
+| `generateToken({length, alphabet, prefix})` | `crypto.getRandomValues` + rejection sampling; panjang 1–512 |
+| `fingerprintToken(token, alg)` | SHA-256/512/1 → `{hex, base64}` |
+
+Jaminan keamanan yang diuji: kunci privat PEM ditolak, signature yang diubah
+satu byte menghasilkan `invalid`, `alg: none` tidak pernah `valid`, dan kunci
+yang gagal di-import tidak tersisa di cache (`Map` per `algorithm\0key`).
+
+Tidak ada JWKS, tidak ada `fetch`, dan tidak ada penyimpanan kunci maupun token:
+sama seperti tool lain, isi input hanya hidup di state React (PRD §3).
+
+### 12.4 Katalog & kategori (ADR-0019)
+
+`CATEGORY_ORDER` = `text, formatter, diff, encoding, auth, convert`, dengan
+`CATEGORY_LABELS` dan `CATEGORY_HINTS`. `Header` membaca `CATEGORY_ORDER`
+sehingga tidak ada daftar kategori kedua. Katalog merender `ToolRow` di dalam
+`<ul class="tool-list">`; `ToolCard`/`card-grid` tidak lagi dipakai katalog.
+
 ### 12.1 Offline mode (ADR-0013)
 
 `scripts/postbuild.mjs` menulis `dist/version.json` berisi `id` (sha256

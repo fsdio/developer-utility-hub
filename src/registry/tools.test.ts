@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { CATEGORY_ORDER, getTool, searchTools, TOOLS, toolsByCategory } from "@/registry/tools";
 
 describe("registry", () => {
-  it("berisi 5 tool MVP + 9 tool Phase 5 + JWT + 2 tool berkas", () => {
-    expect(TOOLS).toHaveLength(17);
+  it("berisi 5 tool MVP + 9 tool Phase 5 + JWT + 2 tool berkas + 3 tool auth", () => {
+    expect(TOOLS).toHaveLength(20);
     expect(TOOLS.slice(0, 5).map((tool) => tool.id)).toEqual([
       "case-converter",
       "json-formatter",
@@ -24,12 +24,21 @@ describe("registry", () => {
       "color",
       "number-base",
       "jwt",
+      "jwt-verify",
+      "basic-auth",
+      "api-key",
     ]);
   });
 
-  it("kategori utilities kini terisi dan muncul di grup", () => {
-    const utilities = toolsByCategory().find((group) => group.category === "utilities");
-    expect(utilities?.tools.length).toBe(12);
+  it("kategori dikelompokkan menurut tugas dan tidak ada grup kosong", () => {
+    const byCategory = new Map(toolsByCategory().map((group) => [group.category, group.tools.length]));
+    expect(byCategory.get("text")).toBe(1);
+    expect(byCategory.get("formatter")).toBe(2);
+    expect(byCategory.get("diff")).toBe(2);
+    expect(byCategory.get("encoding")).toBe(6);
+    expect(byCategory.get("auth")).toBe(5);
+    expect(byCategory.get("convert")).toBe(4);
+    expect(byCategory.size).toBe(CATEGORY_ORDER.length);
   });
 
   it("tool yang sengaja ditunda tidak terdaftar", () => {

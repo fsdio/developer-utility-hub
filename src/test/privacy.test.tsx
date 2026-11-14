@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { screen, waitFor } from "@testing-library/react";
+import { cleanup, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderWithTheme } from "@/test/renderWithTheme";
 import CaseConverterPage from "@/features/text/case-converter/CaseConverterPage";
@@ -11,6 +11,8 @@ import TimestampPage from "@/features/utilities/timestamp/TimestampPage";
 import UuidPage from "@/features/utilities/uuid/UuidPage";
 import ColorPage from "@/features/utilities/color/ColorPage";
 import ImageBase64Page from "@/features/utilities/image-base64/ImageBase64Page";
+import JwtVerifyPage from "@/features/utilities/jwt-verify/JwtVerifyPage";
+import BasicAuthPage from "@/features/utilities/basic-auth/BasicAuthPage";
 
 /**
  * Audit privasi (technical-design §11): isi input tidak boleh masuk ke
@@ -138,6 +140,22 @@ describe("audit privasi", () => {
     const storageDump = allStorageValues().join("|");
     expect(storageDump).not.toContain(firstUuid);
     expect(window.location.hash).not.toContain(firstUuid);
+  });
+
+  it("kunci verifikasi JWT dan kredensial Basic tidak disimpan", async () => {
+    const user = userEvent.setup();
+    renderWithTheme(<JwtVerifyPage />);
+    await user.click(screen.getByLabelText(/Token JWT/));
+    await user.paste(`eyJhbGciOiJIUzI1NiJ9.${btoa(JSON.stringify({ sub: SECRET }))}.tanda`);
+    await user.type(screen.getByLabelText(/Kunci verifikasi/), SECRET);
+    expectNoSecret();
+
+    cleanup();
+    renderWithTheme(<BasicAuthPage />);
+    await user.type(screen.getByLabelText("Username"), SECRET);
+    await user.type(screen.getByLabelText("Password"), SECRET);
+    await user.click(screen.getByRole("button", { name: "Buat header" }));
+    expectNoSecret();
   });
 
   it("riwayat tool hanya menyimpan id tool, bukan isi input", async () => {

@@ -18,6 +18,9 @@ import TimestampPage from "@/features/utilities/timestamp/TimestampPage";
 import ColorPage from "@/features/utilities/color/ColorPage";
 import NumberBasePage from "@/features/utilities/number-base/NumberBasePage";
 import JwtPage from "@/features/utilities/jwt/JwtPage";
+import JwtVerifyPage from "@/features/utilities/jwt-verify/JwtVerifyPage";
+import BasicAuthPage from "@/features/utilities/basic-auth/BasicAuthPage";
+import ApiKeyPage from "@/features/utilities/api-key/ApiKeyPage";
 import { AppShell } from "@/components/layout/AppShell";
 
 const pages: Array<[string, () => React.ReactElement]> = [
@@ -37,6 +40,9 @@ const pages: Array<[string, () => React.ReactElement]> = [
   ["color", () => <ColorPage />],
   ["number base", () => <NumberBasePage />],
   ["jwt", () => <JwtPage />],
+  ["jwt verify", () => <JwtVerifyPage />],
+  ["basic auth", () => <BasicAuthPage />],
+  ["api key", () => <ApiKeyPage />],
 ];
 
 describe("aksesibilitas (axe)", () => {

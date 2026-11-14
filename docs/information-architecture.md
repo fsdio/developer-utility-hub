@@ -94,7 +94,7 @@ Aturan:
 | Elemen | Perilaku |
 |---|---|
 | Logo + nama | Klik → beranda |
-| Kategori (Text · Formatter · Diff) | Klik → beranda terfilter ke kategori tsb. (`#/?kategori=formatter` berupa state UI, bukan isi dokumen) |
+| Kategori (Teks · Formatter · Diff · Encode & Decode · Auth & Token · Konversi) | Klik → beranda terfilter ke kategori tsb. (`#/?kategori=formatter` berupa state UI, bukan isi dokumen). Daftar dibaca dari `CATEGORY_ORDER` di registry (ADR-0019) |
 | Pencarian tools | Input dengan `Ctrl/Cmd+K` fokus; hasil dropdown (maks 6) di bawah input |
 | Tautan GitHub | `aria-label="Buka repositori di GitHub"` |
 | Theme switcher | Siklus `light → dark → system` |
@@ -115,14 +115,19 @@ ditampilkan di mobile (sudah ada "← Semua tools" di atas judul).
 
 Urutan blok:
 
-1. **Hero ringkas** (1 heading + 1 kalimat + indikator privasi "Berjalan di browser Anda").
-2. **Filter kategori** (Semua · Text · Formatter · Diff) — chip, bukan dropdown.
-3. **Grup kategori**: tiap grup berisi kartu tool (nama, deskripsi, 3 kata kunci).
-4. **Blok Community**: dua tautan (fitur/bug) + catatan bahwa keduanya lewat GitHub Issues.
-5. **Footer**: versi, tautan Privacy, lisensi MIT.
+1. **Hero ringkas** (1 heading + 1 kalimat + jumlah tool + catatan berjalan di perangkat).
+2. **Pintasan** "Paling sering dipakai" lalu "Terakhir kamu buka" (bila ada).
+3. **Kontrol katalog**: chip filter kategori + kotak cari, satu baris.
+4. **Grup kategori** (ADR-0019): judul + hitungan + subjudul tugas + tombol
+   `Lipat`/`Buka`, lalu **daftar baris** `ToolRow` (nama · deskripsi satu baris ·
+   kata kunci · panah saat hover). Enam grup menurut tugas: Teks, Formatter,
+   Diff, Encode & Decode, Auth & Token, Konversi.
+5. **Blok Community**: dua baris tautan (fitur/bug) + catatan bahwa keduanya lewat GitHub Issues.
+6. **Footer**: versi, tautan Privacy, lisensi MIT.
 
-Kartu tool adalah `<a>` penuh (bukan div dengan onClick) agar bisa dibuka di tab baru
-dan diakses keyboard.
+Baris tool adalah `<a>` penuh di dalam `<li>` (bukan div dengan onClick) agar bisa
+dibuka di tab baru dan diakses keyboard. Hasil pencarian memakai baris yang sama,
+dengan badge kategori.
 
 ## 6. Halaman tool
 

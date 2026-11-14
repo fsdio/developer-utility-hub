@@ -1,10 +1,11 @@
 import { useTheme } from "@/hooks/useTheme";
 import { ToolSearch } from "@/components/navigation/ToolSearch";
-import { CATEGORY_LABELS, TOOLS, type ToolCategory } from "@/registry/tools";
+import { CATEGORY_LABELS, CATEGORY_ORDER, TOOLS } from "@/registry/tools";
 
 const REPO_URL = "https://github.com/fsdio/developer-utility-hub";
 
-const NAV_CATEGORIES = (["text", "formatter", "diff", "utilities"] as ToolCategory[]).filter((category) =>
+/** Navigasi mengikuti urutan kategori di registry, bukan daftar terpisah. */
+const NAV_CATEGORIES = CATEGORY_ORDER.filter((category) =>
   TOOLS.some((tool) => tool.category === category),
 );
 

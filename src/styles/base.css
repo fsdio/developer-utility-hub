@@ -1635,3 +1635,178 @@ kbd {
 
 /* Area baca-saja untuk hasil Base64 raksasa. */
 .code-area[readonly] { cursor: text; }
+
+/* ---------- Katalog berbentuk daftar (ADR-0019) ---------- */
+
+.category-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.category-head .category-title { margin-bottom: 0; }
+
+.category-count {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  font-size: 10px;
+  vertical-align: middle;
+  color: var(--fg-subtle);
+}
+
+.category-hint {
+  margin: 0;
+  color: var(--fg-subtle);
+  font-size: var(--text-xs);
+}
+
+.category-head .link-button { margin-left: auto; }
+
+.tool-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--border);
+}
+
+.tool-list[hidden] { display: none; }
+
+.tool-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 15rem) minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  color: var(--fg);
+  transition: background var(--motion);
+}
+
+.tool-row:hover,
+.tool-row:focus-visible {
+  background: var(--surface-hover);
+  text-decoration: none;
+}
+
+.tool-row:active { background: var(--surface-active); }
+
+.tool-row-name {
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+
+.tool-row-desc {
+  color: var(--fg-muted);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tool-row-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex: 0 0 auto;
+}
+
+.tool-row-meta .keyword-row { margin: 0; padding: 0; }
+
+.tool-row-badge {
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  font-size: 10px;
+  color: var(--fg-subtle);
+  white-space: nowrap;
+}
+
+.tool-row-action {
+  color: var(--fg-subtle);
+  font-size: var(--text-sm);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity var(--motion), transform var(--motion), color var(--motion);
+}
+
+.tool-row:hover .tool-row-action,
+.tool-row:focus-visible .tool-row-action {
+  opacity: 1;
+  transform: translateX(0);
+  color: var(--accent);
+}
+
+.tool-row--disabled { opacity: 0.6; }
+
+.tool-row--disabled:hover { background: transparent; }
+
+.claim-list {
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--border);
+}
+
+.claim-item {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: var(--space-2);
+  align-items: baseline;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+
+.claim-name {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.claim-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--fg-muted);
+  overflow-wrap: anywhere;
+}
+
+.claim-note { font-size: var(--text-xs); }
+.claim-note--ok { color: var(--success); }
+.claim-note--warn { color: var(--changed-edge); }
+.claim-note--fail { color: var(--danger); }
+.claim-note--gap { color: var(--fg-subtle); }
+
+.verify-body { padding: var(--space-3); }
+
+.code-area--key {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  resize: vertical;
+}
+
+/* Daftar katalog jadi satu kolom penuh di layar sempit. */
+@media (max-width: 760px) {
+  .tool-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 2px;
+  }
+
+  .tool-row-desc {
+    grid-column: 1;
+    white-space: normal;
+  }
+
+  .tool-row-meta { grid-column: 1; }
+
+  .tool-row-action {
+    grid-column: 2;
+    grid-row: 1;
+    opacity: 1;
+    transform: none;
+  }
+
+  .claim-item { grid-template-columns: 1fr; }
+}

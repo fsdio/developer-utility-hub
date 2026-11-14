@@ -211,6 +211,27 @@ Semua satu kolom. Panel satu-input tetap satu panel; strip hasil inline berada d
 bawah isi form, `min-height` panel 180 px. Toolbar membungkus ke beberapa baris
 (`.action-group` ikut wrap) agar tombol aksi tidak perlu digulir horizontal.
 
+### Katalog berbentuk daftar (ADR-0019)
+
+```
+Judul grup  4        subjudul tugas                              [Lipat]
+──────────────────────────────────────────────────────────────────────
+JSON Formatter      Format, minify, validasi, error berposisi   json  → 
+XML Formatter       Format, minify, escape, komentar tetap      xml   → 
+──────────────────────────────────────────────────────────────────────
+```
+
+- `.tool-list` tanpa border luar, tiap `.tool-row` dipisah 1 px `--border`,
+  padding vertikal `--space-2` — tinggi baris ± 28 px, tanpa sudut membulat.
+- Grid `.tool-row`: `minmax(160px,15rem) minmax(0,1fr) auto auto`
+  (nama · deskripsi · meta · panah). Deskripsi satu baris dengan `ellipsis`
+  pada layar lebar; < 760 px ia membungkus dan grid menjadi dua kolom.
+- Hover/fokus: latar `--surface-hover`, panah `--accent` muncul. Tidak ada
+  shadow, tidak ada `transform` skala.
+- Nama tool 600 `--text-sm`; deskripsi `--fg-muted`; kata kunci chip 10 px;
+  badge kategori hanya pada hasil pencarian.
+- `.category-hint` (subjudul tugas) `--fg-subtle` `--text-xs`.
+
 ### Diff (Text Diff & JSON Diff)
 
 ```
