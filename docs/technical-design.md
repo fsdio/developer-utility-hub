@@ -208,7 +208,7 @@ Aturan ini diuji dengan skrip impor sederhana di `scripts/check-boundaries.mjs`
 | Clipboard | Ditangani sebagai kegagalan yang terlihat, bukan error senyap. |
 | Dependency | `npm audit` di CI (gagal pada severity high), Dependabot mingguan, `package-lock.json` di-commit. |
 | Secret | Tidak ada secret di frontend; tautan GitHub Issues memakai URL publik saja. |
-| CSP | Meta CSP di `index.html`: `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'`. `connect-src 'self'` hanya mengizinkan permintaan ke origin sendiri — praktisnya `version.json` (ADR-0013). Dulu `'none'`, tetapi itu memblokir cek versi sehingga build baru tak pernah terdeteksi. |
+| CSP | Meta CSP di `index.html`: `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; object-src 'self' blob:; base-uri 'none'; form-action 'none'`. `connect-src 'self'` hanya mengizinkan permintaan ke origin sendiri — praktisnya `version.json` (ADR-0013). Dulu `'none'`, tetapi itu memblokir cek versi sehingga build baru tak pernah terdeteksi. |
 | Referrer | `<meta name="referrer" content="no-referrer">`. |
 
 Catatan: `style-src 'self'` tanpa `'unsafe-inline'` berarti tidak boleh ada atribut
@@ -339,6 +339,38 @@ minimum 34 px, border `--border-strong`, `border-radius: 0`, serta state
 ada `<input>/<select>/<textarea>` tanpa kelas di luar daftar pengecualian
 (`CodeArea`, `FileDropZone`, `ToolSearch`, kotak cari katalog, pemilih warna),
 lalu memeriksa stylesheet tetap memuat aturan normalisasi tersebut.
+
+### 12.6 Pratinjau berkas (ADR-0021)
+
+Pratinjau memakai **data URL** (`bytesToDataUrl` di `src/lib/encoding/base64.ts`),
+bukan blob URL: `img-src`/`object-src` di CSP produksi tidak mengizinkan `blob:`
+sebelumnya, sehingga pratinjau kosong di build walau terlihat benar di dev.
+
+| Keadaan | Syarat | Tampilan |
+|---|---|---|
+| `inline` | gambar/PDF ≤ `PREVIEW_INLINE_LIMIT` (8 MB) | pratinjau + Unduh |
+| `too-large` | byte > 8 MB | ukuran + alasan + Unduh |
+| `unsupported` | jenis selain gambar/PDF | penjelasan + Unduh |
+| `failed` | belum ada Base64 valid | petunjuk awal |
+
+`useFileBase64` menunda `source` 200 ms (`useDebouncedValue`) sebelum decode,
+dan `previewModeFor()` di `src/lib/encoding/file-base64.ts` menentukan keadaan di
+atas. `scripts/preview-check.mjs` memverifikasi CSP memuat `blob:` untuk
+`img-src` dan `object-src`.
+
+### 12.7 Kelola penyimpanan (ADR-0022)
+
+`src/lib/browser/storage-report.ts`:
+
+| Fungsi | Perilaku |
+|---|---|
+| `collectStorageReport()` | Snapshot `localStorage`/`sessionStorage` (hanya kunci `duh:`), daftar cache + jumlah entri, `navigator.storage.estimate()`, dan kunci asing yang hanya dilaporkan |
+| `clearAppPreferences()` | Hapus kunci `duh:` di kedua storage; kunci situs lain tidak disentuh |
+| `clearCacheStorage()` | `caches.delete()` untuk semua nama cache origin ini |
+| `unregisterServiceWorker()` | `getRegistrations()` → `unregister()` |
+| `utf8Bytes()` | Ukuran via `TextEncoder`, bukan `String.length` |
+
+Tidak ada `fetch` di modul ini maupun di halaman `#/storage`.
 
 ### 12.1 Offline mode (ADR-0013)
 

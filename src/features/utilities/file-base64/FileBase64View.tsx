@@ -66,6 +66,9 @@ export function FileBase64View({
     decodedDetected,
     decodedSize,
     previewUrl,
+    previewMode,
+    previewLimitBytes,
+    previewNote,
     downloadDecoded,
     reset,
   } = state;
@@ -196,19 +199,42 @@ export function FileBase64View({
           <Panel
             label="Pratinjau"
             footer={
-              decodedDetected
+              previewNote ??
+              (decodedDetected
                 ? `${info?.label ?? "Berkas"} · ${formatBytes(decodedSize)}`
-                : "menunggu Base64 yang valid"
+                : "menunggu Base64 yang valid")
             }
           >
-            {previewUrl && decodedDetected ? (
+            {previewMode === "inline" && previewUrl && decodedDetected ? (
               renderPreview(previewUrl, decodedDetected)
-            ) : (
+            ) : null}
+
+            {previewMode === "too-large" && decodedDetected ? (
+              <div className="file-preview-empty">
+                <p className="hint-text hint-text--tight">
+                  Berkas {decodedDetected.label} berukuran {formatBytes(decodedSize)} — di atas
+                  batas pratinjau {formatBytes(previewLimitBytes)} agar tab tetap ringan.
+                  Gunakan <strong>Unduh berkas</strong> untuk membukanya di aplikasi Anda.
+                </p>
+              </div>
+            ) : null}
+
+            {previewMode === "unsupported" && decodedDetected ? (
+              <div className="file-preview-empty">
+                <p className="hint-text hint-text--tight">
+                  Browser tidak bisa menampilkan {decodedDetected.label} di dalam halaman. Berkasnya
+                  tetap utuh — pakai <strong>Unduh berkas</strong> untuk menyimpannya.
+                </p>
+              </div>
+            ) : null}
+
+            {previewMode === "failed" ? (
               <p className="hint-text hint-text--tight file-preview-empty">
                 Tempel Base64 atau data URL di panel kiri untuk melihat pratinjau dan
-                mengunduh berkasnya.
+                mengunduh berkasnya. Pratinjau dibuat di perangkat ini dan tidak pernah
+                diunggah.
               </p>
-            )}
+            ) : null}
           </Panel>
         ) : null}
       </div>

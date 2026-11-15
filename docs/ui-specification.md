@@ -211,6 +211,43 @@ Semua satu kolom. Panel satu-input tetap satu panel; strip hasil inline berada d
 bawah isi form, `min-height` panel 180 px. Toolbar membungkus ke beberapa baris
 (`.action-group` ikut wrap) agar tombol aksi tidak perlu digulir horizontal.
 
+### Pratinjau berkas (ADR-0021)
+
+```
+┌ Pratinjau ──────────────────────────── PNG · 1.2 KB siap dipratinjau ┐
+│ ┌──────────────────────────────────────────────────────────────────┐ │
+│ │  <img class="file-preview"> — data URL lokal, max-height 52vh    │ │
+│ └──────────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+- Gambar: `.file-preview` (`object-fit: contain`, `max-height: 52vh`).
+- PDF: `.file-preview--pdf` (`<object>`, `height: 52vh`, `min-height: 320px`).
+- Keadaan `too-large`/`unsupported`/`failed` memakai `.file-preview-empty`
+  dengan satu paragraf `hint-text` di dalam panel yang sama — tidak ada panel
+  hasil tambahan dan tidak ada kotak kosong tanpa penjelasan.
+
+### Kelola penyimpanan (ADR-0022)
+
+```
+┌ Ringkasan ───────────────────────────────────────────────────────────┐
+│ Preferensi (localStorage + sessionStorage)        3 kunci · 412 B    │
+│ Cache aplikasi (offline)                          1 cache · 42 entri │
+│ Kuota penyimpanan peramban                        12.4 GB            │
+└──────────────────────────────────────────────────────────────────────┘
+┌ Bersihkan ───────────────────────────────────────────────────────────┐
+│ Hapus preferensi            Tema, opsi, tool terakhir.      [Hapus]  │
+│ Hapus cache offline         Aset build untuk offline.       [Hapus]  │
+│ Lepas service worker        Bila situs tampak versi lama.   [Lepas]  │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+- `.storage-row`: nama (+ catatan kecil) di kiri, nilai mono/short di kanan;
+  di < 640 px menumpuk vertikal.
+- Tombol memakai `aria-label` unik ("Hapus preferensi", "Hapus cache offline",
+  "Lepas service worker") agar tidak ada dua tombol bernama sama di satu halaman.
+- Hasil tindakan tampil sebagai `StatusMessage` di atas panel, maksimal tiga.
+
 ### Kontrol form (ADR-0020)
 
 Semua kontrol teks memakai satu sistem: latar `--bg-raised`, border 1 px

@@ -54,6 +54,16 @@ tetapi **hanya untuk decode** dan tidak akan pernah menerima secret/key (ADR-000
 verifikasi signature ada di tool terpisah yang hanya memakai kunci yang kamu
 tempel, tanpa JWKS dan tanpa jaringan (ADR-0018).
 
+## Penyimpanan di peramban
+
+Situs ini tidak menyimpan isi input. Yang tersimpan hanya preferensi tampilan
+(`localStorage`), penjaga reload (`sessionStorage`), dan cache aset service
+worker untuk mode offline. Semuanya bisa dilihat dan dihapus per kelompok di
+**`#/storage`** (Kelola penyimpanan) — lihat [ADR-0022](docs/adr/0022-storage-manager.md).
+
+Pratinjau gambar/PDF dibuat sebagai data URL di perangkat, bukan blob URL, agar
+tidak diblokir CSP produksi — lihat [ADR-0021](docs/adr/0021-file-preview-data-url.md).
+
 ## Menjalankan
 
 Butuh Node.js 20.19+ atau 22.12+.

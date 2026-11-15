@@ -1,12 +1,9 @@
-import { PREFERENCE_KEYS } from "@/lib/browser/storage";
+import { APP_STORAGE_KEYS, PREFERENCE_LABELS } from "@/lib/browser/storage";
 
-const PREFERENCE_LIST: ReadonlyArray<{ key: string; purpose: string }> = [
-  { key: PREFERENCE_KEYS.theme, purpose: "Pilihan tema terang/gelap/sistem." },
-  { key: PREFERENCE_KEYS.caseConverterStyle, purpose: "Gaya case terakhir yang dpilih." },
-  { key: PREFERENCE_KEYS.jsonIndent, purpose: "Preferensi indentasi JSON." },
-  { key: PREFERENCE_KEYS.xmlOptions, purpose: "Preferensi opsi XML (preserve comments)." },
-  { key: PREFERENCE_KEYS.textDiffOptions, purpose: "Preferensi opsi diff (ignore case/whitespace)." },
-];
+/** Satu sumber label dengan halaman Kelola penyimpanan (ADR-0022). */
+const PREFERENCE_LIST: ReadonlyArray<{ key: string; purpose: string }> = APP_STORAGE_KEYS.map(
+  (key) => ({ key, purpose: PREFERENCE_LABELS[key] }),
+);
 
 export function PrivacyPage() {
   return (
@@ -47,14 +44,26 @@ export function PrivacyPage() {
         </ul>
         <p>
           Semua tersimpan di <code>localStorage</code> browser Anda dan tidak pernah dikirim ke mana
-          pun. Menghapus data situs lewat pengaturan browser akan menghapus semuanya.
+          pun. Anda bisa melihat isinya lalu menghapusnya per kelompok di{" "}
+          <a href="#/storage">Kelola penyimpanan</a>; menghapus data situs lewat pengaturan browser
+          juga menghapus semuanya.
+        </p>
+
+        <h2>Cache offline</h2>
+        <p>
+          Agar situs tetap terbuka tanpa jaringan, service worker menyimpan aset build di Cache
+          Storage. Cache ini tidak memuat isi input Anda — hanya berkas aplikasi. Cache bisa dihapus
+          kapan saja dari <a href="#/storage">Kelola penyimpanan</a>.
         </p>
 
         <h2>Catatan keamanan tool</h2>
         <ul>
           <li>Encoding dan Base64 bukan enkripsi.</li>
           <li>Hash tidak dapat dibalik dan bukan enkripsi.</li>
-          <li>JWT decoder (bila tersedia kelak) hanya mendekode, bukan memverifikasi signature.</li>
+          <li>
+            JWT Decoder hanya mendekode; verifikasi signature ada di tool terpisah yang memakai kunci
+            yang Anda tempel sendiri, tanpa JWKS dan tanpa jaringan.
+          </li>
         </ul>
       </div>
     </>

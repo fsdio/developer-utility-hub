@@ -121,7 +121,15 @@ const check = async () => {
     if (/connect-src[^;]*(\*|https?:)/.test(csp[1])) {
       failures.push("CSP connect-src terlalu longgar: hanya 'self' yang diizinkan");
     }
-    console.log("✓ Meta CSP tersuntik dengan connect-src 'self'");
+    // Pratinjau berkas memakai blob URL lokal (ADR-0021); tanpa ini build
+    // produksi menampilkan pratinjau kosong walau dev server terlihat benar.
+    if (!/img-src[^;]*blob:/.test(csp[1])) {
+      failures.push("CSP img-src harus mengizinkan blob: untuk pratinjau gambar");
+    }
+    if (!/object-src[^;]*blob:/.test(csp[1])) {
+      failures.push("CSP object-src harus mengizinkan blob: untuk pratinjau PDF");
+    }
+    console.log("✓ Meta CSP tersuntik: connect-src 'self' + blob: untuk pratinjau");
   }
 
   server.close();

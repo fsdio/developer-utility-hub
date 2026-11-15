@@ -77,6 +77,7 @@ Tidak ada daftar tool kedua di tempat lain.
 | `#/tools/<tidak-dikenal>` | 404 |
 | `#/community` | Community |
 | `#/privacy` | Privacy |
+| `#/storage` | Kelola penyimpanan — lihat & hapus data situs di peramban (ADR-0022) |
 | `#/tools` | Beranda (alias) |
 
 Aturan:
@@ -123,7 +124,7 @@ Urutan blok:
    kata kunci · panah saat hover). Enam grup menurut tugas: Teks, Formatter,
    Diff, Encode & Decode, Auth & Token, Konversi.
 5. **Blok Community**: dua baris tautan (fitur/bug) + catatan bahwa keduanya lewat GitHub Issues.
-6. **Footer**: versi, tautan Privacy, lisensi MIT.
+6. **Footer**: versi, tautan Privasi · Kelola penyimpanan (`#/storage`) · Community · Repositori, lisensi MIT.
 
 Baris tool adalah `<a>` penuh di dalam `<li>` (bukan div dengan onClick) agar bisa
 dibuka di tab baru dan diakses keyboard. Hasil pencarian memakai baris yang sama,

@@ -20,6 +20,7 @@ describe("parseHash", () => {
   it("memetakan halaman statis", () => {
     expect(parseHash("#/community")).toEqual({ name: "community" });
     expect(parseHash("#/privacy")).toEqual({ name: "privacy" });
+    expect(parseHash("#/storage")).toEqual({ name: "storage" });
   });
 
   it("mengembalikan not-found untuk path tak dikenal", () => {
@@ -36,7 +37,7 @@ describe("parseHash", () => {
 
 describe("toHash", () => {
   it("bolak-balik konsisten untuk route sederhana", () => {
-    for (const hash of ["#/", "#/community", "#/privacy", "#/tools/case-converter"]) {
+    for (const hash of ["#/", "#/community", "#/privacy", "#/storage", "#/tools/case-converter"]) {
       expect(toHash(parseHash(hash))).toBe(hash);
     }
   });

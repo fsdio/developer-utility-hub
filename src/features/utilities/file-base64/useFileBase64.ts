@@ -1,14 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { Base64Variant } from "@/lib/encoding/base64";
-import { encodeBytesToBase64 } from "@/lib/encoding/base64";
+import { bytesToDataUrl, encodeBytesToBase64 } from "@/lib/encoding/base64";
 import {
+  PREVIEW_INLINE_LIMIT,
   base64ToBytes,
   decodedByteLength,
   detectFile,
   formatBytes,
+  previewModeFor,
   readBase64Source,
   type DetectedFile,
+  type PreviewMode,
 } from "@/lib/encoding/file-base64";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { baseNameOf, downloadBytes, readFileBytes } from "@/lib/browser/file-io";
 import type { ToolError } from "@/types/result";
 
@@ -47,11 +51,18 @@ export function useFileBase64({ isAccepted = () => true, rejectMessage }: UseFil
   const [variant, setVariant] = useState<Base64Variant>("standard");
   const [includeDataUrl, setIncludeDataUrl] = useState(false);
 
+  /**
+   * Teks ditunda 200 ms sebelum di-parse (PRD §6.0). Tanpa ini setiap ketikan
+   * pada Base64 besar memicu decode penuh + URL pratinjau baru, dan pratinjau
+   * berkedip hilang-timbul selama pengguna menempel/mengetik.
+   */
+  const debouncedSource = useDebouncedValue(source, 200);
+
   /** Hasil parse teks di mode decode; `null` bila kosong. */
   const parsed = useMemo(() => {
-    if (direction !== "decode" || source.trim() === "") return null;
-    return readBase64Source(source);
-  }, [direction, source]);
+    if (direction !== "decode" || debouncedSource.trim() === "") return null;
+    return readBase64Source(debouncedSource);
+  }, [direction, debouncedSource]);
 
   /** Byte hasil decode — hanya dihitung sekali per teks, saat dibutuhkan. */
   const decodedBytes = useMemo(() => {
@@ -62,22 +73,26 @@ export function useFileBase64({ isAccepted = () => true, rejectMessage }: UseFil
   const decodedDetected =
     parsed?.ok && isAccepted(parsed.value.detected) ? parsed.value.detected : null;
 
-  /** Pratinjau memakai blob URL yang selalu di-revoke saat teks berubah. */
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  useEffect(() => {
-    if (direction !== "decode" || !decodedBytes?.ok || !decodedDetected) {
-      setPreviewUrl(null);
-      return;
+  /**
+   * Pratinjau memakai **data URL**, bukan `blob:` (ADR-0021).
+   *
+   * `blob:` bergantung pada dukungan CSP di tiap peramban dan tidak bekerja
+   * saat halaman dibuka lewat `file://`; data URL selalu bisa dirender dan tetap
+   * dibuat di perangkat — tidak ada permintaan jaringan, tidak ada unggahan.
+   * Di atas `PREVIEW_INLINE_LIMIT` pratinjau ditahan dan pengguna diarahkan ke
+   * unduhan agar tab tidak kehabisan memori.
+   */
+  const previewMode: PreviewMode = previewModeFor(
+    decodedDetected,
+    decodedBytes?.ok ? decodedBytes.value.length : 0,
+  );
+
+  const previewUrl = useMemo(() => {
+    if (direction !== "decode" || previewMode !== "inline" || !decodedBytes?.ok || !decodedDetected) {
+      return null;
     }
-    const blob = new Blob([decodedBytes.value.slice().buffer], { type: decodedDetected.mime });
-    const url = URL.createObjectURL(blob);
-    setPreviewUrl(url);
-    // Konfirmasi singkat: isi, ukuran, dan bahwa berkas siap diunduh.
-    setStatus(
-      `${decodedDetected.label} ${formatBytes(decodedBytes.value.length)} siap diunduh.`,
-    );
-    return () => URL.revokeObjectURL(url);
-  }, [direction, decodedBytes, decodedDetected]);
+    return bytesToDataUrl(decodedBytes.value, decodedDetected.mime);
+  }, [direction, decodedBytes, decodedDetected, previewMode]);
 
   /** Teks yang ditampilkan di form: Base64, atau data URL lengkap bila diminta. */
   const displayText = useMemo(() => {
@@ -168,6 +183,18 @@ export function useFileBase64({ isAccepted = () => true, rejectMessage }: UseFil
     decodedDetected,
     decodedSize: decodedDetected ? (decodedBytes?.ok ? decodedBytes.value.length : 0) : decodedByteLength(source),
     previewUrl,
+    previewMode,
+    previewLimitBytes: PREVIEW_INLINE_LIMIT,
+    /** Konfirmasi ringkas untuk footer panel pratinjau. */
+    previewNote: decodedDetected
+      ? previewMode === "inline"
+        ? `${decodedDetected.label} ${formatBytes(decodedBytes?.ok ? decodedBytes.value.length : 0)} siap dipratinjau & diunduh.`
+        : previewMode === "too-large"
+          ? `${decodedDetected.label} ${formatBytes(decodedBytes?.ok ? decodedBytes.value.length : 0)} melebihi batas pratinjau ${formatBytes(PREVIEW_INLINE_LIMIT)} — unduh untuk membukanya.`
+          : previewMode === "unsupported"
+            ? `${decodedDetected.label} tidak bisa dipratinjau di browser — unduh untuk membukanya.`
+            : "Berkas belum bisa dibaca."
+      : null,
     downloadDecoded,
     reset,
   };

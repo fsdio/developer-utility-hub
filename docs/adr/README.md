@@ -25,5 +25,7 @@ yang sebelumnya terbuka di blueprint (§14) dan tidak boleh dibuka kembali tanpa
 | [0018](0018-auth-tools-jwt-verify-basic-and-api-key.md) | Tool auth: verifikasi JWT, Basic Auth, generator API key | Accepted | §3.4 |
 | [0019](0019-catalog-list-and-task-grouping.md) | Katalog berbentuk daftar + enam kategori menurut tugas (menggantikan kartu di 0010) | Accepted | §15, IA §1 |
 | [0020](0020-form-control-system.md) | Satu sistem kontrol form: normalisasi CSS + `TextField`/`TextAreaField`/`SelectField` | Accepted | ui-spec |
+| [0021](0021-file-preview-data-url.md) | Pratinjau berkas: data URL lokal, batas 8 MB, CSP `blob:` | Accepted | §12.2 |
+| [0022](0022-storage-manager.md) | Halaman Kelola penyimpanan: lihat & hapus data situs per kelompok | Accepted | §11, §12 |
 
 Format ADR: Konteks → Keputusan → Konsekuensi → Alternatif yang ditolak.

@@ -20,13 +20,20 @@ const CSP = [
   "default-src 'self'",
   "script-src 'self'",
   "style-src 'self'",
-  "img-src 'self' data:",
+  // Pratinjau gambar/PDF memakai `blob:` dari `URL.createObjectURL` — tetap
+  // dibuat di perangkat, tidak ada permintaan jaringan (ADR-0021). Tanpa
+  // `blob:` di sini, build produksi menampilkan kotak pratinjau kosong
+  // sementara dev server terlihat normal (CSP hanya disuntik saat build).
+  "img-src 'self' data: blob:",
+  "media-src 'self' blob:",
   "font-src 'self'",
   // `connect-src 'self'` (bukan 'none'): satu-satunya permintaan jaringan sah
   // adalah `version.json` milik origin ini untuk cek versi (ADR-0013 §12.1).
   // 'none' akan memblokir cek versi sehingga build baru tak pernah terdeteksi.
   "connect-src 'self'",
-  "object-src 'none'",
+  // `object-src` hanya untuk pratinjau PDF (`<object data="blob:…">`) yang
+  // dirender penampil bawaan browser; tetap lokal, tanpa origin luar.
+  "object-src 'self' blob:",
   "base-uri 'none'",
   "form-action 'none'",
 ].join("; ");
