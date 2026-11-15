@@ -21,6 +21,9 @@ import JwtPage from "@/features/utilities/jwt/JwtPage";
 import JwtVerifyPage from "@/features/utilities/jwt-verify/JwtVerifyPage";
 import BasicAuthPage from "@/features/utilities/basic-auth/BasicAuthPage";
 import ApiKeyPage from "@/features/utilities/api-key/ApiKeyPage";
+import ImageBase64Page from "@/features/utilities/image-base64/ImageBase64Page";
+import PdfBase64Page from "@/features/utilities/pdf-base64/PdfBase64Page";
+import { StoragePage } from "@/features/storage/StoragePage";
 import { AppShell } from "@/components/layout/AppShell";
 
 const pages: Array<[string, () => React.ReactElement]> = [
@@ -43,6 +46,9 @@ const pages: Array<[string, () => React.ReactElement]> = [
   ["jwt verify", () => <JwtVerifyPage />],
   ["basic auth", () => <BasicAuthPage />],
   ["api key", () => <ApiKeyPage />],
+  ["image base64", () => <ImageBase64Page />],
+  ["pdf base64", () => <PdfBase64Page />],
+  ["kelola penyimpanan", () => <StoragePage />],
 ];
 
 describe("aksesibilitas (axe)", () => {

@@ -8,6 +8,7 @@ export type RouteName =
   | "tool"
   | "community"
   | "privacy"
+  | "storage"
   | "not-found";
 
 export interface Route {
@@ -23,6 +24,7 @@ const KNOWN_SIMPLE: Record<string, RouteName> = {
   "/tools": "home",
   "/community": "community",
   "/privacy": "privacy",
+  "/storage": "storage",
 };
 
 export function parseHash(hash: string): Route {
@@ -58,6 +60,8 @@ export function toHash(route: Route): string {
       return "#/community";
     case "privacy":
       return "#/privacy";
+    case "storage":
+      return "#/storage";
     default:
       return "#/";
   }

@@ -20,6 +20,33 @@ export const MAX_FILE_BYTES = 20 * 1024 * 1024;
 /** Batas panjang teks Base64 yang boleh ditempel (≈ 15 MB berkas asal). */
 export const MAX_BASE64_LENGTH = 20 * 1024 * 1024;
 
+/**
+ * Batas ukuran pratinjau inline (ADR-0021). Di atas ini, data URL di dalam DOM
+ * membuat halaman berat dan bisa membuat tab kehabisan memori; unduhan tetap
+ * berfungsi.
+ */
+export const PREVIEW_INLINE_LIMIT = 8 * 1024 * 1024;
+
+export type PreviewMode = "inline" | "too-large" | "unsupported" | "failed";
+
+/**
+ * Memilih cara pratinjau sebuah berkas hasil decode.
+ *
+ * - `inline`      → byte aman ditampilkan sebagai data URL di dalam panel.
+ * - `too-large`   → berkas besar: tampilkan ukuran + tombol unduh saja.
+ * - `unsupported` → jenis yang tidak bisa dirender browser (mis. font).
+ * - `failed`      → decode gagal; tidak ada yang bisa ditampilkan.
+ */
+export function previewModeFor(
+  detected: DetectedFile | null,
+  byteLength: number,
+): PreviewMode {
+  if (detected === null) return "failed";
+  if (detected.kind !== "image" && detected.kind !== "pdf") return "unsupported";
+  if (byteLength > PREVIEW_INLINE_LIMIT) return "too-large";
+  return "inline";
+}
+
 export type FileKind = "image" | "pdf" | "font" | "unknown";
 
 export interface DetectedFile {
@@ -206,6 +233,9 @@ const MIME_TABLE: ReadonlyArray<[RegExp, DetectedFile]> = [
   [/^image\/bmp$/, { kind: "image", mime: "image/bmp", extension: "bmp", label: "BMP" }],
   [/^image\/avif$/, { kind: "image", mime: "image/avif", extension: "avif", label: "AVIF" }],
   [/^application\/pdf$/, { kind: "pdf", mime: "application/pdf", extension: "pdf", label: "PDF" }],
+  // data URL yang mengaku RIFF/WEBP harus tetap dikenali sebagai gambar.
+  [/^image\/(x-)?(webp|avif|bmp)$/, { kind: "image", mime: "image/webp", extension: "webp", label: "WEBP" }],
+  [/^image\/(x-)?icon$/, { kind: "image", mime: "image/x-icon", extension: "ico", label: "ICO" }],
   [/^font\/woff2$/, { kind: "font", mime: "font/woff2", extension: "woff2", label: "WOFF2" }],
   [/^font\/woff$/, { kind: "font", mime: "font/woff", extension: "woff", label: "WOFF" }],
   [/^text\/plain$/, { kind: "unknown", mime: "text/plain", extension: "txt", label: "Teks" }],

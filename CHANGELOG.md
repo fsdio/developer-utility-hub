@@ -5,6 +5,34 @@ dan [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Unreleased]
 
+### Fixed — pratinjau berkas tidak muncul di build produksi (ADR-0021)
+
+- Pratinjau **Gambar ⇄ Base64** dan **PDF ⇄ Base64** kini memakai **data URL**
+  yang dibuat di perangkat, bukan `URL.createObjectURL`. Penyebab pratinjau
+  kosong: meta CSP produksi hanya mengizinkan `img-src 'self' data:` dan
+  `object-src 'none'`, sehingga blob URL diblokir — dan CSP hanya disuntik saat
+  build, jadi dev server terlihat normal.
+- Panel pratinjau punya tiga keadaan yang dijelaskan: `too-large` (> 8 MB,
+  unduh saja), `unsupported` (jenis yang tak bisa dirender), dan `failed`
+  (belum ada Base64 valid) — tidak ada lagi kotak kosong tanpa alasan.
+- Parse & pratinjau ditunda 200 ms (`useDebouncedValue`) sehingga menempel
+  Base64 besar tidak membuat pratinjau berkedip.
+- `scripts/preview-check.mjs` menggagalkan build bila CSP tidak mengizinkan
+  `blob:` untuk pratinjau.
+
+### Added — halaman Kelola penyimpanan (ADR-0022)
+
+- Rute baru **`#/storage`** (tautan di footer): ringkasan pemakaian & kuota,
+  daftar kunci `duh:` beserta ukuran byte UTF-8 dan cuplikan nilai, plus tiga
+  tindakan terpisah — hapus preferensi, hapus cache offline, lepas service
+  worker.
+- Penghapusan hanya menyentuh kunci berawalan `duh:`; kunci situs lain di origin
+  yang sama hanya dihitung, tidak dihapus.
+- `src/lib/browser/storage-report.ts` (laporan + pembersihan, tanpa `fetch`) dan
+  label kunci bersama `PREFERENCE_LABELS`.
+- Halaman Privasi kini mendaftar **semua** kunci preferensi (sebelumnya 5 dari 7)
+  dan menjelaskan Cache Storage, dengan tautan ke Kelola penyimpanan.
+
 ### Added — tool autentikasi (ADR-0018)
 
 - **JWT Verifier** (`#/tools/jwt-verify`): decode + verifikasi signature dengan

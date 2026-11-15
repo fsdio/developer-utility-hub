@@ -6,6 +6,7 @@ import { useHashRoute } from "@/hooks/useHashRoute";
 import { HomePage } from "@/features/home/HomePage";
 import { CommunityPage } from "@/features/community/CommunityPage";
 import { PrivacyPage } from "@/features/privacy/PrivacyPage";
+import { StoragePage } from "@/features/storage/StoragePage";
 import { NotFoundPage } from "@/features/not-found/NotFoundPage";
 import { getTool } from "@/registry/tools";
 
@@ -20,6 +21,7 @@ export function App() {
       home: SITE,
       community: `Community · ${SITE}`,
       privacy: `Privasi · ${SITE}`,
+      storage: `Kelola penyimpanan · ${SITE}`,
       "not-found": `Halaman tidak ditemukan · ${SITE}`,
     };
     document.title = toolName ? `${toolName} · ${SITE}` : titles[route.name] ?? SITE;
@@ -36,6 +38,8 @@ export function App() {
         return <CommunityPage />;
       case "privacy":
         return <PrivacyPage />;
+      case "storage":
+        return <StoragePage />;
       case "tool":
         return <ToolHost id={route.id ?? ""} />;
       default:

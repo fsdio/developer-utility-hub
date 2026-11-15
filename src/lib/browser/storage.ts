@@ -18,6 +18,23 @@ export const PREFERENCE_KEYS = {
 
 export type PreferenceKey = (typeof PREFERENCE_KEYS)[keyof typeof PREFERENCE_KEYS];
 
+/**
+ * Nama manusia untuk setiap kunci (ADR-0022). Dipakai halaman Privasi dan
+ * halaman Kelola penyimpanan agar keduanya tidak pernah berbeda istilah.
+ */
+export const PREFERENCE_LABELS: Record<PreferenceKey, string> = {
+  [PREFERENCE_KEYS.theme]: "Tema terang/gelap/sistem",
+  [PREFERENCE_KEYS.caseConverterStyle]: "Gaya Case Converter terakhir",
+  [PREFERENCE_KEYS.jsonIndent]: "Indentasi JSON Formatter",
+  [PREFERENCE_KEYS.xmlOptions]: "Opsi XML Formatter",
+  [PREFERENCE_KEYS.textDiffOptions]: "Opsi Text Diff",
+  [PREFERENCE_KEYS.recentTools]: "Tool yang terakhir dibuka (id saja)",
+  [PREFERENCE_KEYS.buildVersion]: "ID build untuk mode offline",
+};
+
+/** Semua kunci yang ditulis aplikasi ini; dipakai juga saat membersihkan. */
+export const APP_STORAGE_KEYS = Object.values(PREFERENCE_KEYS) as readonly PreferenceKey[];
+
 const memory = new Map<string, string>();
 
 function safeStorage(): Storage | null {

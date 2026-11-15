@@ -51,7 +51,10 @@ describe("PdfBase64Page — PDF ⇄ Base64", () => {
     const preview = document.querySelector("object.file-preview--pdf");
     expect(preview).not.toBeNull();
     expect(preview?.getAttribute("type")).toBe("application/pdf");
-    expect(screen.getByText(/PDF .* siap diunduh/i)).toBeInTheDocument();
+    // Footer panel pratinjau menyebut kesiapan tanpa menunggu aksi lain.
+    expect(screen.getByText(/PDF .* siap dipratinjau & diunduh/i)).toBeInTheDocument();
+    // Diagram pratinjau memakai data URL (ADR-0021): tetap lokal, tanpa blob/net.
+    expect(preview?.getAttribute("data")?.startsWith("data:application/pdf;base64,")).toBe(true);
   });
 
   it("tombol unduh memakai createObjectURL dan mengunduh berkas PDF", async () => {

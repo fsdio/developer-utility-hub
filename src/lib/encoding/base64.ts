@@ -62,6 +62,19 @@ const wrapText = (text: string): string => {
  * Encode byte mentah (mis. isi berkas gambar/PDF) — dipakai Base64 berkas.
  * Fungsi murni: tidak menyentuh DOM maupun File API.
  */
+/**
+ * Base64 → data URL (ADR-0021).
+ *
+ * Data URL adalah jalur pratinjau yang paling aman: `blob:` butuh dukungan CSP
+ * di setiap peramban, sedangkan data URL sudah diizinkan `img-src` dan bekerja
+ * juga ketika halaman dibuka lewat `file://`. SVG sengaja ditandai agar tidak
+ * menjalankan script saat dirender sebagai gambar.
+ */
+export function bytesToDataUrl(bytes: Uint8Array, mime: string): string {
+  const safeMime = mime === "image/svg+xml" ? "image/svg+xml;charset=utf-8" : mime;
+  return `data:${safeMime || "application/octet-stream"};base64,${bytesToBase64(bytes)}`;
+}
+
 export function encodeBytesToBase64(
   bytes: Uint8Array,
   options: Base64Options = {},
